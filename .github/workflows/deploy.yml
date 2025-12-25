@@ -33,6 +33,23 @@ jobs:
       - name: Build the site
         run: mise run build
 
+      - name: Clone sentinel repo for docs
+        run: git clone --depth 1 https://github.com/raskell-io/sentinel.git /tmp/sentinel
+
+      - name: Install mdBook
+        run: |
+          curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.40/mdbook-v0.4.40-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+          chmod +x mdbook
+          sudo mv mdbook /usr/local/bin/
+
+      - name: Build docs
+        run: |
+          cd /tmp/sentinel/book
+          mdbook build
+
+      - name: Copy docs to public
+        run: cp -r /tmp/sentinel/book/book ./public/docs
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
