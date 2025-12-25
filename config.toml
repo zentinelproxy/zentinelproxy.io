@@ -47,7 +47,7 @@ index_format = "elasticlunr_json"
 author = "raskell.io"
 github_repo = "https://github.com/raskell-io/sentinel"
 docs_url = "https://sentinel.raskell.io/docs/"
-docs_external_url = "https://raskell-io.github.io/sentinel/"
+docs_external_url = "/docs/"
 
 # Social links
 github = "https://github.com/raskell-io/sentinel"
@@ -56,6 +56,6 @@ github = "https://github.com/raskell-io/sentinel"
 nav_links = [
     { name = "Features", url = "#features" },
     { name = "Agents", url = "/agents/" },
-    { name = "Docs", url = "https://raskell-io.github.io/sentinel/" },
+    { name = "Docs", url = "/docs/" },
     { name = "GitHub", url = "https://github.com/raskell-io/sentinel" },
 ]
