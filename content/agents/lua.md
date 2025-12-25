@@ -11,15 +11,15 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Beta"
-version = "25.12.0"
-license = "MIT OR Apache-2.0"
+version = "0.1.0"
+license = "MIT"
 repo = "https://github.com/raskell-io/sentinel-agent-lua"
 homepage = "https://sentinel.raskell.io/agents/lua/"
 protocol_version = "0.1"
 
 # Installation methods
 crate_name = "sentinel-agent-lua"
-docker_image = "ghcr.io/raskell-io/sentinel-agent-lua"
+docker_image = ""
 
 # Compatibility
 min_sentinel_version = "25.12.0"

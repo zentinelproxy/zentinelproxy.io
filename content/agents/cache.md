@@ -11,8 +11,8 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Planned"
-version = "-"
-license = "MIT OR Apache-2.0"
+version = ""
+license = "MIT"
 repo = "https://github.com/raskell-io/sentinel"
 protocol_version = "0.1"
 

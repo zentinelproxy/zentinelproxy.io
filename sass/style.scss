@@ -385,7 +385,8 @@ img {
 // ============================================
 .hero {
     padding: var(--space-3xl) 0;
-    overflow: hidden;
+    position: relative;
+    z-index: 10;
 
     .container {
         display: grid;
@@ -503,6 +504,7 @@ img {
 
 .install-selector {
     position: relative;
+    z-index: 100;
 }
 
 .install-toggle {
@@ -542,7 +544,7 @@ img {
     position: absolute;
     top: calc(100% + var(--space-xs));
     left: 0;
-    min-width: 140px;
+    min-width: 180px;
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -573,6 +575,7 @@ img {
     font-size: 0.875rem;
     cursor: pointer;
     transition: all var(--transition-fast);
+    white-space: nowrap;
 
     &:first-child {
         border-radius: var(--radius-md) var(--radius-md) 0 0;
@@ -1010,29 +1013,80 @@ img {
     padding: 0 0 var(--space-3xl);
 }
 
+.agents-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    max-width: 400px;
+    margin: 0 auto var(--space-2xl);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+
+    &:focus-within {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+    }
+
+    svg {
+        color: var(--color-text-muted);
+        flex-shrink: 0;
+    }
+
+    input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: var(--color-text);
+        font-size: 0.9375rem;
+        outline: none;
+
+        &::placeholder {
+            color: var(--color-text-subtle);
+        }
+    }
+}
+
 .agents-category {
     margin-bottom: var(--space-3xl);
 
-    &:last-child {
+    &:last-of-type {
         margin-bottom: 0;
+    }
+
+    &[open] .chevron {
+        transform: rotate(180deg);
     }
 }
 
 .category-header {
-    margin-bottom: var(--space-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
     border-bottom: 1px solid var(--color-border-subtle);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
 
     h2 {
         font-size: 1.25rem;
         font-weight: 600;
+        margin: 0;
     }
+}
 
-    p {
-        color: var(--color-text-muted);
-        font-size: 0.9375rem;
-        margin-top: var(--space-xs);
-    }
+.category-description {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    margin: 0 0 var(--space-lg);
 }
 
 .category-title {
@@ -1044,6 +1098,25 @@ img {
     svg {
         color: var(--color-primary);
     }
+}
+
+.category-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.agent-count {
+    font-size: 0.8125rem;
+    color: var(--color-text-subtle);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+}
+
+.chevron {
+    color: var(--color-text-muted);
+    transition: transform var(--transition-base);
 }
 
 .agents-grid {
@@ -1171,6 +1244,58 @@ img {
     flex-shrink: 0;
 }
 
+// Submit Your Agent card
+.agent-card-submit {
+    border-style: dashed;
+    border-color: var(--color-border);
+    background: transparent;
+
+    &:hover {
+        border-color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 3%, transparent);
+    }
+}
+
+.submit-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    min-height: 180px;
+    gap: var(--space-md);
+}
+
+.submit-card-icon {
+    color: var(--color-text-subtle);
+    opacity: 0.6;
+
+    .agent-card-submit:hover & {
+        color: var(--color-primary);
+        opacity: 1;
+    }
+}
+
+.agent-card-submit .agent-name {
+    margin: 0;
+    color: var(--color-text-muted);
+
+    .agent-card-submit:hover & {
+        color: var(--color-text);
+    }
+}
+
+.agent-card-submit .agent-description {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.btn-sm {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.8125rem;
+}
+
 .agent-version {
     font-size: 0.75rem;
     font-family: var(--font-mono);
@@ -1207,54 +1332,64 @@ img {
     }
 }
 
-// Create Agent CTA Section
-.create-agent-cta {
-    display: flex;
-    gap: var(--space-xl);
-    padding: var(--space-xl);
+// Create Agent CTA Section - Collapsible
+.create-agent-details {
     margin-top: var(--space-3xl);
-    background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-
-    @media (max-width: 768px) {
-        flex-direction: column;
-        text-align: center;
-    }
+    background: var(--color-bg);
 }
 
-.create-agent-cta .cta-icon {
+.create-agent-summary {
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-    background: var(--color-bg-elevated);
-    border-radius: var(--radius-md);
-    color: var(--color-primary);
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-xl);
+    cursor: pointer;
+    list-style: none;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: background var(--transition-fast);
 
-    svg {
-        margin-top: var(--space-md);
+    &::-webkit-details-marker {
+        display: none;
     }
 
-    @media (max-width: 768px) {
-        margin: 0 auto;
+    &:hover {
+        background: var(--color-bg-elevated);
+    }
+
+    > svg:first-child {
+        color: var(--color-primary);
+        flex-shrink: 0;
+    }
+
+    > span {
+        flex: 1;
+    }
+
+    .chevron {
+        color: var(--color-text-muted);
+        transition: transform var(--transition-fast);
+        flex-shrink: 0;
     }
 }
 
-.create-agent-cta .cta-content {
-    flex: 1;
+.create-agent-details[open] .chevron {
+    transform: rotate(180deg);
+}
 
-    h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: var(--space-sm);
-    }
+.create-agent-content {
+    padding: 0 var(--space-xl) var(--space-xl);
 
     > p {
         color: var(--color-text-muted);
         margin-bottom: var(--space-lg);
+
+        a {
+            color: var(--color-primary);
+        }
     }
 }
 
