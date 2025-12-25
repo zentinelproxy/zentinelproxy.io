@@ -694,6 +694,49 @@ img {
     }
 }
 
+// Hero Animation (animated AVIF)
+.hero-animation {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    z-index: 1;
+    border-radius: var(--radius-lg);
+    // Left-side fade using CSS mask - works with any background
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.3) 10%,
+        rgba(0, 0, 0, 0.7) 20%,
+        black 35%,
+        black 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.3) 10%,
+        rgba(0, 0, 0, 0.7) 20%,
+        black 35%,
+        black 100%
+    );
+
+    @media (max-width: 768px) {
+        max-width: 280px;
+        // On mobile, less aggressive fade
+        mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 15%,
+            black 100%
+        );
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 15%,
+            black 100%
+        );
+    }
+}
+
 // ============================================
 // Why Sentinel Section
 // ============================================
@@ -929,6 +972,57 @@ img {
 
     p {
         color: var(--color-text-muted);
+    }
+}
+
+// Footer Mascot with floating animation
+.footer-mascot-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+
+.footer-mascot-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-primary);
+    filter: blur(24px);
+    opacity: 0.35;
+    border-radius: 50%;
+    animation: footer-pulse 4s ease-in-out infinite;
+}
+
+@keyframes footer-pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.35;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 0.5;
+    }
+}
+
+.footer-mascot {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    z-index: 1;
+    filter: drop-shadow(var(--shadow-md));
+    animation: footer-float 5s ease-in-out infinite;
+}
+
+@keyframes footer-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
     }
 }
 
