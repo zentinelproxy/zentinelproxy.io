@@ -384,13 +384,19 @@ upstreams {
 }`;
 
     if (selectedAgents.length > 0) {
-        configCode += '\n\nagents {';
+        configCode += `
+
+agents {`;
         selectedAgents.forEach(agent => {
-            configCode += '\n    ' + agentConfigs[agent].config;
+            configCode += `
+    ` + agentConfigs[agent].config;
         });
-        configCode += '\n}';
+        configCode += `
+}`;
     } else {
-        configCode += '\n\n// No agents configured';
+        configCode += `
+
+// No agents configured`;
     }
 
     document.querySelector('#config-code code').textContent = configCode;
