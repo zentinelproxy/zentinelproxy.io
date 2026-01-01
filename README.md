@@ -1,75 +1,45 @@
 # sentinel.raskell.io
 
-Landing page and agent registry for [Sentinel](https://github.com/raskell-io/sentinel), a security-first reverse proxy based on Pingora.
+Marketing site and agent registry for [Sentinel](https://github.com/raskell-io/sentinel).
 
-## Tech Stack
+**Live:** https://sentinel.raskell.io
 
-- [Zola](https://www.getzola.org/) - Static site generator
-- [mise](https://mise.jdx.dev/) - Task runner and tool versioning
-- [Catppuccin](https://catppuccin.com/) - Color palette inspiration
-- [Geist](https://vercel.com/font) - Typeface
-
-## Development
-
-### Prerequisites
-
-Install mise following the [official guide](https://mise.jdx.dev/getting-started.html).
-
-### Setup
+## Quick Start
 
 ```bash
-# Install tools (Zola)
+# Install tools
 mise install
 
-# Start development server
+# Start dev server
 mise run serve
 ```
 
-The site will be available at `http://127.0.0.1:1111`.
+Visit http://127.0.0.1:1111
 
-### Build
+## Tasks
 
-```bash
-# Build for production
-mise run build
-```
+| Task | Description |
+|------|-------------|
+| `mise run serve` | Dev server with live reload |
+| `mise run build` | Build for production |
+| `mise run convert-images` | Convert images to AVIF |
 
-Output is generated in the `public/` directory.
-
-### Image Optimization
-
-Convert PNG/JPG images to AVIF format:
-
-```bash
-mise run convert-images
-```
-
-Requires ImageMagick (`brew install imagemagick`).
-
-## Project Structure
+## Structure
 
 ```
 sentinel.raskell.io/
 ├── config.toml          # Zola configuration
-├── mise.toml            # mise tasks and tools
 ├── content/
 │   ├── _index.md        # Homepage
-│   └── agents/          # Agent registry
-├── sass/
-│   └── style.scss       # Styles (Catppuccin theme)
-├── static/
-│   ├── favicon.svg
-│   └── img/
-└── templates/
-    ├── base.html        # Base layout
-    ├── index.html       # Homepage template
-    ├── agents.html      # Agent list template
-    └── agent.html       # Individual agent template
+│   └── agents/          # Agent registry pages
+├── sass/style.scss      # Styles (Catppuccin palette)
+├── static/              # Images, fonts, favicon
+└── templates/           # Zola templates
 ```
 
 ## Adding Agents
 
-Create a new markdown file in `content/agents/`:
+Create `content/agents/your-agent.md`:
 
 ```markdown
 +++
@@ -77,29 +47,30 @@ title = "Agent Name"
 description = "Short description"
 template = "agent.html"
 
-[taxonomies]
-tags = ["security", "auth"]
-
 [extra]
-official = false  # true for Sentinel Core Team agents
+official = false
 author = "Your Name"
-status = "Stable"  # Stable, Experimental, or Deprecated
+status = "Stable"
 version = "1.0.0"
 repo = "https://github.com/..."
 +++
 
-Agent documentation content here...
+Documentation content...
 ```
 
-The registry page displays official and community agents in separate sections.
+## Tech Stack
 
-## Deployment
+- [Zola](https://www.getzola.org/) — Static site generator
+- [mise](https://mise.jdx.dev/) — Task runner
+- [Catppuccin](https://catppuccin.com/) — Color palette
+- [Geist](https://vercel.com/font) — Typeface
 
-The site is designed for deployment to Cloudflare Pages at `sentinel.raskell.io`.
+## Related
 
-Build command: `mise run build`
-Output directory: `public`
+- [sentinel](https://github.com/raskell-io/sentinel) — Main repository
+- [sentinel.raskell.io-docs](https://github.com/raskell-io/sentinel.raskell.io-docs) — Documentation site
+- [Discussions](https://github.com/raskell-io/sentinel/discussions) — Questions and ideas
 
 ## License
 
-MIT - see [LICENSE](./LICENSE)
+MIT
