@@ -49,6 +49,10 @@ github_repo = "https://github.com/raskell-io/sentinel"
 docs_url = "https://sentinel.raskell.io/docs/"
 docs_external_url = "/docs/"
 
+# SEO metadata
+keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, sleepable ops, agents"
+# twitter_handle = "@raskell_io"  # Uncomment when Twitter handle is available
+
 # Social links
 github = "https://github.com/raskell-io/sentinel"
 

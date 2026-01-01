@@ -1,27 +1,66 @@
 <!DOCTYPE html>
-<html lang="{{ lang | default(value='en') }}" data-theme="auto">
+<html lang="{{ lang | default(value='en') }}" prefix="og: https://ogp.me/ns#" data-theme="auto">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+
+    <!-- Primary Meta Tags -->
+    <title>{% block title %}{{ config.title }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+    {% if page.taxonomies.tags %}
+    <meta name="keywords" content="{{ page.taxonomies.tags | join(sep=', ') }}">
+    {% elif section.extra.keywords %}
+    <meta name="keywords" content="{{ section.extra.keywords }}">
+    {% elif config.extra.keywords %}
+    <meta name="keywords" content="{{ config.extra.keywords }}">
+    {% endif %}
     <meta name="author" content="{{ config.extra.author }}">
 
+    <!-- Search Engine Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+    <!-- Canonical URL -->
+    {% if current_url %}
+    <link rel="canonical" href="{{ current_url | safe }}">
+    {% else %}
+    <link rel="canonical" href="{{ config.base_url | safe }}">
+    {% endif %}
+
     <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ current_url | default(value=config.base_url) }}">
+    <meta property="og:type" content="{% if page %}article{% else %}website{% endif %}">
+    <meta property="og:url" content="{{ current_url | default(value=config.base_url) | safe }}">
     <meta property="og:title" content="{% block og_title %}{{ config.title }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ config.description }}{% endblock %}">
     <meta property="og:image" content="{{ get_url(path='img/og-image.png') | safe }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{% block og_image_alt %}{{ config.title }} - {{ config.description }}{% endblock %}">
+    <meta property="og:site_name" content="{{ config.title }}">
+    <meta property="og:locale" content="{{ lang | default(value='en') | replace(from='-', to='_') }}">
+    {% if page.date %}
+    <meta property="article:published_time" content="{{ page.date | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00">
+    {% endif %}
+    {% if page.updated %}
+    <meta property="article:modified_time" content="{{ page.updated | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00">
+    {% endif %}
+    {% if page.taxonomies.tags %}
+    {% for tag in page.taxonomies.tags %}
+    <meta property="article:tag" content="{{ tag }}">
+    {% endfor %}
+    {% endif %}
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ current_url | default(value=config.base_url) | safe }}">
     <meta name="twitter:title" content="{% block twitter_title %}{{ config.title }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}{{ config.description }}{% endblock %}">
     <meta name="twitter:image" content="{{ get_url(path='img/og-image.png') | safe }}">
-
-    <title>{% block title %}{{ config.title }}{% endblock %}</title>
+    <meta name="twitter:image:alt" content="{% block twitter_image_alt %}{{ config.title }} - {{ config.description }}{% endblock %}">
+    {% if config.extra.twitter_handle %}
+    <meta name="twitter:site" content="{{ config.extra.twitter_handle }}">
+    {% endif %}
 
     <!-- Preload fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,8 +71,11 @@
     <link rel="stylesheet" href="{{ get_url(path='style.css') | safe }}">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ get_url(path='favicon.png') | safe }}">
-    <link rel="apple-touch-icon" href="{{ get_url(path='apple-touch-icon.png') | safe }}">
+    <link rel="icon" href="{{ get_url(path='favicon.ico') | safe }}" sizes="48x48">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ get_url(path='favicon.png') | safe }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ get_url(path='icon-192.png') | safe }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ get_url(path='apple-touch-icon.png') | safe }}">
+    <link rel="manifest" href="{{ get_url(path='site.webmanifest') | safe }}">
 
     <!-- Theme detection script - runs before paint -->
     <script>
@@ -48,13 +90,101 @@
     <!-- Feed -->
     <link rel="alternate" type="application/atom+xml" title="Sentinel Feed" href="{{ get_url(path='atom.xml') | safe }}">
 
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": "{{ config.base_url | safe }}/#website",
+                "url": "{{ config.base_url | safe }}",
+                "name": "{{ config.title }}",
+                "description": "{{ config.description }}",
+                "publisher": {
+                    "@id": "{{ config.base_url | safe }}/#organization"
+                },
+                "inLanguage": "{{ lang | default(value='en') }}"
+            },
+            {
+                "@type": "Organization",
+                "@id": "{{ config.base_url | safe }}/#organization",
+                "name": "{{ config.extra.author }}",
+                "url": "{{ config.base_url | safe }}",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "{{ get_url(path='img/og-image.png') | safe }}",
+                    "width": 1200,
+                    "height": 630
+                }
+            },
+            {
+                "@type": "WebPage",
+                "@id": "{{ current_url | default(value=config.base_url) | safe }}/#webpage",
+                "url": "{{ current_url | default(value=config.base_url) | safe }}",
+                "name": "{% block jsonld_title %}{{ config.title }}{% endblock %}",
+                "description": "{% block jsonld_description %}{{ config.description }}{% endblock %}",
+                "isPartOf": {
+                    "@id": "{{ config.base_url | safe }}/#website"
+                },
+                "inLanguage": "{{ lang | default(value='en') }}"
+                {% if page.date %},
+                "datePublished": "{{ page.date | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00"
+                {% endif %}
+                {% if page.updated %},
+                "dateModified": "{{ page.updated | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00"
+                {% endif %}
+            }
+            {% if page %},
+            {
+                "@type": "Article",
+                "@id": "{{ current_url | safe }}/#article",
+                "headline": "{{ page.title }}",
+                "description": "{{ page.description | default(value=config.description) }}",
+                "url": "{{ current_url | safe }}",
+                "isPartOf": {
+                    "@id": "{{ current_url | safe }}/#webpage"
+                },
+                "mainEntityOfPage": {
+                    "@id": "{{ current_url | safe }}/#webpage"
+                },
+                "inLanguage": "{{ lang | default(value='en') }}",
+                "author": {
+                    "@type": "Organization",
+                    "@id": "{{ config.base_url | safe }}/#organization"
+                },
+                "publisher": {
+                    "@id": "{{ config.base_url | safe }}/#organization"
+                }
+                {% if page.date %},
+                "datePublished": "{{ page.date | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00"
+                {% endif %}
+                {% if page.updated %},
+                "dateModified": "{{ page.updated | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00"
+                {% endif %}
+                {% if page.taxonomies.tags %},
+                "keywords": "{{ page.taxonomies.tags | join(sep=', ') }}"
+                {% endif %}
+                {% if page.word_count %},
+                "wordCount": {{ page.word_count }}
+                {% endif %}
+            }
+            {% endif %}
+            {% block jsonld_breadcrumb %}{% endblock %}
+        ]
+    }
+    </script>
+
     {% block head %}{% endblock %}
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <div class="layout">
-        <header class="header">
+        <header class="header" role="banner">
             <div class="container">
-                <nav class="nav">
+                <nav class="nav" role="navigation" aria-label="Main navigation">
                     <a href="{{ get_url(path='/') }}" class="logo" aria-label="Sentinel Home">
                         <img src="{{ get_url(path='img/sentinel-mascot.avif') | safe }}" alt="Sentinel" class="logo-img">
                         <span class="logo-text">Sentinel</span>
@@ -65,53 +195,54 @@
                             {{ link.name }}
                         </a>
                         {% endfor %}
-                        <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
-                            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <button class="theme-toggle" aria-label="Toggle theme" aria-live="polite" onclick="toggleTheme()">
+                            <svg class="icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                            <svg class="icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            <span class="sr-only" id="theme-status">Theme: auto</span>
                         </button>
                     </div>
-                    <button class="mobile-menu-btn" aria-label="Open menu" onclick="toggleMobileMenu()">
-                        <svg class="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                        <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <button class="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileMenu" onclick="toggleMobileMenu()">
+                        <svg class="icon-menu" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        <svg class="icon-close" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </nav>
             </div>
         </header>
 
         <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu-overlay" id="mobileMenu">
-            <nav class="mobile-menu-content">
+        <div class="mobile-menu-overlay" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" aria-hidden="true">
+            <nav class="mobile-menu-content" role="navigation" aria-label="Mobile navigation">
                 {% for link in config.extra.nav_links %}
                 <a href="{{ link.url }}" class="mobile-menu-link" {% if link.url is starting_with("http") %}target="_blank" rel="noopener"{% endif %}>
                     {{ link.name }}
                 </a>
                 {% endfor %}
                 <button class="mobile-theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
-                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <svg class="icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                     <span>Toggle Theme</span>
                 </button>
             </nav>
         </div>
 
-        <main class="main">
+        <main id="main-content" class="main" role="main" aria-label="Main content">
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="footer">
+        <footer class="footer" role="contentinfo">
             <div class="container">
                 <div class="footer-content">
                     <div class="footer-brand">
-                        <div class="footer-mascot-wrapper">
+                        <div class="footer-mascot-wrapper" aria-hidden="true">
                             <div class="footer-mascot-glow"></div>
-                            <img src="{{ get_url(path='img/sentinel-mascot.avif') | safe }}" alt="Sentinel" class="footer-mascot">
+                            <img src="{{ get_url(path='img/sentinel-mascot.avif') | safe }}" alt="" class="footer-mascot">
                         </div>
                         <div class="footer-tagline">
                             <p class="footer-title">Security-first reverse proxy<br>built to guard the free web</p>
                             <p class="footer-description">A high-performance, security-focused reverse proxy built on Cloudflare's Pingora framework. Sleepable ops at the edge with extensible agent architecture.</p>
                         </div>
                     </div>
-                    <div class="footer-links">
+                    <nav class="footer-links" role="navigation" aria-label="Footer navigation">
                         <div class="footer-col">
                             <h4>Resources</h4>
                             <a href="{{ config.extra.docs_external_url }}">Documentation</a>
@@ -124,14 +255,14 @@
                             <a href="{{ config.extra.github }}/discussions">Discussions</a>
                             <a href="{{ config.extra.github }}/blob/main/CONTRIBUTING.md">Contributing</a>
                         </div>
-                    </div>
+                    </nav>
                 </div>
                 <div class="footer-bottom">
                     <p>&copy; {{ now() | date(format='%Y') }} <a href="https://raskell.io">raskell.io</a>. Licensed under Apache 2.0.</p>
                 </div>
             </div>
             <a href="https://learn-you-the-web.raskell.io/" target="_blank" rel="noopener" class="page-peel" aria-label="Learn You The Web - An e-book about how the web works">
-                <span class="page-peel-tooltip">
+                <span class="page-peel-tooltip" aria-hidden="true">
                     <strong>Learn You The Web</strong>
                     <span>An e-book about how the web works, inspired by "Learn You a Haskell for Great Good!"</span>
                 </span>
@@ -146,6 +277,11 @@
             const next = current === 'dark' ? 'light' : 'dark';
             html.dataset.theme = next;
             localStorage.setItem('theme', next);
+            // Update screen reader status
+            const statusEl = document.getElementById('theme-status');
+            if (statusEl) {
+                statusEl.textContent = 'Theme: ' + next;
+            }
         }
 
         function toggleMobileMenu() {
@@ -153,24 +289,37 @@
             const btn = document.querySelector('.mobile-menu-btn');
             const isOpen = menu.classList.toggle('open');
             btn.classList.toggle('open', isOpen);
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            btn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+            menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
             document.body.style.overflow = isOpen ? 'hidden' : '';
+            // Focus management for accessibility
+            if (isOpen) {
+                const firstLink = menu.querySelector('.mobile-menu-link');
+                if (firstLink) firstLink.focus();
+            }
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const btn = document.querySelector('.mobile-menu-btn');
+            menu.classList.remove('open');
+            btn.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'Open navigation menu');
+            menu.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
         }
 
         // Close mobile menu when clicking a link
         document.querySelectorAll('.mobile-menu-link').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('mobileMenu').classList.remove('open');
-                document.querySelector('.mobile-menu-btn').classList.remove('open');
-                document.body.style.overflow = '';
-            });
+            link.addEventListener('click', closeMobileMenu);
         });
 
         // Close mobile menu on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                document.getElementById('mobileMenu').classList.remove('open');
-                document.querySelector('.mobile-menu-btn').classList.remove('open');
-                document.body.style.overflow = '';
+                closeMobileMenu();
             }
         });
     </script>

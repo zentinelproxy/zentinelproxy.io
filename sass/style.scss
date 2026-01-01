@@ -2233,6 +2233,29 @@ img {
     border-width: 0;
 }
 
+// Skip to main content link for accessibility
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-primary);
+    color: var(--color-bg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: top 0.2s ease;
+
+    &:focus {
+        top: var(--space-md);
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
 // ============================================
 // Taxonomy Pages
 // ============================================
