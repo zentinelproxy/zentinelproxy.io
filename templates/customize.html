@@ -105,8 +105,24 @@
                     Installation Method
                 </h2>
                 <div class="option-cards">
-                    <label class="option-card selected" data-method="cargo">
-                        <input type="radio" name="install-method" value="cargo" checked>
+                    <label class="option-card selected" data-method="script">
+                        <input type="radio" name="install-method" value="script" checked>
+                        <div class="option-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                                <path d="m10 8 4 4-4 4"/>
+                            </svg>
+                        </div>
+                        <div class="option-content">
+                            <h3>Install Script</h3>
+                            <p>One-line installer for Linux and macOS (Recommended)</p>
+                        </div>
+                        <div class="option-check">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                    </label>
+                    <label class="option-card" data-method="cargo">
+                        <input type="radio" name="install-method" value="cargo">
                         <div class="option-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16">
                                 <g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linejoin="round" stroke-width="1">
@@ -124,8 +140,8 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                     </label>
-                    <label class="option-card disabled" data-method="oci">
-                        <input type="radio" name="install-method" value="oci" disabled>
+                    <label class="option-card" data-method="oci">
+                        <input type="radio" name="install-method" value="oci">
                         <div class="option-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="M13.152.682a2.25 2.25 0 0 1 2.269 0l.007.004l6.957 4.276a2.28 2.28 0 0 1 1.126 1.964v7.516c0 .81-.432 1.56-1.133 1.968l-.002.001l-11.964 7.037l-.004.003c-.706.41-1.578.41-2.284 0l-.026-.015l-6.503-4.502a2.27 2.27 0 0 1-1.096-1.943V9.438c0-.392.1-.77.284-1.1l.003-.006l.014-.026c.197-.342.48-.627.82-.827h.002L13.152.681Zm.757 1.295h-.001L2.648 8.616l6.248 4.247a.78.78 0 0 0 .758-.01h.001l11.633-6.804l-6.629-4.074a.75.75 0 0 0-.75.003ZM8.517 14.33a2.3 2.3 0 0 1-.393-.18l-.023-.014l-6.102-4.147v7.003c0 .275.145.528.379.664l.025.014l6.114 4.232zM18 9.709l-3.25 1.9v7.548L18 17.245Zm-7.59 4.438l-.002.002a2.3 2.3 0 0 1-.391.18v7.612l3.233-1.902v-7.552Zm9.09-5.316v7.532l2.124-1.25a.78.78 0 0 0 .387-.671V7.363Z"/>
@@ -133,8 +149,7 @@
                         </div>
                         <div class="option-content">
                             <h3>OCI Container</h3>
-                            <p>Pull pre-built container image</p>
-                            <span class="coming-soon-badge">Coming Soon</span>
+                            <p>Pull pre-built container image from GitHub Registry</p>
                         </div>
                         <div class="option-check">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -222,6 +237,76 @@
                             </div>
                         </div>
                         <p class="agent-description">Embed custom Lua scripts for flexible request/response processing</p>
+                    </label>
+
+                    <label class="agent-card" data-agent="js" data-crate="sentinel-agent-js">
+                        <input type="checkbox" name="agents" value="js">
+                        <div class="agent-header">
+                            <div class="agent-info">
+                                <h3>JavaScript</h3>
+                                <span class="status-badge beta">Beta</span>
+                            </div>
+                            <div class="agent-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="agent-description">Custom JavaScript logic with QuickJS runtime</p>
+                    </label>
+
+                    <label class="agent-card" data-agent="wasm" data-crate="sentinel-agent-wasm">
+                        <input type="checkbox" name="agents" value="wasm">
+                        <div class="agent-header">
+                            <div class="agent-info">
+                                <h3>WebAssembly</h3>
+                                <span class="status-badge beta">Beta</span>
+                            </div>
+                            <div class="agent-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="agent-description">High-performance Wasm modules in any language</p>
+                    </label>
+
+                    <label class="agent-card" data-agent="modsec" data-crate="sentinel-agent-modsec">
+                        <input type="checkbox" name="agents" value="modsec">
+                        <div class="agent-header">
+                            <div class="agent-info">
+                                <h3>ModSecurity</h3>
+                                <span class="status-badge beta">Beta</span>
+                            </div>
+                            <div class="agent-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="agent-description">Full OWASP CRS with 800+ detection rules</p>
+                    </label>
+
+                    <label class="agent-card" data-agent="ai-gateway" data-crate="sentinel-agent-ai-gateway">
+                        <input type="checkbox" name="agents" value="ai-gateway">
+                        <div class="agent-header">
+                            <div class="agent-info">
+                                <h3>AI Gateway</h3>
+                                <span class="status-badge beta">Beta</span>
+                            </div>
+                            <div class="agent-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="agent-description">AI API security: prompt injection, PII, rate limits</p>
+                    </label>
+
+                    <label class="agent-card" data-agent="websocket-inspector" data-crate="sentinel-agent-websocket-inspector">
+                        <input type="checkbox" name="agents" value="websocket-inspector">
+                        <div class="agent-header">
+                            <div class="agent-info">
+                                <h3>WebSocket Inspector</h3>
+                                <span class="status-badge beta">Beta</span>
+                            </div>
+                            <div class="agent-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="agent-description">WebSocket frame inspection and security controls</p>
                     </label>
                 </div>
             </div>
@@ -468,6 +553,78 @@ const agentConfigs = {
         timeout-ms 100
         failure-mode "open"
     }`
+    },
+    js: {
+        crate: 'sentinel-agent-js',
+        bin: 'sentinel-agent-js',
+        socket: '/var/run/sentinel/js.sock',
+        config: `agent "js" {
+        type "js"
+        transport "unix_socket" {
+            path "/var/run/sentinel/js.sock"
+        }
+        events ["request_headers" "response_headers"]
+        timeout-ms 100
+        failure-mode "open"
+    }`
+    },
+    wasm: {
+        crate: 'sentinel-agent-wasm',
+        bin: 'sentinel-agent-wasm',
+        socket: '/var/run/sentinel/wasm.sock',
+        config: `agent "wasm" {
+        type "wasm"
+        transport "unix_socket" {
+            path "/var/run/sentinel/wasm.sock"
+        }
+        events ["request_headers" "response_headers"]
+        timeout-ms 50
+        failure-mode "closed"
+    }`
+    },
+    modsec: {
+        crate: 'sentinel-agent-modsec',
+        bin: 'sentinel-agent-modsec',
+        socket: '/var/run/sentinel/modsec.sock',
+        config: `agent "modsec" {
+        type "modsec"
+        transport "unix_socket" {
+            path "/var/run/sentinel/modsec.sock"
+        }
+        events ["request_headers" "request_body" "response_body"]
+        timeout-ms 200
+        failure-mode "closed"
+        max-request-body-bytes 1048576
+    }`
+    },
+    'ai-gateway': {
+        crate: 'sentinel-agent-ai-gateway',
+        bin: 'sentinel-agent-ai-gateway',
+        socket: '/var/run/sentinel/ai-gateway.sock',
+        config: `agent "ai-gateway" {
+        type "ai-gateway"
+        transport "unix_socket" {
+            path "/var/run/sentinel/ai-gateway.sock"
+        }
+        events ["request_headers" "request_body"]
+        timeout-ms 100
+        failure-mode "closed"
+        max-request-body-bytes 1048576
+    }`
+    },
+    'websocket-inspector': {
+        crate: 'sentinel-agent-websocket-inspector',
+        bin: 'sentinel-agent-websocket-inspector',
+        socket: '/var/run/sentinel/ws-inspector.sock',
+        config: `agent "websocket-inspector" {
+        type "websocket-inspector"
+        transport "unix_socket" {
+            path "/var/run/sentinel/ws-inspector.sock"
+        }
+        events ["websocket_frame"]
+        timeout-ms 50
+        failure-mode "open"
+    }`
     }
 };
 
@@ -475,23 +632,59 @@ const agentConfigs = {
 function updateOutput() {
     const selectedAgents = Array.from(document.querySelectorAll('input[name="agents"]:checked'))
         .map(cb => cb.value);
+    const installMethod = document.querySelector('input[name="install-method"]:checked').value;
 
-    // Update install commands
-    let installCode = `# Install Sentinel
+    // Update install commands based on selected method
+    let installCode = '';
+
+    if (installMethod === 'script') {
+        installCode = `# Install Sentinel using the install script
+curl -fsSL https://getsentinel.raskell.io | sh
+`;
+        if (selectedAgents.length > 0) {
+            installCode += `
+# Install selected agents (via cargo)
+`;
+            selectedAgents.forEach(agent => {
+                installCode += `cargo install ${agentConfigs[agent].crate}
+`;
+            });
+        } else {
+            installCode += `
+# No agents selected yet`;
+        }
+    } else if (installMethod === 'cargo') {
+        installCode = `# Install Sentinel
 cargo install sentinel-proxy
 `;
-
-    if (selectedAgents.length > 0) {
-        installCode += `
+        if (selectedAgents.length > 0) {
+            installCode += `
 # Install selected agents
 `;
-        selectedAgents.forEach(agent => {
-            installCode += `cargo install ${agentConfigs[agent].crate}
+            selectedAgents.forEach(agent => {
+                installCode += `cargo install ${agentConfigs[agent].crate}
 `;
-        });
-    } else {
-        installCode += `
+            });
+        } else {
+            installCode += `
 # No agents selected yet`;
+        }
+    } else if (installMethod === 'oci') {
+        installCode = `# Pull Sentinel container image
+docker pull ghcr.io/raskell-io/sentinel:latest
+`;
+        if (selectedAgents.length > 0) {
+            installCode += `
+# Pull selected agent images
+`;
+            selectedAgents.forEach(agent => {
+                installCode += `docker pull ghcr.io/raskell-io/${agentConfigs[agent].crate}:latest
+`;
+            });
+        } else {
+            installCode += `
+# No agents selected yet`;
+        }
     }
 
     const installEl = document.querySelector('#install-code code');
@@ -564,21 +757,50 @@ agents {`;
     let startupCode = '';
     const startupNote = document.querySelector('#startup-note');
 
-    if (selectedAgents.length > 0) {
-        startupCode += `# Start agents (each in a separate terminal or as background processes)
+    if (installMethod === 'oci') {
+        if (selectedAgents.length > 0) {
+            startupCode = `# Start agents (each in a separate terminal)
 `;
-        selectedAgents.forEach(agent => {
-            startupCode += `${agentConfigs[agent].bin} --socket ${agentConfigs[agent].socket} &
+            selectedAgents.forEach(agent => {
+                startupCode += `docker run -d --name ${agent} \\
+    -v /var/run/sentinel:/var/run/sentinel \\
+    ghcr.io/raskell-io/${agentConfigs[agent].crate}:latest \\
+    --socket ${agentConfigs[agent].socket}
 `;
-        });
-        startupCode += `
+            });
+            startupCode += `
+# Start Sentinel
+docker run -d --name sentinel \\
+    -p 8080:8080 -p 9090:9090 \\
+    -v $(pwd)/sentinel.kdl:/etc/sentinel/sentinel.kdl:ro \\
+    -v /var/run/sentinel:/var/run/sentinel \\
+    ghcr.io/raskell-io/sentinel:latest`;
+            startupNote.style.display = 'flex';
+        } else {
+            startupCode = `# Start Sentinel
+docker run -d --name sentinel \\
+    -p 8080:8080 -p 9090:9090 \\
+    -v $(pwd)/sentinel.kdl:/etc/sentinel/sentinel.kdl:ro \\
+    ghcr.io/raskell-io/sentinel:latest`;
+            startupNote.style.display = 'none';
+        }
+    } else {
+        if (selectedAgents.length > 0) {
+            startupCode = `# Start agents (each in a separate terminal or as background processes)
+`;
+            selectedAgents.forEach(agent => {
+                startupCode += `${agentConfigs[agent].bin} --socket ${agentConfigs[agent].socket} &
+`;
+            });
+            startupCode += `
 # Start Sentinel
 sentinel-proxy --config sentinel.kdl`;
-        startupNote.style.display = 'flex';
-    } else {
-        startupCode = `# Start Sentinel
+            startupNote.style.display = 'flex';
+        } else {
+            startupCode = `# Start Sentinel
 sentinel-proxy --config sentinel.kdl`;
-        startupNote.style.display = 'none';
+            startupNote.style.display = 'none';
+        }
     }
 
     const startupEl = document.querySelector('#startup-code code');
