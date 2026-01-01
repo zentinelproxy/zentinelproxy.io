@@ -36,7 +36,7 @@ AI Gateway provides comprehensive security controls for AI API traffic (OpenAI, 
 - **Prompt Injection Detection**: Block attempts to override system prompts or manipulate AI behavior
 - **Jailbreak Detection**: Detect DAN, developer mode, and other bypass attempts
 - **PII Detection**: Detect emails, SSNs, phone numbers, credit cards, IP addresses
-  - Configurable actions: block, redact (coming soon), or log
+  - Configurable actions: block, redact, or log
 - **Schema Validation**: Validate requests against OpenAI and Anthropic JSON schemas
 
 ### Usage Control
@@ -89,7 +89,10 @@ sentinel-ai-gateway-agent \
 | `--max-tokens` | `MAX_TOKENS` | Max tokens per request | `0` (unlimited) |
 | `--rate-limit-requests` | `RATE_LIMIT_REQUESTS` | Requests per minute per client | `0` (unlimited) |
 | `--rate-limit-tokens` | `RATE_LIMIT_TOKENS` | Tokens per minute per client | `0` (unlimited) |
+| `--add-cost-headers` | `ADD_COST_HEADERS` | Add cost estimation headers | `true` |
 | `--block-mode` | `BLOCK_MODE` | Block or detect-only | `true` |
+| `--fail-open` | `FAIL_OPEN` | Allow requests on processing errors | `false` |
+| `--verbose`, `-v` | `VERBOSE` | Enable debug logging | `false` |
 
 ### Sentinel Configuration
 

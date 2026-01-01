@@ -128,6 +128,9 @@ return { decision: "allow" };
 // Block with custom status and body
 return { decision: "block", status: 403, body: "Access Denied" };
 
+// Deny is an alias for block
+return { decision: "deny", status: 403, body: "Access Denied" };
+
 // Redirect to another URL
 return { decision: "redirect", status: 302, body: "https://example.com/login" };
 ```
@@ -255,24 +258,21 @@ function on_request_headers(request) {
 
 | Feature | JavaScript | Lua |
 |---------|------------|-----|
-| Engine | QuickJS | mlua (Lua 5.4) |
-| Scripting | Single script file | Multiple scripts |
-| Hot Reload | No | Yes |
-| VM Pooling | No | Yes |
-| Resource Limits | Minimal | Comprehensive |
-| Standard Library | Basic (console) | Rich (JSON, crypto) |
-| Use Case | Simple scripts | Production workloads |
+| Engine | QuickJS (ES2020) | mlua (Lua 5.4) |
+| Scripting | Single script file | Single script file |
+| String handling | Full regex | Pattern matching |
+| Standard Library | console.log/warn/error | None |
+| Use Case | Complex logic, regex | Simple scripts |
 
 **Use JavaScript when:**
-- Simple request filtering logic
-- Quick prototyping
-- Lightweight deployments
-- Familiar with JavaScript
+- You need full regular expression support
+- Familiar with JavaScript syntax
+- Complex string manipulation
 
 **Use [Lua agent](/agents/lua/) when:**
-- Complex processing logic
-- Production environments with strict resource limits
-- Multiple scripts with hot reload
+- Familiar with Lua syntax
+- Simple pattern matching is sufficient
+- Prefer Lua's concise table syntax
 
 ## Related Agents
 

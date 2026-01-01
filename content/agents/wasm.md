@@ -235,9 +235,9 @@ Configure pool size based on workload:
 | Language | Any (Rust, Go, C) | JavaScript | Lua |
 | Runtime | wasmtime | QuickJS | mlua |
 | Performance | Fastest | Fast | Fast |
-| Sandboxing | Strong (Wasm) | Basic | Comprehensive |
+| Sandboxing | Strong (Wasm) | Basic | Basic |
 | Complexity | Higher | Lower | Lower |
-| Use Case | Max performance | Simple scripts | Production |
+| Use Case | Max performance | Full regex | Simple scripts |
 
 **Use WebAssembly when:**
 - Maximum performance requirements
@@ -254,6 +254,6 @@ Configure pool size based on workload:
 
 | Agent | Integration |
 |-------|-------------|
-| **JavaScript** | Simpler scripting alternative |
-| **Lua** | Production scripting with hot reload |
+| **JavaScript** | Simpler scripting with full regex |
+| **Lua** | Simple scripting with Lua syntax |
 | **WAF** | Combine with security rules |

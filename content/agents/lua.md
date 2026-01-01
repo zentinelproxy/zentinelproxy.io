@@ -1,6 +1,6 @@
 +++
 title = "Lua Scripting"
-description = "Embed custom Lua scripts for flexible request/response processing and business logic."
+description = "Embed custom Lua scripts for flexible request/response processing and header manipulation."
 template = "agent.html"
 
 [taxonomies]
@@ -12,7 +12,7 @@ author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Beta"
 version = "0.1.0"
-license = "MIT"
+license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-lua"
 homepage = "https://sentinel.raskell.io/agents/lua/"
 protocol_version = "0.1"
@@ -22,269 +22,288 @@ crate_name = "sentinel-agent-lua"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_sentinel_version = "0.1.0"
 +++
 
 ## Overview
 
-The Lua Scripting agent enables custom request/response processing using embedded Lua scripts. Perfect for business logic, custom routing, header manipulation, and integration with external systems.
+The Lua Scripting agent enables custom request/response processing using embedded Lua scripts. Use it for header manipulation, custom routing logic, access control, and request/response transformation.
 
 ## Features
 
-- **Embedded Lua 5.4**: Full Lua runtime with LuaJIT performance
-- **Request/Response Access**: Read and modify headers, body, metadata
-- **Hot Reload**: Update scripts without restart
-- **Sandboxed Execution**: Safe, isolated script environment
-- **HTTP Client**: Make external API calls from scripts
+- **Embedded Lua Runtime**: Uses mlua (Lua 5.4) for script execution
+- **Request/Response Hooks**: Inspect and modify at both request and response phases
+- **Header Manipulation**: Add, remove, or modify request and response headers
+- **Decision Control**: Allow, block, deny, or redirect requests
+- **Audit Tags**: Add custom tags for logging and analytics
+- **Fail-Open Mode**: Optionally allow requests when scripts error
 
 ## Installation
-
-### Using Cargo
 
 ```bash
 cargo install sentinel-agent-lua
 ```
 
-### Using Docker
+## Quick Start
 
 ```bash
-docker pull ghcr.io/raskell-io/sentinel-agent-lua:latest
-```
-
-### Docker Compose
-
-```yaml
-services:
-  lua-agent:
-    image: ghcr.io/raskell-io/sentinel-agent-lua:latest
-    volumes:
-      - /var/run/sentinel:/var/run/sentinel
-      - ./scripts:/etc/sentinel/lua:ro
-    environment:
-      - SOCKET_PATH=/var/run/sentinel/lua.sock
-```
-
-## Configuration
-
-Add the agent to your Sentinel configuration:
-
-```kdl
-agent "lua" {
-    socket "/var/run/sentinel/lua.sock"
-    timeout 100ms
-    fail-open true
-
-    config {
-        scripts-dir "/etc/sentinel/lua"
-        reload-interval 30s
-
-        // Global variables available to scripts
-        globals {
-            "API_VERSION" "v1"
-            "ENVIRONMENT" "production"
+# Create a simple script
+cat > policy.lua << 'EOF'
+function on_request_headers()
+    -- Block requests to /admin from non-internal IPs
+    if request.uri:match("^/admin") and not request.client_ip:match("^10%.") then
+        return {
+            decision = "block",
+            status = 403,
+            body = "Access denied"
         }
-    }
-}
-```
-
-### Configuration Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `scripts-dir` | string | - | Directory containing Lua scripts |
-| `reload-interval` | duration | `30s` | Script reload check interval |
-| `max-execution-time` | duration | `50ms` | Maximum script execution time |
-| `memory-limit` | string | `"10MB"` | Maximum memory per script |
-
-## Lua API
-
-### Request Object
-
-```lua
--- Access request properties
-local method = request.method        -- "GET", "POST", etc.
-local path = request.path            -- "/api/users"
-local query = request.query          -- table of query params
-local headers = request.headers      -- table of headers
-local body = request.body            -- request body (string)
-
--- Modify request
-request:set_header("X-Custom", "value")
-request:remove_header("Cookie")
-request:set_path("/v2" .. request.path)
-```
-
-### Response Object
-
-```lua
--- Access response (in response phase)
-local status = response.status
-local headers = response.headers
-local body = response.body
-
--- Modify response
-response:set_header("X-Processed-By", "lua")
-response:set_status(200)
-response:set_body('{"modified": true}')
-```
-
-### Available Functions
-
-```lua
--- Logging
-log.info("Processing request")
-log.warn("Rate limit approaching")
-log.error("Failed to process")
-
--- JSON handling
-local data = json.decode(request.body)
-local str = json.encode({status = "ok"})
-
--- HTTP client (async)
-local resp = http.get("https://api.example.com/check")
-local resp = http.post("https://api.example.com/log", {
-    headers = {["Content-Type"] = "application/json"},
-    body = json.encode({event = "request"})
-})
-
--- Key-value store (shared across requests)
-kv.set("user:123:count", 5, 3600)  -- key, value, ttl
-local count = kv.get("user:123:count")
-kv.incr("user:123:count")
-```
-
-## Script Structure
-
-Create scripts in the configured directory:
-
-```lua
--- /etc/sentinel/lua/custom_routing.lua
-
-function on_request(request)
-    -- Add request ID
-    request:set_header("X-Request-Id", generate_uuid())
-
-    -- Custom routing based on header
-    local tenant = request.headers["X-Tenant-Id"]
-    if tenant == "premium" then
-        request:set_header("X-Upstream", "premium-backend")
     end
 
-    return "continue"  -- or "block", "redirect"
-end
-
-function on_response(request, response)
-    -- Add timing header
-    response:set_header("X-Process-Time", tostring(request.start_time))
-
-    return "continue"
-end
-```
-
-## Test Payloads
-
-### Basic Script Test
-
-```bash
-# Create test script
-cat > /etc/sentinel/lua/test.lua << 'EOF'
-function on_request(request)
-    request:set_header("X-Lua-Processed", "true")
-    return "continue"
+    -- Add processing header
+    return {
+        decision = "allow",
+        add_request_headers = {
+            ["X-Processed-By"] = "lua-agent"
+        }
+    }
 end
 EOF
 
-# Test
-curl -i http://localhost:8080/api/test
+# Run the agent
+sentinel-lua-agent --script policy.lua --socket /tmp/sentinel-lua.sock
 ```
 
-### Expected Response
+## CLI Options
 
-```http
-HTTP/1.1 200 OK
-X-Lua-Processed: true
-...
+| Option | Env Var | Default | Description |
+|--------|---------|---------|-------------|
+| `--socket` | `AGENT_SOCKET` | `/tmp/sentinel-lua.sock` | Unix socket path |
+| `--script` | `LUA_SCRIPT` | (required) | Path to Lua script file |
+| `--verbose` | `LUA_VERBOSE` | `false` | Enable debug logging |
+| `--fail-open` | `FAIL_OPEN` | `false` | Allow requests on script errors |
+
+## Lua API
+
+### Request Object (on_request_headers)
+
+The `request` global table is available in the `on_request_headers` function:
+
+```lua
+request.method         -- HTTP method: "GET", "POST", etc.
+request.uri            -- Full URI with query string: "/api/users?page=1"
+request.client_ip      -- Client IP address: "192.168.1.100"
+request.correlation_id -- Request tracking ID
+request.headers        -- Table of headers (values joined with ", " if multiple)
 ```
+
+### Response Object (on_response_headers)
+
+The `response` global table is available in the `on_response_headers` function:
+
+```lua
+response.status         -- HTTP status code: 200, 404, etc.
+response.correlation_id -- Request tracking ID (same as request)
+response.headers        -- Table of response headers
+```
+
+### Return Value
+
+Both hook functions return a table with the following fields:
+
+```lua
+return {
+    decision = "allow",  -- "allow", "block", "deny", or "redirect"
+
+    -- For block/deny (optional)
+    status = 403,        -- HTTP status code (default: 403)
+    body = "Forbidden",  -- Response body
+
+    -- For redirect (required)
+    body = "https://example.com/login",  -- Redirect URL
+    status = 302,        -- Redirect status (default: 302)
+
+    -- Header modifications (optional)
+    add_request_headers = {
+        ["X-Custom"] = "value"
+    },
+    remove_request_headers = {"Cookie", "Authorization"},
+    add_response_headers = {
+        ["X-Frame-Options"] = "DENY"
+    },
+    remove_response_headers = {"Server"},
+
+    -- Audit metadata (optional)
+    tags = {"custom-rule", "blocked"}
+}
+```
+
+### Decision Types
+
+| Decision | Description |
+|----------|-------------|
+| `"allow"` | Allow request to proceed (default) |
+| `"block"` | Block request with status code and body |
+| `"deny"` | Alias for block |
+| `"redirect"` | Redirect to URL specified in `body` field |
 
 ## Examples
 
-### A/B Testing
+### Block by IP Range
 
 ```lua
--- /etc/sentinel/lua/ab_test.lua
+function on_request_headers()
+    -- Block requests from specific IP ranges
+    local blocked_ranges = {"192.168.1.", "10.0.0."}
 
-function on_request(request)
-    local user_id = request.headers["X-User-Id"] or "anonymous"
-
-    -- Deterministic bucketing based on user ID
-    local hash = string.byte(user_id, 1) or 0
-    local variant = (hash % 100 < 50) and "A" or "B"
-
-    request:set_header("X-AB-Variant", variant)
-
-    if variant == "B" then
-        request:set_header("X-Upstream", "new-backend")
-    end
-
-    return "continue"
-end
-```
-
-### Request Enrichment
-
-```lua
--- /etc/sentinel/lua/enrich.lua
-
-function on_request(request)
-    -- Look up user from cache or external service
-    local user_id = request.headers["X-User-Id"]
-    if user_id then
-        local cached = kv.get("user:" .. user_id)
-        if not cached then
-            local resp = http.get("https://api.internal/users/" .. user_id)
-            if resp.status == 200 then
-                cached = resp.body
-                kv.set("user:" .. user_id, cached, 300)
-            end
-        end
-
-        if cached then
-            local user = json.decode(cached)
-            request:set_header("X-User-Org", user.org_id)
-            request:set_header("X-User-Role", user.role)
+    for _, range in ipairs(blocked_ranges) do
+        if request.client_ip:match("^" .. range:gsub("%.", "%%.")) then
+            return {
+                decision = "block",
+                status = 403,
+                body = "IP blocked",
+                tags = {"ip-blocked"}
+            }
         end
     end
 
-    return "continue"
+    return {decision = "allow"}
 end
 ```
 
-### Custom Rate Limiting
+### Add Security Headers
 
 ```lua
--- /etc/sentinel/lua/custom_ratelimit.lua
+function on_request_headers()
+    return {
+        decision = "allow",
+        add_response_headers = {
+            ["X-Content-Type-Options"] = "nosniff",
+            ["X-Frame-Options"] = "DENY",
+            ["X-XSS-Protection"] = "1; mode=block",
+            ["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        }
+    }
+end
+```
 
-function on_request(request)
-    local key = request.headers["X-API-Key"] or request.client_ip
+### Path-Based Routing
 
-    -- Get current count
-    local count = kv.get("rate:" .. key) or 0
-
-    -- Check limit
-    if count >= 100 then
-        return "block", {
-            status = 429,
-            body = json.encode({error = "rate_limit_exceeded"})
+```lua
+function on_request_headers()
+    -- Route API versions to different upstreams
+    if request.uri:match("^/api/v2") then
+        return {
+            decision = "allow",
+            add_request_headers = {
+                ["X-Upstream"] = "api-v2-backend"
+            }
+        }
+    elseif request.uri:match("^/api/v1") then
+        return {
+            decision = "allow",
+            add_request_headers = {
+                ["X-Upstream"] = "api-v1-backend"
+            }
         }
     end
 
-    -- Increment
-    kv.incr("rate:" .. key)
-    if count == 0 then
-        kv.expire("rate:" .. key, 60)
-    end
-
-    request:set_header("X-RateLimit-Remaining", tostring(100 - count - 1))
-    return "continue"
+    return {decision = "allow"}
 end
 ```
+
+### Authentication Check
+
+```lua
+function on_request_headers()
+    -- Require auth for protected paths
+    local protected_paths = {"/admin", "/api/internal", "/dashboard"}
+
+    for _, path in ipairs(protected_paths) do
+        if request.uri:match("^" .. path) then
+            local auth = request.headers["Authorization"]
+            if not auth or auth == "" then
+                return {
+                    decision = "redirect",
+                    body = "/login?next=" .. request.uri,
+                    status = 302
+                }
+            end
+        end
+    end
+
+    return {decision = "allow"}
+end
+```
+
+### Response Header Modification
+
+```lua
+function on_response_headers()
+    -- Remove server information headers
+    return {
+        decision = "allow",
+        remove_response_headers = {"Server", "X-Powered-By"},
+        add_response_headers = {
+            ["X-Response-Time"] = os.time()
+        }
+    }
+end
+```
+
+### Method Filtering
+
+```lua
+function on_request_headers()
+    -- Only allow GET and POST for most endpoints
+    local allowed_methods = {GET = true, POST = true, HEAD = true, OPTIONS = true}
+
+    if not allowed_methods[request.method] then
+        -- Allow PUT/DELETE only for /api paths
+        if not request.uri:match("^/api/") then
+            return {
+                decision = "block",
+                status = 405,
+                body = "Method not allowed",
+                add_response_headers = {
+                    ["Allow"] = "GET, POST, HEAD, OPTIONS"
+                }
+            }
+        end
+    end
+
+    return {decision = "allow"}
+end
+```
+
+## Error Handling
+
+When a script encounters an error:
+
+- **fail-open disabled** (default): Request is blocked with HTTP 500 and audit tags `["lua", "error"]`
+- **fail-open enabled**: Request is allowed with audit tags `["lua", "error", "fail_open"]`
+
+The error message is included in the `reason_codes` audit field.
+
+## Sentinel Integration
+
+```kdl
+agent "lua" {
+    type "lua"
+    transport "unix_socket" {
+        path "/tmp/sentinel-lua.sock"
+    }
+    events ["request_headers", "response_headers"]
+    timeout-ms 50
+    failure-mode "open"
+}
+```
+
+## Comparison with JavaScript Agent
+
+| Feature | Lua Agent | JavaScript Agent |
+|---------|-----------|------------------|
+| Runtime | mlua (Lua 5.4) | QuickJS (ES2020) |
+| Syntax | Lua | JavaScript |
+| Performance | Fast startup | Fast startup |
+| Use case | Simple scripts | Complex logic |
+| String handling | Pattern matching | Full regex |

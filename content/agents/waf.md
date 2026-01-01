@@ -40,6 +40,7 @@ A lightweight Web Application Firewall agent for Sentinel using **native Rust re
 - **Command Injection**: Shell commands, pipe injection
 - **Scanner Detection**: Block known security scanners
 - **Request Body Inspection**: JSON, form data, all content types
+- **Response Body Inspection**: Detect attacks in server responses (optional)
 - **Paranoia Levels**: 1-4 for tuning sensitivity
 - **Detect-Only Mode**: Monitor without blocking
 
@@ -74,6 +75,8 @@ sentinel-waf-agent --socket /var/run/sentinel/waf.sock --paranoia-level 1
 | `--exclude-paths` | `WAF_EXCLUDE_PATHS` | Paths to exclude (comma-separated) | - |
 | `--body-inspection` | `WAF_BODY_INSPECTION` | Enable request body inspection | `true` |
 | `--max-body-size` | `WAF_MAX_BODY_SIZE` | Maximum body size (bytes) | `1048576` (1MB) |
+| `--response-inspection` | `WAF_RESPONSE_INSPECTION` | Enable response body inspection | `false` |
+| `--verbose`, `-v` | `WAF_VERBOSE` | Enable debug logging | `false` |
 
 ### Sentinel Configuration
 

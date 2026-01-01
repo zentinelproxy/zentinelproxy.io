@@ -79,12 +79,13 @@ sentinel-modsec-agent \
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-modsec.sock` |
-| `--rules` | `MODSEC_RULES` | Paths to rule files (comma-separated) | - |
+| `--rules` | `MODSEC_RULES` | Paths to rule files (supports glob patterns like `*.conf`) | - |
 | `--block-mode` | `MODSEC_BLOCK_MODE` | Block (true) or detect-only (false) | `true` |
 | `--exclude-paths` | `MODSEC_EXCLUDE_PATHS` | Paths to exclude (comma-separated) | - |
 | `--body-inspection` | `MODSEC_BODY_INSPECTION` | Enable request body inspection | `true` |
 | `--max-body-size` | `MODSEC_MAX_BODY_SIZE` | Maximum body size to inspect | `1048576` (1MB) |
 | `--response-inspection` | `MODSEC_RESPONSE_INSPECTION` | Enable response body inspection | `false` |
+| `--verbose`, `-v` | `MODSEC_VERBOSE` | Enable debug logging | `false` |
 
 ### Sentinel Configuration
 
