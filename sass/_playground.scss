@@ -7,7 +7,6 @@
 .playground-hero {
     padding: var(--space-2xl) 0;
     text-align: center;
-    border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .playground-title {
@@ -28,65 +27,96 @@
     padding: var(--space-xl) 0 var(--space-3xl);
 }
 
-// Template Selector
-.template-selector {
-    margin-bottom: var(--space-2xl);
+.playground-intro {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0 auto var(--space-lg);
+    max-width: 600px;
 }
 
-.template-selector-header {
-    text-align: center;
+// Template Selector
+.template-selector {
     margin-bottom: var(--space-xl);
-
-    h2 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin-bottom: var(--space-sm);
-    }
-
-    p {
-        color: var(--color-text-muted);
-        font-size: 1rem;
-    }
 }
 
 .template-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--space-lg);
-    margin: 0 auto;
-    max-width: 1400px;
+    display: flex;
+    gap: var(--space-md);
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-top: 4px;
+    padding-bottom: var(--space-sm);
 
-    @media (max-width: 768px) {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: var(--space-md);
+    // Hide scrollbar but keep functionality
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-subtle) transparent;
+
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--color-border-subtle);
+        border-radius: 3px;
+
+        &:hover {
+            background: var(--color-text-muted);
+        }
     }
 }
 
 .template-card {
+    flex: 0 0 90px;
+    width: 90px;
+    height: 90px;
     background: var(--color-bg-elevated);
-    border: 2px solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: start;
+
+    @media (max-width: 768px) {
+        flex: 0 0 80px;
+        width: 80px;
+        height: 80px;
+    }
 
     &:hover {
-        border-color: var(--color-accent);
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        border-color: var(--color-border);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+        .template-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
     }
 
     &:active {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
 
     &.active {
-        border-color: var(--color-accent);
+        border-color: var(--color-border);
         background: linear-gradient(135deg, var(--color-bg-elevated) 0%, rgba(var(--color-accent-rgb), 0.05) 100%);
-        box-shadow: 0 4px 16px rgba(var(--color-accent-rgb), 0.15);
 
         &::before {
             content: '';
@@ -94,30 +124,70 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
+            height: 2px;
             background: var(--color-accent);
         }
     }
 
-    .template-icon {
-        font-size: 3rem;
-        margin-bottom: var(--space-md);
-        display: block;
-        line-height: 1;
-    }
-
     h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: var(--space-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0;
         color: var(--color-text-base);
+        line-height: 1.3;
+        word-wrap: break-word;
+
+        @media (max-width: 768px) {
+            font-size: 0.75rem;
+        }
+    }
+}
+
+.template-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    margin-bottom: 10px;
+    min-width: 200px;
+    max-width: 280px;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    text-align: center;
+    z-index: 100;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+    font-weight: 400;
+    white-space: normal;
+
+    // Tooltip arrow
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: var(--color-bg-elevated);
     }
 
-    p {
-        font-size: 0.875rem;
-        color: var(--color-text-muted);
-        line-height: 1.5;
-        margin: 0;
+    &::before {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 7px solid transparent;
+        border-top-color: var(--color-border);
+        margin-top: 1px;
     }
 }
 
@@ -158,6 +228,46 @@
     }
 }
 
+.panel-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.panel-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--color-bg-elevated);
+        color: var(--color-text);
+        border-color: var(--color-border);
+    }
+
+    &:active {
+        background: var(--color-bg-subtle);
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .icon-collapse {
+        display: none;
+    }
+}
+
 // Config Panel
 .config-panel {
     display: flex;
@@ -166,6 +276,31 @@
 
     @media (max-width: 1024px) {
         min-height: 350px;
+    }
+
+    // Fullscreen mode
+    &.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        min-height: 100vh;
+        z-index: 9999;
+        margin: 0;
+        border-radius: 0;
+
+        .icon-expand {
+            display: none;
+        }
+
+        .icon-collapse {
+            display: block;
+        }
     }
 }
 
@@ -665,6 +800,37 @@ $editor-padding: var(--space-md);
     margin-bottom: var(--space-lg);
 }
 
+.flow-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.flow-section {
+    flex: 1;
+}
+
+.flow-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin: 0;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border-subtle);
+
+    &:first-child {
+        border-top: none;
+    }
+}
+
+.flow-divider {
+    height: 1px;
+    background: var(--color-border-subtle);
+}
+
 .flow-diagram {
     padding: var(--space-xl);
     min-height: 120px;
@@ -685,6 +851,11 @@ $editor-padding: var(--space-md);
     gap: var(--space-sm);
     flex-wrap: wrap;
     justify-content: center;
+
+    // Response flow goes right to left
+    #response-flow-diagram & {
+        flex-direction: row-reverse;
+    }
 }
 
 .flow-node {
@@ -792,6 +963,11 @@ $editor-padding: var(--space-md);
     svg {
         width: 24px;
         height: 24px;
+    }
+
+    // Flip arrows to point left in response flow
+    #response-flow-diagram & svg {
+        transform: scaleX(-1);
     }
 }
 

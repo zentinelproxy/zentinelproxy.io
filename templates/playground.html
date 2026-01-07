@@ -17,54 +17,75 @@
 
 <section class="playground-main">
     <div class="container">
+        <p class="playground-intro">Choose a template to get started, or write your own configuration below</p>
+
         <!-- Template Selector -->
         <div class="template-selector">
-            <div class="template-selector-header">
-                <h2>Quick Start Templates</h2>
-                <p>Choose a template to get started, or write your own configuration below</p>
-            </div>
             <div class="template-grid">
+                <button type="button" class="template-card" data-template="basic">
+                    <h3>Vanilla Setup</h3>
+                    <span class="template-tooltip">Simple reverse proxy with multiple routes and load balancing</span>
+                </button>
                 <button type="button" class="template-card" data-template="ai-gateway">
-                    <div class="template-icon">🤖</div>
                     <h3>AI Gateway</h3>
-                    <p>Route to OpenAI, Anthropic, Azure OpenAI with inference service type</p>
+                    <span class="template-tooltip">LLM inference proxy with token-based rate limiting and intelligent routing</span>
                 </button>
                 <button type="button" class="template-card" data-template="api-gateway">
-                    <div class="template-icon">🌐</div>
                     <h3>API Gateway</h3>
-                    <p>REST API proxy with schema validation and versioning</p>
+                    <span class="template-tooltip">REST API proxy with schema validation and versioning</span>
                 </button>
                 <button type="button" class="template-card" data-template="microservices">
-                    <div class="template-icon">⚡</div>
-                    <h3>Microservices Mesh</h3>
-                    <p>Service-to-service routing with health checks and load balancing</p>
+                    <h3>Service Mesh</h3>
+                    <span class="template-tooltip">Service-to-service routing with health checks and load balancing</span>
                 </button>
                 <button type="button" class="template-card" data-template="static-cdn">
-                    <div class="template-icon">📄</div>
-                    <h3>Static Website + CDN</h3>
-                    <p>High-performance static file delivery with caching</p>
+                    <h3>Varnish-type Caching (CDN)</h3>
+                    <span class="template-tooltip">High-performance static file delivery with caching</span>
                 </button>
                 <button type="button" class="template-card" data-template="websocket">
-                    <div class="template-icon">💬</div>
                     <h3>WebSocket Proxy</h3>
-                    <p>Real-time WebSocket connections with upgrade handling</p>
+                    <span class="template-tooltip">Real-time WebSocket connections with upgrade handling</span>
                 </button>
                 <button type="button" class="template-card" data-template="security">
-                    <div class="template-icon">🔒</div>
                     <h3>Security Gateway</h3>
-                    <p>WAF, rate limiting, and security headers</p>
+                    <span class="template-tooltip">WAF, rate limiting, and security headers</span>
+                </button>
+                <button type="button" class="template-card" data-template="canary">
+                    <h3>Canary Deployment</h3>
+                    <span class="template-tooltip">Gradual rollout with weighted traffic splitting between versions</span>
+                </button>
+                <button type="button" class="template-card" data-template="content-routing">
+                    <h3>Content Router</h3>
+                    <span class="template-tooltip">Header-based and path-based intelligent routing</span>
+                </button>
+                <button type="button" class="template-card" data-template="grpc">
+                    <h3>gRPC Gateway</h3>
+                    <span class="template-tooltip">HTTP/2 gRPC service proxy with load balancing</span>
+                </button>
+                <button type="button" class="template-card" data-template="multi-region">
+                    <h3>Multi-Region</h3>
+                    <span class="template-tooltip">Geographic routing with failover across regions</span>
                 </button>
             </div>
         </div>
 
         <div class="playground-grid">
             <!-- Config Editor -->
-            <div class="playground-panel config-panel">
+            <div class="playground-panel config-panel" id="config-panel">
                 <div class="panel-header">
                     <h2>Configuration</h2>
-                    <div class="validation-status" id="validation-status">
-                        <span class="status-icon" id="status-icon"></span>
-                        <span class="status-text" id="status-text">Loading...</span>
+                    <div class="panel-header-actions">
+                        <div class="validation-status" id="validation-status">
+                            <span class="status-icon" id="status-icon"></span>
+                            <span class="status-text" id="status-text">Loading...</span>
+                        </div>
+                        <button type="button" class="panel-action-btn" id="copy-config-btn" title="Copy configuration">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        <button type="button" class="panel-action-btn" id="fullscreen-config-btn" title="Toggle fullscreen">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-expand"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-collapse"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                        </button>
                     </div>
                 </div>
                 <div class="editor-wrapper">
@@ -192,11 +213,25 @@ Host: example.com</textarea>
         <!-- Flow Diagram -->
         <div class="playground-panel flow-panel" id="flow-panel">
             <div class="panel-header">
-                <h2>Request Flow</h2>
+                <h2>Request & Response Flow</h2>
             </div>
-            <div class="flow-diagram" id="flow-diagram">
-                <div class="flow-placeholder">
-                    <p>Click "Simulate Request" to see the routing flow</p>
+            <div class="flow-container">
+                <div class="flow-section">
+                    <h3 class="flow-section-title">Request Flow</h3>
+                    <div class="flow-diagram" id="flow-diagram">
+                        <div class="flow-placeholder">
+                            <p>Click "Simulate Request" to see the routing flow</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-divider"></div>
+                <div class="flow-section">
+                    <h3 class="flow-section-title">Response Flow</h3>
+                    <div class="flow-diagram" id="response-flow-diagram">
+                        <div class="flow-placeholder">
+                            <p>Response flow will appear here</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
