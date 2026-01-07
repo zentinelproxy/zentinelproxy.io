@@ -1025,6 +1025,17 @@ $editor-padding: var(--space-md);
         letter-spacing: 0.05em;
         color: white;
     }
+
+    a {
+        color: white;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 2px;
+
+        &:hover {
+            text-decoration-style: solid;
+        }
+    }
 }
 
 .info-content {
@@ -1052,6 +1063,19 @@ $editor-padding: var(--space-md);
         strong {
             color: var(--color-text);
             font-weight: 600;
+        }
+
+        a {
+            color: var(--ctp-mauve);
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 3px;
+            transition: color var(--transition-fast);
+
+            &:hover {
+                color: var(--ctp-pink);
+                text-decoration-style: solid;
+            }
         }
     }
 
