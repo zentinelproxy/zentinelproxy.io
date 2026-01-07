@@ -17,6 +17,46 @@
 
 <section class="playground-main">
     <div class="container">
+        <!-- Template Selector -->
+        <div class="template-selector">
+            <div class="template-selector-header">
+                <h2>Quick Start Templates</h2>
+                <p>Choose a template to get started, or write your own configuration below</p>
+            </div>
+            <div class="template-grid">
+                <button type="button" class="template-card" data-template="ai-gateway">
+                    <div class="template-icon">🤖</div>
+                    <h3>AI Gateway</h3>
+                    <p>Route to OpenAI, Anthropic, Azure OpenAI with inference service type</p>
+                </button>
+                <button type="button" class="template-card" data-template="api-gateway">
+                    <div class="template-icon">🌐</div>
+                    <h3>API Gateway</h3>
+                    <p>REST API proxy with schema validation and versioning</p>
+                </button>
+                <button type="button" class="template-card" data-template="microservices">
+                    <div class="template-icon">⚡</div>
+                    <h3>Microservices Mesh</h3>
+                    <p>Service-to-service routing with health checks and load balancing</p>
+                </button>
+                <button type="button" class="template-card" data-template="static-cdn">
+                    <div class="template-icon">📄</div>
+                    <h3>Static Website + CDN</h3>
+                    <p>High-performance static file delivery with caching</p>
+                </button>
+                <button type="button" class="template-card" data-template="websocket">
+                    <div class="template-icon">💬</div>
+                    <h3>WebSocket Proxy</h3>
+                    <p>Real-time WebSocket connections with upgrade handling</p>
+                </button>
+                <button type="button" class="template-card" data-template="security">
+                    <div class="template-icon">🔒</div>
+                    <h3>Security Gateway</h3>
+                    <p>WAF, rate limiting, and security headers</p>
+                </button>
+            </div>
+        </div>
+
         <div class="playground-grid">
             <!-- Config Editor -->
             <div class="playground-panel config-panel">

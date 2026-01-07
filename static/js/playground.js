@@ -16,6 +16,625 @@ let wasmReady = false;
 let lastValidation = null;
 let debounceTimer = null;
 
+// Template Configurations
+const TEMPLATES = {
+    'ai-gateway': `// AI Gateway Configuration
+// Route requests to OpenAI, Anthropic, and Azure OpenAI
+
+system {
+    worker-threads 0
+}
+
+listeners {
+    listener "https" {
+        address "0.0.0.0:8443"
+        protocol "https"
+        tls {
+            cert-file "/etc/sentinel/certs/gateway.crt"
+            key-file "/etc/sentinel/certs/gateway.key"
+        }
+    }
+}
+
+routes {
+    // OpenAI API
+    route "openai" {
+        priority 200
+        matches {
+            path-prefix "/v1/"
+            host "api.openai.local"
+        }
+        service-type "inference"
+        upstream "openai"
+        policies {
+            timeout_secs 120
+            max_body_size "10MB"
+        }
+    }
+
+    // Anthropic API
+    route "anthropic" {
+        priority 200
+        matches {
+            path-prefix "/v1/"
+            host "api.anthropic.local"
+        }
+        service-type "inference"
+        upstream "anthropic"
+        policies {
+            timeout_secs 120
+            max_body_size "10MB"
+        }
+    }
+
+    // Azure OpenAI
+    route "azure-openai" {
+        priority 200
+        matches {
+            path-prefix "/openai/"
+            host "azure.openai.local"
+        }
+        service-type "inference"
+        upstream "azure-openai"
+        policies {
+            timeout_secs 120
+            max_body_size "10MB"
+        }
+    }
+}
+
+upstreams {
+    upstream "openai" {
+        targets {
+            target { address "api.openai.com:443" }
+        }
+        tls {
+            sni "api.openai.com"
+            insecure-skip-verify #false
+        }
+    }
+
+    upstream "anthropic" {
+        targets {
+            target { address "api.anthropic.com:443" }
+        }
+        tls {
+            sni "api.anthropic.com"
+            insecure-skip-verify #false
+        }
+    }
+
+    upstream "azure-openai" {
+        targets {
+            target { address "your-resource.openai.azure.com:443" }
+        }
+        tls {
+            sni "your-resource.openai.azure.com"
+            insecure-skip-verify #false
+        }
+    }
+}`,
+
+    'api-gateway': `// API Gateway Configuration
+// Multi-version REST API with schema validation
+
+system {
+    worker-threads 0
+}
+
+listeners {
+    listener "https" {
+        address "0.0.0.0:8443"
+        protocol "https"
+        tls {
+            cert-file "/etc/sentinel/certs/api.crt"
+            key-file "/etc/sentinel/certs/api.key"
+        }
+    }
+}
+
+routes {
+    // API v2 (current)
+    route "api-v2" {
+        priority 200
+        matches {
+            path-prefix "/api/v2/"
+        }
+        service-type "api"
+        upstream "api-v2-backend"
+        policies {
+            timeout_secs 30
+            max_body_size "5MB"
+        }
+        error_pages {
+            default_format "json"
+        }
+    }
+
+    // API v1 (legacy, read-only)
+    route "api-v1" {
+        priority 200
+        matches {
+            path-prefix "/api/v1/"
+        }
+        service-type "api"
+        upstream "api-v1-backend"
+        policies {
+            timeout_secs 30
+            max_body_size "1MB"
+        }
+        error_pages {
+            default_format "json"
+        }
+    }
+
+    // Health check
+    route "health" {
+        priority 1000
+        matches { path "/health" }
+        service-type "builtin"
+        builtin-handler "health"
+    }
+}
+
+upstreams {
+    upstream "api-v2-backend" {
+        targets {
+            target { address "127.0.0.1:8001" }
+            target { address "127.0.0.1:8002" }
+        }
+        load-balancing "round_robin"
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 10
+        }
+    }
+
+    upstream "api-v1-backend" {
+        targets {
+            target { address "127.0.0.1:7001" }
+        }
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 10
+        }
+    }
+}`,
+
+    'microservices': `// Microservices Mesh Configuration
+// Service-to-service routing with health checks
+
+system {
+    worker-threads 0
+}
+
+listeners {
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+routes {
+    // Auth service
+    route "auth" {
+        priority 300
+        matches {
+            path-prefix "/auth/"
+        }
+        upstream "auth-service"
+        policies {
+            timeout_secs 10
+        }
+    }
+
+    // Users service
+    route "users" {
+        priority 300
+        matches {
+            path-prefix "/users/"
+        }
+        upstream "users-service"
+        policies {
+            timeout_secs 15
+        }
+    }
+
+    // Orders service
+    route "orders" {
+        priority 300
+        matches {
+            path-prefix "/orders/"
+        }
+        upstream "orders-service"
+        policies {
+            timeout_secs 30
+        }
+    }
+
+    // Inventory service
+    route "inventory" {
+        priority 300
+        matches {
+            path-prefix "/inventory/"
+        }
+        upstream "inventory-service"
+        policies {
+            timeout_secs 20
+        }
+    }
+}
+
+upstreams {
+    upstream "auth-service" {
+        targets {
+            target { address "auth-1.local:3000" }
+            target { address "auth-2.local:3000" }
+        }
+        load-balancing "round_robin"
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 10
+            unhealthy-threshold 3
+        }
+    }
+
+    upstream "users-service" {
+        targets {
+            target { address "users-1.local:3001" }
+            target { address "users-2.local:3001" }
+        }
+        load-balancing "least_connections"
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 10
+        }
+    }
+
+    upstream "orders-service" {
+        targets {
+            target { address "orders-1.local:3002" }
+        }
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 15
+        }
+    }
+
+    upstream "inventory-service" {
+        targets {
+            target { address "inventory-1.local:3003" }
+            target { address "inventory-2.local:3003" }
+        }
+        load-balancing "round_robin"
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 10
+        }
+    }
+}`,
+
+    'static-cdn': `// Static Website + CDN Configuration
+// High-performance static file delivery with caching
+
+system {
+    worker-threads 0
+}
+
+listeners {
+    listener "https" {
+        address "0.0.0.0:8443"
+        protocol "https"
+        tls {
+            cert-file "/etc/sentinel/certs/cdn.crt"
+            key-file "/etc/sentinel/certs/cdn.key"
+        }
+    }
+
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+routes {
+    // Static assets
+    route "assets" {
+        priority 500
+        matches {
+            path-prefix "/assets/"
+        }
+        service-type "static"
+        static-files {
+            root "/var/www/static"
+            index "index.html"
+            compression {
+                gzip #true
+                brotli #true
+            }
+        }
+        policies {
+            response_headers {
+                set {
+                    "Cache-Control" "public, max-age=31536000, immutable"
+                    "X-Content-Type-Options" "nosniff"
+                }
+            }
+        }
+    }
+
+    // Images
+    route "images" {
+        priority 500
+        matches {
+            path-prefix "/images/"
+        }
+        service-type "static"
+        static-files {
+            root "/var/www/images"
+            compression {
+                gzip #true
+            }
+        }
+        policies {
+            response_headers {
+                set {
+                    "Cache-Control" "public, max-age=604800"
+                }
+            }
+        }
+    }
+
+    // Main site (SPA)
+    route "webapp" {
+        priority 100
+        matches {
+            path-prefix "/"
+        }
+        service-type "static"
+        static-files {
+            root "/var/www/app"
+            index "index.html"
+            fallback "index.html"
+            compression {
+                gzip #true
+                brotli #true
+            }
+        }
+        error_pages {
+            default_format "html"
+            404 {
+                format "html"
+                message "Page not found"
+            }
+        }
+    }
+}`,
+
+    'websocket': `// WebSocket Proxy Configuration
+// Real-time connection handling with upgrade support
+
+system {
+    worker-threads 0
+}
+
+listeners {
+    listener "https" {
+        address "0.0.0.0:8443"
+        protocol "https"
+        tls {
+            cert-file "/etc/sentinel/certs/ws.crt"
+            key-file "/etc/sentinel/certs/ws.key"
+        }
+    }
+}
+
+routes {
+    // WebSocket chat
+    route "chat-ws" {
+        priority 300
+        matches {
+            path-prefix "/ws/chat"
+        }
+        service-type "websocket"
+        upstream "chat-backend"
+        policies {
+            timeout_secs 3600
+        }
+    }
+
+    // WebSocket notifications
+    route "notifications-ws" {
+        priority 300
+        matches {
+            path-prefix "/ws/notifications"
+        }
+        service-type "websocket"
+        upstream "notifications-backend"
+        policies {
+            timeout_secs 3600
+        }
+    }
+
+    // HTTP API fallback
+    route "api" {
+        priority 200
+        matches {
+            path-prefix "/api/"
+        }
+        service-type "api"
+        upstream "api-backend"
+        policies {
+            timeout_secs 30
+        }
+        error_pages {
+            default_format "json"
+        }
+    }
+
+    // Web interface
+    route "webapp" {
+        priority 100
+        matches {
+            path-prefix "/"
+        }
+        service-type "web"
+        upstream "web-backend"
+    }
+}
+
+upstreams {
+    upstream "chat-backend" {
+        targets {
+            target { address "127.0.0.1:9001" }
+            target { address "127.0.0.1:9002" }
+        }
+        load-balancing "least_connections"
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 30
+        }
+    }
+
+    upstream "notifications-backend" {
+        targets {
+            target { address "127.0.0.1:9003" }
+        }
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 30
+        }
+    }
+
+    upstream "api-backend" {
+        targets {
+            target { address "127.0.0.1:8001" }
+        }
+    }
+
+    upstream "web-backend" {
+        targets {
+            target { address "127.0.0.1:8000" }
+        }
+    }
+}`,
+
+    'security': `// Security Gateway Configuration
+// WAF, rate limiting, and security headers
+
+system {
+    worker-threads 0
+}
+
+listeners {
+    listener "https" {
+        address "0.0.0.0:8443"
+        protocol "https"
+        tls {
+            cert-file "/etc/sentinel/certs/secure.crt"
+            key-file "/etc/sentinel/certs/secure.key"
+            min-version "TLS1.2"
+        }
+    }
+}
+
+routes {
+    // Health check (no security)
+    route "health" {
+        priority 1000
+        matches { path "/health" }
+        service-type "builtin"
+        builtin-handler "health"
+    }
+
+    // Public API (WAF + rate limit)
+    route "public-api" {
+        priority 500
+        matches {
+            path-prefix "/public/"
+        }
+        upstream "backend"
+        policies {
+            response_headers {
+                set {
+                    "X-Content-Type-Options" "nosniff"
+                    "X-Frame-Options" "DENY"
+                    "X-XSS-Protection" "1; mode=block"
+                    "Strict-Transport-Security" "max-age=31536000"
+                }
+                remove "Server" "X-Powered-By"
+            }
+        }
+    }
+
+    // Protected API (WAF + auth + strict rate limit)
+    route "protected-api" {
+        priority 600
+        matches {
+            path-prefix "/api/"
+        }
+        service-type "api"
+        upstream "backend"
+        policies {
+            timeout_secs 30
+            max_body_size "5MB"
+            response_headers {
+                set {
+                    "X-Content-Type-Options" "nosniff"
+                    "Cache-Control" "no-store"
+                }
+                remove "Server" "X-Powered-By"
+            }
+        }
+        error_pages {
+            default_format "json"
+        }
+    }
+
+    // Admin (strictest security)
+    route "admin" {
+        priority 700
+        matches {
+            path-prefix "/admin/"
+        }
+        upstream "backend"
+        policies {
+            failure_mode "closed"
+            response_headers {
+                set {
+                    "X-Content-Type-Options" "nosniff"
+                    "X-Frame-Options" "DENY"
+                    "Cache-Control" "no-store, no-cache, must-revalidate"
+                }
+            }
+        }
+    }
+}
+
+upstreams {
+    upstream "backend" {
+        targets {
+            target { address "127.0.0.1:3000" }
+        }
+        health-check {
+            type "http" { path "/health" }
+            interval-secs 10
+        }
+    }
+}
+
+observability {
+    metrics {
+        enabled #true
+        address "0.0.0.0:9090"
+    }
+    logging {
+        level "info"
+        format "json"
+    }
+}`
+};
+
 // DOM Elements
 const configEditor = document.getElementById('config-editor');
 const highlightCode = document.getElementById('highlight-code');
@@ -644,6 +1263,54 @@ if (toggleTraceBtn) {
             : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> Expand All`;
     });
 }
+
+// =============================================================================
+// Template Selector
+// =============================================================================
+
+function loadTemplate(templateKey) {
+    const template = TEMPLATES[templateKey];
+    if (!template) {
+        console.error(`Template not found: ${templateKey}`);
+        return;
+    }
+
+    // Load template into editor
+    configEditor.value = template;
+
+    // Update syntax highlighting
+    updateHighlight();
+
+    // Trigger validation
+    if (wasmReady) {
+        validateConfig();
+    }
+
+    // Scroll to top of editor
+    configEditor.scrollTop = 0;
+
+    // Visual feedback: highlight the selected template button
+    document.querySelectorAll('.template-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    const selectedCard = document.querySelector(`.template-card[data-template="${templateKey}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('active');
+
+        // Scroll editor into view on mobile
+        setTimeout(() => {
+            configEditor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+}
+
+// Add click handlers to template cards
+document.querySelectorAll('.template-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const templateKey = card.getAttribute('data-template');
+        loadTemplate(templateKey);
+    });
+});
 
 // Initialize
 loadConfigFromHash();
