@@ -79,24 +79,139 @@
 .editor-wrapper {
     flex: 1;
     display: flex;
+    overflow: hidden;
+}
+
+.editor-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+// Shared editor font settings - must be identical
+$editor-font: var(--font-mono);
+$editor-font-size: 13px; // Fixed px for consistency
+$editor-line-height: 1.6;
+$editor-padding: var(--space-md);
+
+.editor-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: $editor-padding;
+    font-family: $editor-font;
+    font-size: $editor-font-size;
+    line-height: $editor-line-height;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+    background: var(--color-bg-subtle);
+    border: none;
+    border-radius: 0;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+
+    code {
+        display: block;
+        padding: 0;
+        margin: 0;
+        background: none;
+        border: none;
+        border-radius: 0;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+        white-space: inherit;
+        word-wrap: inherit;
+        overflow-wrap: inherit;
+        color: var(--ctp-text, var(--color-text));
+    }
 }
 
 #config-editor {
-    flex: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
-    padding: var(--space-md);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    line-height: 1.6;
-    color: var(--color-text);
-    background: var(--color-bg-subtle);
+    height: 100%;
+    margin: 0;
+    padding: $editor-padding;
+    font-family: $editor-font;
+    font-size: $editor-font-size;
+    line-height: $editor-line-height;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    color: transparent;
+    caret-color: var(--color-text);
+    background: transparent;
     border: none;
+    border-radius: 0;
     resize: none;
     outline: none;
+    z-index: 2;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
 
     &::placeholder {
         color: var(--color-text-subtle);
     }
+
+    &::selection {
+        background: rgba(203, 166, 247, 0.3);
+    }
+}
+
+// =============================================================================
+// KDL Syntax Highlighting (Catppuccin colors)
+// =============================================================================
+
+.hl-comment {
+    color: var(--ctp-overlay1, #6c7086);
+    font-style: italic;
+}
+
+.hl-string {
+    color: var(--ctp-green, #a6e3a1);
+}
+
+.hl-number {
+    color: var(--ctp-peach, #fab387);
+}
+
+.hl-keyword {
+    color: var(--ctp-mauve, #cba6f7);
+    font-weight: 600;
+}
+
+.hl-property {
+    color: var(--ctp-lavender, #b4befe);
+}
+
+.hl-constant {
+    color: var(--ctp-peach, #fab387);
+}
+
+.hl-node {
+    color: var(--ctp-blue, #89b4fa);
+}
+
+.hl-brace {
+    color: var(--ctp-overlay2, #9399b2);
+    font-weight: bold;
+}
+
+.hl-operator {
+    color: var(--ctp-sky, #89dceb);
 }
 
 // Validation Status
@@ -213,6 +328,46 @@
     flex-direction: column;
 }
 
+// Request Tabs
+.request-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--color-bg);
+    padding: 3px;
+    border-radius: 8px;
+}
+
+.request-tab {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+        color: var(--color-text);
+    }
+
+    &.active {
+        background: var(--color-bg-elevated);
+        color: var(--color-text);
+    }
+}
+
+.request-tab-content {
+    display: none;
+    flex: 1;
+
+    &.active {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 .request-builder {
     padding: var(--space-lg);
     display: flex;
@@ -221,21 +376,56 @@
     flex: 1;
 }
 
+// Raw request textarea
+.request-raw {
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    flex: 1;
+}
+
+#raw-request {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-height: 200px;
+    padding: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s ease;
+
+    &::placeholder {
+        color: var(--color-text-subtle);
+    }
+
+    &:focus {
+        border-color: var(--ctp-mauve);
+    }
+}
+
 .request-row {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
 
     label {
-        font-size: 0.75rem;
-        font-weight: 500;
+        font-size: 0.6875rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--color-text-muted);
+        letter-spacing: 0.08em;
+        color: var(--color-text-subtle);
     }
 
-    select,
-    input[type="text"] {
+    select {
         padding: var(--space-sm) var(--space-md);
         font-family: var(--font-mono);
         font-size: 0.875rem;
@@ -244,11 +434,39 @@
         border: 1px solid var(--color-border);
         border-radius: var(--radius-md);
         outline: none;
-        transition: border-color var(--transition-fast);
+        transition: border-color 0.2s ease;
+        cursor: pointer;
 
         &:focus {
-            border-color: var(--color-primary);
+            border-color: var(--color-accent);
         }
+    }
+
+}
+
+// Host and Path inputs - match original dark style
+#request-host,
+#request-path {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+
+    padding: var(--space-sm) var(--space-md) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 0.875rem !important;
+    color: var(--color-text) !important;
+    background: var(--color-bg) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    outline: none !important;
+    transition: border-color 0.2s ease !important;
+
+    &::placeholder {
+        color: var(--color-text-subtle) !important;
+    }
+
+    &:focus {
+        border-color: var(--ctp-mauve) !important;
     }
 }
 
@@ -271,6 +489,10 @@
     align-items: center;
 
     input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+
         padding: var(--space-sm);
         font-family: var(--font-mono);
         font-size: 0.8125rem;
@@ -279,9 +501,10 @@
         border: 1px solid var(--color-border);
         border-radius: var(--radius-sm);
         outline: none;
+        transition: border-color 0.2s ease;
 
         &:focus {
-            border-color: var(--color-primary);
+            border-color: var(--ctp-mauve);
         }
 
         &::placeholder {
@@ -294,20 +517,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     padding: 0;
-    background: transparent;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
+    background: var(--color-bg-surface);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--color-text-subtle);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.2s ease;
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
 
     &:hover {
-        background: var(--color-error);
-        border-color: var(--color-error);
-        color: white;
+        background: rgba(243, 139, 168, 0.15);
+        color: var(--color-error);
+    }
+
+    &:active {
+        background: rgba(243, 139, 168, 0.25);
     }
 }
 
@@ -369,7 +600,7 @@
     align-items: center;
     padding: var(--space-md) var(--space-lg);
     background: var(--color-bg);
-    border: 2px solid var(--color-border);
+    border: 2px solid var(--ctp-mauve);
     border-radius: var(--radius-md);
     min-width: 120px;
     opacity: 0;
@@ -379,29 +610,59 @@
         animation: nodeAppear 0.3s ease forwards;
     }
 
-    &.flow-node-client {
-        border-color: var(--color-info);
-        background: rgba(116, 199, 236, 0.08);
-    }
-
-    &.flow-node-route {
-        border-color: var(--color-success);
-        background: rgba(166, 227, 161, 0.08);
-    }
-
+    // Error state - red for no match
     &.flow-node-nomatch {
-        border-color: var(--color-error);
-        background: rgba(243, 139, 168, 0.08);
+        border-color: var(--color-error) !important;
+        background: rgba(243, 139, 168, 0.12) !important;
+    }
+}
+
+// Gradient progression across nodes using data attributes set by JS
+.flow-nodes {
+    .flow-node[data-index="0"] {
+        border-color: var(--ctp-mauve);
+        background: rgba(203, 166, 247, 0.1);
     }
 
-    &.flow-node-policies {
-        border-color: var(--color-warning);
-        background: rgba(249, 226, 175, 0.08);
+    .flow-node[data-index="1"] {
+        border-color: #e0a4df;
+        background: rgba(224, 164, 223, 0.1);
     }
 
-    &.flow-node-upstream {
-        border-color: var(--color-primary);
-        background: rgba(203, 166, 247, 0.08);
+    .flow-node[data-index="2"] {
+        border-color: var(--ctp-pink);
+        background: rgba(245, 194, 231, 0.1);
+    }
+
+    .flow-node[data-index="3"] {
+        border-color: #f8a9b0;
+        background: rgba(248, 169, 176, 0.1);
+    }
+
+    .flow-node[data-index="4"],
+    .flow-node[data-index="5"],
+    .flow-node[data-index="6"] {
+        border-color: var(--ctp-peach);
+        background: rgba(250, 179, 135, 0.1);
+    }
+
+    // Arrows follow gradient too
+    .flow-arrow[data-index="0"] {
+        color: #d9a5eb;
+    }
+
+    .flow-arrow[data-index="1"] {
+        color: #eba3d7;
+    }
+
+    .flow-arrow[data-index="2"] {
+        color: #f5a6c3;
+    }
+
+    .flow-arrow[data-index="3"],
+    .flow-arrow[data-index="4"],
+    .flow-arrow[data-index="5"] {
+        color: var(--ctp-peach);
     }
 }
 
