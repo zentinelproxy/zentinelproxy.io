@@ -18,100 +18,116 @@ let debounceTimer = null;
 
 // Template Configurations
 const TEMPLATES = {
-    'ai-gateway': `// AI Gateway Configuration
-// Route requests to OpenAI, Anthropic, and Azure OpenAI
+    'basic': `// Vanilla Setup Configuration
+// Simple reverse proxy with multiple routes and load balancing
 
 system {
-    worker-threads 0
+    worker-threads 4
+    max-connections 10000
 }
 
 listeners {
-    listener "https" {
-        address "0.0.0.0:8443"
-        protocol "https"
-        tls {
-            cert-file "/etc/sentinel/certs/gateway.crt"
-            key-file "/etc/sentinel/certs/gateway.key"
-        }
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
     }
 }
 
 routes {
-    // OpenAI API
-    route "openai" {
-        priority 200
+    route "api" {
+        priority "high"
         matches {
-            path-prefix "/v1/"
-            host "api.openai.local"
+            path-prefix "/api"
         }
-        service-type "inference"
-        upstream "openai"
+        upstream "backend"
         policies {
-            timeout_secs 120
-            max_body_size "10MB"
+            timeout-secs 30
+            failure-mode "open"
         }
     }
-
-    // Anthropic API
-    route "anthropic" {
-        priority 200
+    route "static" {
+        priority "medium"
         matches {
-            path-prefix "/v1/"
-            host "api.anthropic.local"
+            path-prefix "/static"
         }
-        service-type "inference"
-        upstream "anthropic"
-        policies {
-            timeout_secs 120
-            max_body_size "10MB"
-        }
+        upstream "backend"
     }
-
-    // Azure OpenAI
-    route "azure-openai" {
-        priority 200
+    route "default" {
+        priority "low"
         matches {
-            path-prefix "/openai/"
-            host "azure.openai.local"
+            path-prefix "/"
         }
-        service-type "inference"
-        upstream "azure-openai"
-        policies {
-            timeout_secs 120
-            max_body_size "10MB"
-        }
+        upstream "backend"
     }
 }
 
 upstreams {
-    upstream "openai" {
-        targets {
-            target { address "api.openai.com:443" }
+    upstream "backend" {
+        target "127.0.0.1:8081" weight=1
+        target "127.0.0.1:8082" weight=2
+        load-balancing "round_robin"
+    }
+}`,
+
+    'ai-gateway': `// AI Gateway Configuration
+// LLM inference proxy with token-based rate limiting
+
+system {
+    worker-threads 4
+    max-connections 10000
+}
+
+// Listener for the inference API
+listeners {
+    listener "inference-api" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+// Inference route with token-based rate limiting
+routes {
+    route "openai-proxy" {
+        priority 100
+        matches {
+            path-prefix "/v1/"
         }
-        tls {
-            sni "api.openai.com"
-            insecure-skip-verify #false
+        service-type "inference"
+        upstream "llm-pool"
+
+        inference {
+            provider "openai"
+
+            rate-limit {
+                tokens-per-minute 100000
+                requests-per-minute 500
+                burst-tokens 20000
+                estimation-method "chars"
+            }
+
+            routing {
+                strategy "least_tokens_queued"
+            }
+        }
+
+        policies {
+            timeout-secs 120
+            request-headers {
+                set {
+                    "Authorization" "Bearer \${OPENAI_API_KEY}"
+                }
+            }
         }
     }
+}
 
-    upstream "anthropic" {
-        targets {
-            target { address "api.anthropic.com:443" }
-        }
-        tls {
-            sni "api.anthropic.com"
-            insecure-skip-verify #false
-        }
-    }
-
-    upstream "azure-openai" {
-        targets {
-            target { address "your-resource.openai.azure.com:443" }
-        }
-        tls {
-            sni "your-resource.openai.azure.com"
-            insecure-skip-verify #false
-        }
+// Upstream pool with inference health checks
+upstreams {
+    upstream "llm-pool" {
+        target "gpu-1.internal:8080"
+        target "gpu-2.internal:8080"
+        target "gpu-3.internal:8080"
+        load-balancing "least_tokens_queued"
     }
 }`,
 
@@ -119,7 +135,8 @@ upstreams {
 // Multi-version REST API with schema validation
 
 system {
-    worker-threads 0
+    worker-threads 4
+    max-connections 10000
 }
 
 listeners {
@@ -143,11 +160,11 @@ routes {
         service-type "api"
         upstream "api-v2-backend"
         policies {
-            timeout_secs 30
-            max_body_size "5MB"
+            timeout-secs 30
+            max-body-size "5MB"
         }
-        error_pages {
-            default_format "json"
+        error-pages {
+            default-format "json"
         }
     }
 
@@ -160,11 +177,11 @@ routes {
         service-type "api"
         upstream "api-v1-backend"
         policies {
-            timeout_secs 30
-            max_body_size "1MB"
+            timeout-secs 30
+            max-body-size "1MB"
         }
-        error_pages {
-            default_format "json"
+        error-pages {
+            default-format "json"
         }
     }
 
@@ -179,33 +196,22 @@ routes {
 
 upstreams {
     upstream "api-v2-backend" {
-        targets {
-            target { address "127.0.0.1:8001" }
-            target { address "127.0.0.1:8002" }
-        }
+        target "127.0.0.1:8001"
+        target "127.0.0.1:8002"
         load-balancing "round_robin"
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 10
-        }
     }
 
     upstream "api-v1-backend" {
-        targets {
-            target { address "127.0.0.1:7001" }
-        }
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 10
-        }
+        target "127.0.0.1:7001"
     }
 }`,
 
-    'microservices': `// Microservices Mesh Configuration
+    'microservices': `// Service Mesh Configuration
 // Service-to-service routing with health checks
 
 system {
-    worker-threads 0
+    worker-threads 4
+    max-connections 10000
 }
 
 listeners {
@@ -224,7 +230,7 @@ routes {
         }
         upstream "auth-service"
         policies {
-            timeout_secs 10
+            timeout-secs 10
         }
     }
 
@@ -236,7 +242,7 @@ routes {
         }
         upstream "users-service"
         policies {
-            timeout_secs 15
+            timeout-secs 15
         }
     }
 
@@ -248,7 +254,7 @@ routes {
         }
         upstream "orders-service"
         policies {
-            timeout_secs 30
+            timeout-secs 30
         }
     }
 
@@ -260,65 +266,41 @@ routes {
         }
         upstream "inventory-service"
         policies {
-            timeout_secs 20
+            timeout-secs 20
         }
     }
 }
 
 upstreams {
     upstream "auth-service" {
-        targets {
-            target { address "auth-1.local:3000" }
-            target { address "auth-2.local:3000" }
-        }
+        target "auth-1.local:3000"
+        target "auth-2.local:3000"
         load-balancing "round_robin"
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 10
-            unhealthy-threshold 3
-        }
     }
 
     upstream "users-service" {
-        targets {
-            target { address "users-1.local:3001" }
-            target { address "users-2.local:3001" }
-        }
+        target "users-1.local:3001"
+        target "users-2.local:3001"
         load-balancing "least_connections"
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 10
-        }
     }
 
     upstream "orders-service" {
-        targets {
-            target { address "orders-1.local:3002" }
-        }
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 15
-        }
+        target "orders-1.local:3002"
     }
 
     upstream "inventory-service" {
-        targets {
-            target { address "inventory-1.local:3003" }
-            target { address "inventory-2.local:3003" }
-        }
+        target "inventory-1.local:3003"
+        target "inventory-2.local:3003"
         load-balancing "round_robin"
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 10
-        }
     }
 }`,
 
-    'static-cdn': `// Static Website + CDN Configuration
+    'static-cdn': `// Varnish-type Caching (CDN) Configuration
 // High-performance static file delivery with caching
 
 system {
-    worker-threads 0
+    worker-threads 4
+    max-connections 10000
 }
 
 listeners {
@@ -354,7 +336,7 @@ routes {
             }
         }
         policies {
-            response_headers {
+            response-headers {
                 set {
                     "Cache-Control" "public, max-age=31536000, immutable"
                     "X-Content-Type-Options" "nosniff"
@@ -377,7 +359,7 @@ routes {
             }
         }
         policies {
-            response_headers {
+            response-headers {
                 set {
                     "Cache-Control" "public, max-age=604800"
                 }
@@ -401,11 +383,13 @@ routes {
                 brotli #true
             }
         }
-        error_pages {
-            default_format "html"
-            404 {
-                format "html"
-                message "Page not found"
+        error-pages {
+            default-format "html"
+            pages {
+                "404" {
+                    format "html"
+                    message "Page not found"
+                }
             }
         }
     }
@@ -415,7 +399,8 @@ routes {
 // Real-time connection handling with upgrade support
 
 system {
-    worker-threads 0
+    worker-threads 4
+    max-connections 10000
 }
 
 listeners {
@@ -439,7 +424,7 @@ routes {
         service-type "websocket"
         upstream "chat-backend"
         policies {
-            timeout_secs 3600
+            timeout-secs 3600
         }
     }
 
@@ -452,7 +437,7 @@ routes {
         service-type "websocket"
         upstream "notifications-backend"
         policies {
-            timeout_secs 3600
+            timeout-secs 3600
         }
     }
 
@@ -465,10 +450,10 @@ routes {
         service-type "api"
         upstream "api-backend"
         policies {
-            timeout_secs 30
+            timeout-secs 30
         }
-        error_pages {
-            default_format "json"
+        error-pages {
+            default-format "json"
         }
     }
 
@@ -485,37 +470,21 @@ routes {
 
 upstreams {
     upstream "chat-backend" {
-        targets {
-            target { address "127.0.0.1:9001" }
-            target { address "127.0.0.1:9002" }
-        }
+        target "127.0.0.1:9001"
+        target "127.0.0.1:9002"
         load-balancing "least_connections"
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 30
-        }
     }
 
     upstream "notifications-backend" {
-        targets {
-            target { address "127.0.0.1:9003" }
-        }
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 30
-        }
+        target "127.0.0.1:9003"
     }
 
     upstream "api-backend" {
-        targets {
-            target { address "127.0.0.1:8001" }
-        }
+        target "127.0.0.1:8001"
     }
 
     upstream "web-backend" {
-        targets {
-            target { address "127.0.0.1:8000" }
-        }
+        target "127.0.0.1:8000"
     }
 }`,
 
@@ -523,7 +492,8 @@ upstreams {
 // WAF, rate limiting, and security headers
 
 system {
-    worker-threads 0
+    worker-threads 4
+    max-connections 10000
 }
 
 listeners {
@@ -555,7 +525,7 @@ routes {
         }
         upstream "backend"
         policies {
-            response_headers {
+            response-headers {
                 set {
                     "X-Content-Type-Options" "nosniff"
                     "X-Frame-Options" "DENY"
@@ -576,9 +546,9 @@ routes {
         service-type "api"
         upstream "backend"
         policies {
-            timeout_secs 30
-            max_body_size "5MB"
-            response_headers {
+            timeout-secs 30
+            max-body-size "5MB"
+            response-headers {
                 set {
                     "X-Content-Type-Options" "nosniff"
                     "Cache-Control" "no-store"
@@ -586,8 +556,8 @@ routes {
                 remove "Server" "X-Powered-By"
             }
         }
-        error_pages {
-            default_format "json"
+        error-pages {
+            default-format "json"
         }
     }
 
@@ -599,8 +569,8 @@ routes {
         }
         upstream "backend"
         policies {
-            failure_mode "closed"
-            response_headers {
+            failure-mode "closed"
+            response-headers {
                 set {
                     "X-Content-Type-Options" "nosniff"
                     "X-Frame-Options" "DENY"
@@ -613,13 +583,7 @@ routes {
 
 upstreams {
     upstream "backend" {
-        targets {
-            target { address "127.0.0.1:3000" }
-        }
-        health-check {
-            type "http" { path "/health" }
-            interval-secs 10
-        }
+        target "127.0.0.1:3000"
     }
 }
 
@@ -632,7 +596,314 @@ observability {
         level "info"
         format "json"
     }
-}`
+}`,
+
+    'canary': `// Canary Deployment Configuration
+// Gradual rollout with weighted traffic splitting
+
+system {
+    worker-threads 4
+    max-connections 10000
+}
+
+listeners {
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+routes {
+    // Canary release - 10% traffic to new version
+    route "api-canary" {
+        priority 300
+        matches {
+            path-prefix "/api/"
+            header "X-Canary-User" "true"
+        }
+        upstream "api-v2-canary"
+    }
+
+    // Main API - 90% traffic to stable version
+    route "api-stable" {
+        priority 200
+        matches {
+            path-prefix "/api/"
+        }
+        upstream "api-v1-stable"
+    }
+}
+
+upstreams {
+    // New version (10% traffic)
+    upstream "api-v2-canary" {
+        target "127.0.0.1:8002"
+        target "127.0.0.1:8003"
+        load-balancing "round_robin"
+    }
+
+    // Stable version (90% traffic)
+    upstream "api-v1-stable" {
+        target "127.0.0.1:8001"
+        target "127.0.0.1:8004"
+        target "127.0.0.1:8005"
+        load-balancing "least_connections"
+    }
+}`,
+
+    'content-routing': `// Content Router Configuration
+// Header-based and path-based intelligent routing
+
+system {
+    worker-threads 4
+    max-connections 10000
+}
+
+listeners {
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+routes {
+    // Mobile API (special handling for mobile clients)
+    route "mobile-api" {
+        priority 500
+        matches {
+            path-prefix "/api/"
+            header "User-Agent" ".*Mobile.*"
+        }
+        upstream "mobile-backend"
+        policies {
+            timeout-secs 60
+        }
+    }
+
+    // JSON API
+    route "json-api" {
+        priority 400
+        matches {
+            path-prefix "/api/"
+            header "Accept" "application/json"
+        }
+        upstream "json-backend"
+        policies {
+            timeout-secs 30
+        }
+    }
+
+    // XML API (legacy)
+    route "xml-api" {
+        priority 400
+        matches {
+            path-prefix "/api/"
+            header "Accept" "application/xml"
+        }
+        upstream "xml-backend"
+        policies {
+            timeout-secs 30
+        }
+    }
+
+    // Default API
+    route "default-api" {
+        priority 100
+        matches {
+            path-prefix "/api/"
+        }
+        upstream "default-backend"
+    }
+}
+
+upstreams {
+    upstream "mobile-backend" {
+        target "127.0.0.1:9001"
+        target "127.0.0.1:9002"
+        load-balancing "least_connections"
+    }
+
+    upstream "json-backend" {
+        target "127.0.0.1:8001"
+        target "127.0.0.1:8002"
+        load-balancing "round_robin"
+    }
+
+    upstream "xml-backend" {
+        target "127.0.0.1:7001"
+    }
+
+    upstream "default-backend" {
+        target "127.0.0.1:8000"
+    }
+}`,
+
+    'grpc': `// gRPC Gateway Configuration
+// HTTP/2 gRPC service proxy with load balancing
+
+system {
+    worker-threads 4
+    max-connections 10000
+}
+
+listeners {
+    listener "grpc" {
+        address "0.0.0.0:8080"
+        protocol "h2"
+    }
+}
+
+routes {
+    // User service
+    route "user-service" {
+        priority 300
+        matches {
+            path-prefix "/user.UserService/"
+        }
+        service-type "grpc"
+        upstream "user-grpc"
+        policies {
+            timeout-secs 30
+        }
+    }
+
+    // Order service
+    route "order-service" {
+        priority 300
+        matches {
+            path-prefix "/order.OrderService/"
+        }
+        service-type "grpc"
+        upstream "order-grpc"
+        policies {
+            timeout-secs 45
+        }
+    }
+
+    // Inventory service
+    route "inventory-service" {
+        priority 300
+        matches {
+            path-prefix "/inventory.InventoryService/"
+        }
+        service-type "grpc"
+        upstream "inventory-grpc"
+        policies {
+            timeout-secs 30
+        }
+    }
+}
+
+upstreams {
+    upstream "user-grpc" {
+        target "user-1.svc.local:9090"
+        target "user-2.svc.local:9090"
+        load-balancing "round_robin"
+    }
+
+    upstream "order-grpc" {
+        target "order-1.svc.local:9090"
+        target "order-2.svc.local:9090"
+        load-balancing "least_connections"
+    }
+
+    upstream "inventory-grpc" {
+        target "inventory.svc.local:9090"
+    }
+}`,
+
+    'multi-region': `// Multi-Region Configuration
+// Geographic routing with failover across regions
+
+system {
+    worker-threads 4
+    max-connections 10000
+}
+
+listeners {
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+routes {
+    // US East traffic
+    route "api-us-east" {
+        priority 400
+        matches {
+            path-prefix "/api/"
+            header "X-Region" "us-east"
+        }
+        upstream "us-east-backend"
+    }
+
+    // US West traffic
+    route "api-us-west" {
+        priority 400
+        matches {
+            path-prefix "/api/"
+            header "X-Region" "us-west"
+        }
+        upstream "us-west-backend"
+    }
+
+    // EU traffic
+    route "api-eu" {
+        priority 400
+        matches {
+            path-prefix "/api/"
+            header "X-Region" "eu"
+        }
+        upstream "eu-backend"
+    }
+
+    // Asia-Pacific traffic
+    route "api-apac" {
+        priority 400
+        matches {
+            path-prefix "/api/"
+            header "X-Region" "apac"
+        }
+        upstream "apac-backend"
+    }
+
+    // Default (nearest region)
+    route "api-default" {
+        priority 100
+        matches {
+            path-prefix "/api/"
+        }
+        upstream "us-east-backend"
+    }
+}
+
+upstreams {
+    upstream "us-east-backend" {
+        target "us-east-1.example.com:8080"
+        target "us-east-2.example.com:8080"
+        load-balancing "least_connections"
+    }
+
+    upstream "us-west-backend" {
+        target "us-west-1.example.com:8080"
+        target "us-west-2.example.com:8080"
+        load-balancing "least_connections"
+    }
+
+    upstream "eu-backend" {
+        target "eu-central-1.example.com:8080"
+        target "eu-west-1.example.com:8080"
+        load-balancing "least_connections"
+    }
+
+    upstream "apac-backend" {
+        target "apac-east-1.example.com:8080"
+        target "apac-southeast-1.example.com:8080"
+        load-balancing "least_connections"
+    }
+}
+`
 };
 
 // DOM Elements
@@ -646,6 +917,10 @@ const flowDiagram = document.getElementById('flow-diagram');
 const traceContent = document.getElementById('trace-content');
 const headersList = document.getElementById('headers-list');
 const addHeaderBtn = document.getElementById('add-header-btn');
+const configPanel = document.getElementById('config-panel');
+const copyConfigBtn = document.getElementById('copy-config-btn');
+const fullscreenConfigBtn = document.getElementById('fullscreen-config-btn');
+const responseFlowDiagram = document.getElementById('response-flow-diagram');
 
 // =============================================================================
 // KDL Syntax Highlighting
@@ -905,10 +1180,12 @@ function runSimulation() {
 
         const result = simulate(config, JSON.stringify(request));
         renderFlowDiagram(result, { method, host, path });
+        renderResponseFlowDiagram(result);
         renderTrace(result);
     } catch (e) {
         console.error('Simulation error:', e);
         flowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
+        responseFlowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
     }
 }
 
@@ -956,6 +1233,85 @@ function renderFlowDiagram(result, request) {
     // Animate nodes appearing
     requestAnimationFrame(() => {
         document.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
+            el.style.animationDelay = `${i * 0.1}s`;
+            el.classList.add('flow-animate');
+        });
+    });
+}
+
+// Render response flow diagram (reverse direction)
+function renderResponseFlowDiagram(result) {
+    const matched = result.matched_route;
+    const upstream = result.upstream_selection;
+    const policies = result.applied_policies || {};
+
+    const nodes = [];
+
+    // Build response flow in reverse order
+    if (matched) {
+        if (upstream) {
+            nodes.push({
+                id: 'upstream',
+                label: `Upstream: ${upstream.upstream_id}`,
+                sublabel: upstream.selected_target || '',
+                type: 'upstream'
+            });
+        }
+
+        // Response transformations (if any policies modify response)
+        if (Object.keys(policies).length > 0) {
+            const responseTransforms = [];
+            if (policies.response_headers) responseTransforms.push('headers modified');
+            if (policies.response_body) responseTransforms.push('body transformed');
+
+            if (responseTransforms.length > 0) {
+                nodes.push({
+                    id: 'transform',
+                    label: 'Response Transform',
+                    sublabel: responseTransforms.join(', '),
+                    type: 'policies'
+                });
+            }
+        }
+
+        nodes.push({
+            id: 'proxy',
+            label: 'Sentinel Proxy',
+            sublabel: 'response processing',
+            type: 'route'
+        });
+    } else {
+        // No match - return error response
+        nodes.push({
+            id: 'proxy',
+            label: 'Sentinel Proxy',
+            sublabel: '404 - no route matched',
+            type: 'nomatch'
+        });
+    }
+
+    nodes.push({
+        id: 'client',
+        label: 'Client',
+        sublabel: matched ? '200 OK' : '404 Not Found',
+        type: 'client'
+    });
+
+    responseFlowDiagram.innerHTML = `
+        <div class="flow-nodes">
+            ${nodes.map((node, i) => `
+                <div class="flow-node flow-node-${node.type}" data-node="${node.id}" data-index="${i}">
+                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
+                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
+                </div>
+                ${i < nodes.length - 1 ? `<div class="flow-arrow" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
+            `).join('')}
+        </div>
+    `;
+
+    // Animate nodes appearing
+    requestAnimationFrame(() => {
+        responseFlowDiagram.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
             el.style.animationDelay = `${i * 0.1}s`;
             el.classList.add('flow-animate');
         });
@@ -1138,6 +1494,40 @@ configEditor.addEventListener('scroll', syncScroll);
 simulateBtn.addEventListener('click', runSimulation);
 addHeaderBtn.addEventListener('click', () => addHeaderRow());
 
+// Copy configuration button
+copyConfigBtn.addEventListener('click', async () => {
+    const config = configEditor.value;
+    try {
+        await navigator.clipboard.writeText(config);
+        // Visual feedback
+        const originalHTML = copyConfigBtn.innerHTML;
+        copyConfigBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        copyConfigBtn.style.color = 'var(--color-success)';
+        setTimeout(() => {
+            copyConfigBtn.innerHTML = originalHTML;
+            copyConfigBtn.style.color = '';
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy:', err);
+    }
+});
+
+// Fullscreen toggle button
+fullscreenConfigBtn.addEventListener('click', () => {
+    configPanel.classList.toggle('fullscreen');
+
+    // Handle escape key to exit fullscreen
+    if (configPanel.classList.contains('fullscreen')) {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                configPanel.classList.remove('fullscreen');
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+    }
+});
+
 // Also listen for keyup to catch paste events and other input methods
 configEditor.addEventListener('keyup', () => {
     updateHighlight();
@@ -1218,6 +1608,7 @@ function runRawSimulation() {
 
     if (!parsed) {
         flowDiagram.innerHTML = `<div class="flow-error">Invalid request format. Expected: METHOD /path HTTP/1.1</div>`;
+        responseFlowDiagram.innerHTML = `<div class="flow-error">Invalid request format</div>`;
         return;
     }
 
@@ -1229,10 +1620,12 @@ function runRawSimulation() {
 
         const result = simulate(config, JSON.stringify(request));
         renderFlowDiagram(result, parsed);
+        renderResponseFlowDiagram(result);
         renderTrace(result);
     } catch (e) {
         console.error('Simulation error:', e);
         flowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
+        responseFlowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
     }
 }
 
@@ -1296,11 +1689,6 @@ function loadTemplate(templateKey) {
     const selectedCard = document.querySelector(`.template-card[data-template="${templateKey}"]`);
     if (selectedCard) {
         selectedCard.classList.add('active');
-
-        // Scroll editor into view on mobile
-        setTimeout(() => {
-            configEditor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
     }
 }
 
