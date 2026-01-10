@@ -261,6 +261,22 @@ img {
             color: var(--color-text);
         }
     }
+
+    .nav-icon-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        transition: all var(--transition-fast);
+
+        &:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border);
+        }
+    }
 }
 
 .theme-toggle {
@@ -404,6 +420,16 @@ img {
 
     &:hover {
         color: var(--color-primary);
+    }
+
+    &--icon {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+
+        svg {
+            flex-shrink: 0;
+        }
     }
 }
 
@@ -1317,10 +1343,21 @@ img {
 
 .footer-links {
     display: flex;
-    gap: var(--space-3xl);
+    gap: var(--space-2xl);
+    flex-wrap: wrap;
+
+    @media (max-width: 900px) {
+        gap: var(--space-xl);
+    }
 
     @media (max-width: 768px) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: var(--space-xl);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1328,6 +1365,7 @@ img {
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+    min-width: 120px;
 
     h4 {
         font-size: 0.875rem;
@@ -1337,11 +1375,18 @@ img {
     }
 
     a {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
         font-size: 0.875rem;
         color: var(--color-text-muted);
 
         &:hover {
             color: var(--color-text);
+        }
+
+        svg {
+            flex-shrink: 0;
         }
     }
 }
@@ -1962,6 +2007,266 @@ img {
     @media (max-width: 768px) {
         justify-content: center;
     }
+}
+
+// Agent Explainer Grid
+.agent-explainer {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-md);
+
+    h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: var(--space-lg);
+        color: var(--color-text);
+    }
+}
+
+.explainer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-lg);
+}
+
+.explainer-item {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.explainer-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    color: var(--color-primary);
+}
+
+.explainer-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    strong {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+
+    span {
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+        line-height: 1.5;
+    }
+}
+
+// SDK Cards Grid
+.sdk-intro {
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+}
+
+.sdk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+.sdk-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-lg);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+
+    &:hover {
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+}
+
+.sdk-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.sdk-logo {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+
+    &.rust {
+        background: color-mix(in srgb, #f5a97f 15%, var(--color-bg));
+        color: #f5a97f;
+    }
+
+    &.go {
+        background: color-mix(in srgb, #00ADD8 15%, var(--color-bg));
+        color: #00ADD8;
+    }
+
+    &.python {
+        background: color-mix(in srgb, #3776ab 15%, var(--color-bg));
+        color: #3776ab;
+    }
+
+    &.typescript {
+        background: color-mix(in srgb, #3178c6 15%, var(--color-bg));
+        color: #3178c6;
+    }
+}
+
+.sdk-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.sdk-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.sdk-package {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+}
+
+.sdk-description {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    flex: 1;
+    margin-bottom: var(--space-md);
+}
+
+.sdk-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.sdk-install {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--color-primary);
+    background: var(--color-bg-elevated);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: calc(100% - 24px);
+}
+
+.sdk-footer svg {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+}
+
+.sdk-card:hover .sdk-footer svg {
+    color: var(--color-primary);
+}
+
+// Code Example Tabs
+.code-example {
+    margin: var(--space-lg) 0 var(--space-2xl);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.code-tabs {
+    display: flex;
+    background: var(--color-bg-elevated);
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.code-tab {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+        color: var(--color-text);
+        background: var(--color-bg);
+    }
+
+    &.active {
+        color: var(--color-primary);
+        background: var(--color-bg);
+        box-shadow: inset 0 -2px 0 var(--color-primary);
+    }
+}
+
+.code-panels {
+    background: var(--color-bg);
+}
+
+.code-panel {
+    display: none;
+    margin: 0;
+    padding: var(--space-lg);
+    overflow-x: auto;
+
+    &.active {
+        display: block;
+    }
+
+    code {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: var(--color-text);
+    }
+}
+
+.config-example {
+    margin: var(--space-md) 0 var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+
+    code {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: var(--color-text);
+    }
+}
+
+.create-agent-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: var(--space-xl) 0 var(--space-md);
+    color: var(--color-text);
 }
 
 // Agent Detail Page - Quick Install
