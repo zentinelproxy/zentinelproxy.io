@@ -1,6 +1,6 @@
 +++
 title = "WebSocket Inspector"
-description = "Deep inspection and filtering of WebSocket connections with content detection, schema validation, and rate limiting."
+description = "Security analysis for WebSocket frames: content filtering, schema validation, and attack detection for real-time connections."
 template = "agent.html"
 
 [taxonomies]
@@ -22,12 +22,49 @@ crate_name = "sentinel-agent-websocket-inspector"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "0.1.0"
+min_sentinel_version = "26.01.0"
 +++
 
 ## Overview
 
-WebSocket Inspector provides security controls for WebSocket connections, enabling content filtering, schema validation, rate limiting, and size limits for bidirectional real-time communication.
+WebSocket Inspector provides **content-level security analysis** for WebSocket connections. This agent processes individual frames sent by Sentinel's native WebSocket support, enabling deep inspection of real-time bidirectional traffic.
+
+<div class="info-notice">
+
+### How It Works with Sentinel
+
+Sentinel v26.01 includes [native WebSocket support](/features/#websocket) that handles:
+- RFC 6455 compliant connection upgrades
+- Frame parsing and encoding
+- Frame masking/unmasking
+- Connection management
+
+When you enable WebSocket inspection, Sentinel routes each frame to this agent for security analysis:
+
+```
+Client ←→ Sentinel ←→ WebSocket Inspector ←→ Backend
+              │                │
+       Frame Routing    Content Analysis
+              │                │
+              └── Decision ────┘
+                  (allow/block)
+```
+
+| Feature | Built-in | Agent |
+|---------|----------|-------|
+| HTTP 101 Upgrade handling | Yes | — |
+| Frame parsing/encoding | Yes | — |
+| Frame masking/unmasking | Yes | — |
+| Max frame size limits | Yes | — |
+| Per-route WebSocket enable | Yes | — |
+| **XSS detection in frames** | — | Yes |
+| **SQL injection detection** | — | Yes |
+| **Command injection detection** | — | Yes |
+| **JSON Schema validation** | — | Yes |
+| **Per-connection rate limiting** | — | Yes |
+| **Custom pattern matching** | — | Yes |
+
+</div>
 
 ## Features
 
@@ -47,9 +84,9 @@ Validate message structure:
 - **JSON Schema**: Validate text frames against JSON Schema
 - **MessagePack**: Decode and validate binary MessagePack messages
 
-### Rate Limiting
+### Per-Connection Rate Limiting
 
-Per-connection rate controls:
+Prevent abuse on individual connections:
 
 - Messages per second
 - Bytes per second
@@ -110,6 +147,62 @@ sentinel-ws-agent --json-schema /path/to/schema.json
 | `--log-frames` | `WS_LOG_FRAMES` | Log all frames | `false` |
 | `--inspect-binary` | `WS_INSPECT_BINARY` | Inspect binary frames | `false` |
 
+## Sentinel Configuration
+
+Enable WebSocket support on a route and attach the inspector agent:
+
+```kdl
+agent "websocket-inspector" {
+    socket "/tmp/sentinel-ws.sock"
+    timeout 50ms
+    events ["websocket_frame"]
+    failure-mode open
+}
+
+route {
+    match { path-prefix "/ws" }
+    websocket enabled {
+        max-frame-size 65536
+    }
+    agents ["websocket-inspector"]
+    upstream "backend"
+}
+```
+
+### Frame Inspection Events
+
+When `events ["websocket_frame"]` is configured, Sentinel sends each frame to the agent with:
+
+```json
+{
+    "event_type": "websocket_frame",
+    "correlation_id": "conn-123",
+    "frame": {
+        "opcode": "text",
+        "payload": "Hello, world!",
+        "direction": "client_to_server"
+    }
+}
+```
+
+The agent responds with a decision:
+
+```json
+{
+    "decision": "allow"
+}
+```
+
+Or to block:
+
+```json
+{
+    "decision": "block",
+    "websocket_close_code": 1008,
+    "websocket_close_reason": "Policy violation: XSS detected"
+}
+```
+
 ## Detection Patterns
 
 ### XSS Patterns
@@ -151,26 +244,28 @@ Detections are logged with audit tags for analysis:
 - `ws-rate-limit` - Rate limit exceeded
 - `detect-only` - Detection without blocking
 
-## Sentinel Integration
-
-Configure the agent in your Sentinel proxy:
+## Example: Chat Application
 
 ```kdl
 agent "websocket-inspector" {
-    type "websocket_inspector"
-    transport "unix_socket" {
-        path "/tmp/sentinel-ws.sock"
-    }
+    socket "/tmp/chat-ws.sock"
+    timeout 50ms
     events ["websocket_frame"]
-    timeout-ms 50
-    failure-mode "open"
+}
+
+route {
+    match { path-prefix "/chat" }
+    websocket enabled {
+        max-frame-size 4096
+    }
+    agents ["websocket-inspector"]
+    upstream "chat-backend"
 }
 ```
 
-## Example: Chat Application
+Run the agent with chat-specific settings:
 
 ```bash
-# Protect a real-time chat with content filtering and rate limiting
 sentinel-ws-agent \
   --socket /tmp/chat-ws.sock \
   --xss-detection true \
@@ -182,20 +277,33 @@ sentinel-ws-agent \
 
 ## Example: Schema-Validated API
 
+For WebSocket APIs with strict message formats:
+
 ```bash
-# Validate all messages against a JSON Schema
 sentinel-ws-agent \
   --socket /tmp/api-ws.sock \
   --json-schema /etc/sentinel/ws-api-schema.json \
   --block-mode true
 ```
 
-## Architecture
+Example JSON Schema for a trading API:
 
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["action", "symbol"],
+  "properties": {
+    "action": { "enum": ["subscribe", "unsubscribe", "order"] },
+    "symbol": { "type": "string", "pattern": "^[A-Z]{1,5}$" },
+    "quantity": { "type": "integer", "minimum": 1 }
+  }
+}
 ```
-Client ←→ Sentinel ←→ WebSocket Inspector ←→ Backend
-              ↓                  ↓
-         Frame Relay      Content Analysis
-                               ↓
-                    Filter / Validate / Block
-```
+
+## Related Agents
+
+| Agent | Integration |
+|-------|-------------|
+| **WAF** | HTTP request/response protection |
+| **Auth** | Authenticate WebSocket upgrade requests |

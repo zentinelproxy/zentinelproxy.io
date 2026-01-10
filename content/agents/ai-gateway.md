@@ -1,10 +1,10 @@
 +++
 title = "AI Gateway"
-description = "Security controls for AI API requests including prompt injection detection, PII filtering, rate limiting, and schema validation."
+description = "Semantic security for AI APIs: prompt injection detection, jailbreak prevention, and PII filtering for LLM traffic."
 template = "agent.html"
 
 [taxonomies]
-tags = ["ai", "llm", "gateway", "security", "rate-limiting"]
+tags = ["ai", "llm", "gateway", "security", "guardrails"]
 
 [extra]
 official = true
@@ -27,23 +27,42 @@ min_sentinel_version = "25.12.0"
 
 ## Overview
 
-AI Gateway provides comprehensive security controls for AI API traffic (OpenAI, Anthropic, Azure OpenAI). Detect prompt injections, filter PII, enforce rate limits, and validate request schemas at the edge.
+AI Gateway provides **semantic security controls** for AI API traffic (OpenAI, Anthropic, Azure OpenAI). This agent specializes in content-level analysis that requires understanding the meaning and intent of prompts — capabilities that complement Sentinel's built-in inference features.
+
+<div class="info-notice">
+
+### Built-in vs Agent Features
+
+Sentinel v26.01 includes [built-in inference support](/configuration/inference/) for token-based rate limiting, cost tracking, and model routing. This agent focuses on **semantic guardrails** that analyze prompt content:
+
+| Feature | Built-in | Agent |
+|---------|----------|-------|
+| Token-based rate limiting | Yes | — |
+| Token counting (Tiktoken) | Yes | — |
+| Cost attribution & budgets | Yes | — |
+| Model-based routing | Yes | — |
+| Fallback routing | Yes | — |
+| **Prompt injection detection** | — | Yes |
+| **Jailbreak detection** | — | Yes |
+| **PII detection & redaction** | — | Yes |
+| **Schema validation** | — | Yes |
+| **Model allowlist** | — | Yes |
+
+**Recommended setup:** Use Sentinel's built-in inference features for rate limiting and cost control, and add this agent for semantic security.
+
+</div>
 
 ## Features
 
-### Security Controls
+### Semantic Guardrails (Agent-Specific)
+
+These features require content analysis that only an agent can provide:
 
 - **Prompt Injection Detection**: Block attempts to override system prompts or manipulate AI behavior
 - **Jailbreak Detection**: Detect DAN, developer mode, and other bypass attempts
 - **PII Detection**: Detect emails, SSNs, phone numbers, credit cards, IP addresses
   - Configurable actions: block, redact, or log
 - **Schema Validation**: Validate requests against OpenAI and Anthropic JSON schemas
-
-### Usage Control
-
-- **Rate Limiting**: Per-client limits for requests and tokens per minute
-- **Token Limits**: Enforce maximum tokens per request
-- **Cost Estimation**: Add headers with estimated cost based on model pricing
 - **Model Allowlist**: Restrict which AI models can be used
 
 ### Observability
@@ -68,10 +87,7 @@ cargo install sentinel-agent-ai-gateway
 sentinel-ai-gateway-agent \
   --socket /tmp/sentinel-ai.sock \
   --allowed-models "gpt-4,gpt-3.5-turbo,claude-3" \
-  --max-tokens 4000 \
   --pii-action block \
-  --rate-limit-requests 60 \
-  --rate-limit-tokens 100000 \
   --schema-validation
 ```
 
@@ -86,17 +102,24 @@ sentinel-ai-gateway-agent \
 | `--jailbreak-detection` | `JAILBREAK_DETECTION` | Enable jailbreak detection | `true` |
 | `--schema-validation` | `SCHEMA_VALIDATION` | Enable JSON schema validation | `false` |
 | `--allowed-models` | `ALLOWED_MODELS` | Comma-separated model allowlist | (all) |
-| `--max-tokens` | `MAX_TOKENS` | Max tokens per request | `0` (unlimited) |
-| `--rate-limit-requests` | `RATE_LIMIT_REQUESTS` | Requests per minute per client | `0` (unlimited) |
-| `--rate-limit-tokens` | `RATE_LIMIT_TOKENS` | Tokens per minute per client | `0` (unlimited) |
-| `--add-cost-headers` | `ADD_COST_HEADERS` | Add cost estimation headers | `true` |
 | `--block-mode` | `BLOCK_MODE` | Block or detect-only | `true` |
 | `--fail-open` | `FAIL_OPEN` | Allow requests on processing errors | `false` |
 | `--verbose`, `-v` | `VERBOSE` | Enable debug logging | `false` |
 
-### Sentinel Configuration
+### Recommended Sentinel Configuration
+
+Combine built-in inference features with the agent for comprehensive protection:
 
 ```kdl
+// Built-in: Token rate limiting and cost tracking
+inference "openai" {
+    provider openai
+    token-rate-limit 100000 per minute
+    token-budget 1000000 per day
+    cost-tracking enabled
+}
+
+// Agent: Semantic guardrails
 agent "ai-gateway" {
     socket "/tmp/sentinel-ai-gateway.sock"
     timeout 5s
@@ -104,9 +127,10 @@ agent "ai-gateway" {
 }
 
 route {
-    match { hosts ["api.openai.com" "api.anthropic.com"] }
+    match { path-prefix "/v1/chat" }
+    inference "openai"
     agents ["ai-gateway"]
-    upstream "ai-backend"
+    upstream "openai-backend"
 }
 ```
 
@@ -116,16 +140,10 @@ route {
 |--------|-------------|
 | `X-AI-Gateway-Provider` | Detected provider (openai, anthropic, azure) |
 | `X-AI-Gateway-Model` | Model from request |
-| `X-AI-Gateway-Tokens-Estimated` | Estimated token count |
-| `X-AI-Gateway-Cost-Estimated` | Estimated cost in USD |
 | `X-AI-Gateway-PII-Detected` | Comma-separated PII types found |
 | `X-AI-Gateway-Schema-Valid` | Schema validation result |
 | `X-AI-Gateway-Blocked` | `true` if request was blocked |
 | `X-AI-Gateway-Blocked-Reason` | Reason for blocking |
-| `X-RateLimit-Limit-Requests` | Request limit per minute |
-| `X-RateLimit-Remaining-Requests` | Requests remaining in window |
-| `X-RateLimit-Reset` | Seconds until window resets |
-| `Retry-After` | Seconds to wait (when rate limited) |
 
 ## Detection Patterns
 
@@ -190,14 +208,16 @@ X-AI-Gateway-Blocked: true
 X-AI-Gateway-Blocked-Reason: prompt-injection
 ```
 
-### Rate Limited Response
+### PII Redaction
 
-```http
-HTTP/1.1 429 Too Many Requests
-X-RateLimit-Limit-Requests: 60
-X-RateLimit-Remaining-Requests: 0
-X-RateLimit-Reset: 45
-Retry-After: 45
+With `--pii-action redact`, PII is replaced before reaching the upstream:
+
+```json
+// Original
+{"messages": [{"role": "user", "content": "Email me at john@example.com"}]}
+
+// After redaction
+{"messages": [{"role": "user", "content": "Email me at [EMAIL_REDACTED]"}]}
 ```
 
 ## Library Usage
@@ -209,11 +229,9 @@ use sentinel_agent_protocol::AgentServer;
 let config = AiGatewayConfig {
     prompt_injection_enabled: true,
     pii_detection_enabled: true,
-    pii_action: PiiAction::Block,
+    pii_action: PiiAction::Redact,
     jailbreak_detection_enabled: true,
     schema_validation_enabled: true,
-    rate_limit_requests: 60,
-    rate_limit_tokens: 100000,
     ..Default::default()
 };
 
@@ -228,4 +246,4 @@ server.run().await?;
 |-------|-------------|
 | **ModSecurity** | Full OWASP CRS support for web attacks |
 | **Auth** | Per-user API keys and quotas |
-| **Rate Limiter** | Additional rate limiting layers |
+| **WAF** | Additional web attack detection |
