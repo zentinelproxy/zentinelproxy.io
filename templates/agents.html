@@ -2,6 +2,226 @@
 
 {% block title %}{{ section.title }} | {{ config.title }}{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<style>
+    /* Syntax highlighting colors (Catppuccin Mocha) */
+    :root {
+        --sh-bg: #1e1e2e;
+        --sh-text: #cdd6f4;
+        --sh-muted: #6c7086;
+        --sh-green: #a6e3a1;
+        --sh-mauve: #cba6f7;
+        --sh-blue: #89b4fa;
+        --sh-yellow: #f9e2af;
+        --sh-peach: #fab387;
+        --sh-sky: #89dceb;
+        --sh-lavender: #b4befe;
+        --sh-red: #f38ba8;
+        --sh-pink: #f5c2e7;
+        --sh-teal: #94e2d5;
+        --sh-border: #313244;
+    }
+    [data-theme="light"] {
+        --sh-bg: #eff1f5;
+        --sh-text: #4c4f69;
+        --sh-muted: #9ca0b0;
+        --sh-green: #40a02b;
+        --sh-mauve: #8839ef;
+        --sh-blue: #1e66f5;
+        --sh-yellow: #df8e1d;
+        --sh-peach: #fe640b;
+        --sh-sky: #04a5e5;
+        --sh-lavender: #7287fd;
+        --sh-red: #d20f39;
+        --sh-pink: #ea76cb;
+        --sh-teal: #179299;
+        --sh-border: #ccd0da;
+    }
+    /* Override Prism theme */
+    code[class*="language-"],
+    pre[class*="language-"] {
+        background: var(--sh-bg) !important;
+        color: var(--sh-text) !important;
+        text-shadow: none !important;
+        font-family: 'Geist Mono', ui-monospace, monospace !important;
+        font-size: 0.875rem !important;
+        line-height: 1.6 !important;
+    }
+    pre[class*="language-"] {
+        padding: 1.25rem !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--sh-border) !important;
+        overflow-x: auto !important;
+    }
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata { color: var(--sh-muted) !important; font-style: italic; }
+    .token.string,
+    .token.char,
+    .token.attr-value { color: var(--sh-green) !important; }
+    .token.keyword,
+    .token.control,
+    .token.directive,
+    .token.unit { color: var(--sh-mauve) !important; }
+    .token.function,
+    .token.function-name { color: var(--sh-blue) !important; }
+    .token.class-name,
+    .token.type-class-name,
+    .token.builtin { color: var(--sh-yellow) !important; }
+    .token.number,
+    .token.boolean { color: var(--sh-peach) !important; }
+    .token.operator,
+    .token.arrow { color: var(--sh-sky) !important; }
+    .token.punctuation { color: var(--sh-muted) !important; }
+    .token.property,
+    .token.node { color: var(--sh-lavender) !important; }
+    .token.attr-name,
+    .token.variable,
+    .token.parameter { color: var(--sh-red) !important; }
+    .token.symbol,
+    .token.atom { color: var(--sh-pink) !important; }
+    .token.module,
+    .token.namespace { color: var(--sh-teal) !important; }
+    /* Code example styling - override site defaults */
+    .code-example pre,
+    .config-example {
+        margin: 0 !important;
+    }
+    .code-panel,
+    .config-example {
+        background: var(--sh-bg) !important;
+        padding: 1.25rem !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--sh-border) !important;
+        overflow-x: auto !important;
+    }
+    .code-panel code,
+    .config-example code {
+        background: transparent !important;
+        color: var(--sh-text) !important;
+        font-family: 'Geist Mono', ui-monospace, monospace !important;
+        font-size: 0.875rem !important;
+    }
+    /* Ensure Prism tokens override base code color */
+    .code-panel .token,
+    .config-example .token {
+        background: transparent !important;
+    }
+    /* Protocol documentation links */
+    .protocol-docs-links {
+        margin: 1.5rem 0;
+        padding: 1.25rem;
+        background: var(--color-bg-subtle, #1e1e2e);
+        border-radius: 8px;
+        border: 1px solid var(--color-border, #313244);
+    }
+    .protocol-docs-links h4 {
+        margin: 0 0 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-secondary, #a6adc8);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .docs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+    .doc-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text, #cdd6f4);
+        background: var(--color-bg, #11111b);
+        border: 1px solid var(--color-border, #313244);
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    .doc-link:hover {
+        color: var(--color-primary, #cba6f7);
+        border-color: var(--color-primary, #cba6f7);
+        background: rgba(203, 166, 247, 0.1);
+        text-decoration: none;
+    }
+    .doc-link svg {
+        flex-shrink: 0;
+        opacity: 0.7;
+    }
+    .doc-link:hover svg {
+        opacity: 1;
+    }
+    /* Why Agents section */
+    .why-agents {
+        padding: 0.5rem 0;
+    }
+    .philosophy-content {
+        margin-bottom: 1.5rem;
+    }
+    .philosophy-content p {
+        margin: 0 0 1rem;
+        font-size: 0.9375rem;
+        line-height: 1.7;
+        color: var(--color-text-secondary, #bac2de);
+    }
+    .philosophy-content p:last-child {
+        margin-bottom: 0;
+    }
+    .philosophy-content strong {
+        color: var(--color-text, #cdd6f4);
+    }
+    .philosophy-content em {
+        color: var(--color-primary, #cba6f7);
+        font-style: normal;
+        font-weight: 500;
+    }
+    .philosophy-principles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(203, 166, 247, 0.15);
+    }
+    .principle {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .principle-icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: rgba(203, 166, 247, 0.15);
+        border-radius: 8px;
+        color: var(--color-primary, #cba6f7);
+    }
+    .principle-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+    .principle-text strong {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text, #cdd6f4);
+    }
+    .principle-text span {
+        font-size: 0.8125rem;
+        color: var(--color-text-muted, #6c7086);
+    }
+</style>
+{% endblock head %}
+
 {% block content %}
 <div class="page-header">
     <div class="container">
@@ -274,7 +494,259 @@
             </div>
         </details>
 
-        {# Create Your Own Agent CTA - Collapsible #}
+        {# Why Agents? - Collapsible #}
+        <details class="create-agent-details" open>
+            <summary class="create-agent-summary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                <span>Why Agents?</span>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <div class="create-agent-content">
+                <div class="why-agents">
+                    <div class="philosophy-content">
+                        <p>
+                            Sentinel's core philosophy is simple: <strong>the dataplane should be boring</strong>. Stable, bounded, predictable.
+                            No 3 AM wake-ups. No memory explosions. No cascading failures from a misbehaving script.
+                        </p>
+                        <p>
+                            But the real world demands more than routing packets. You need WAF rules, authentication flows,
+                            rate limiting, bot detection, content filtering, ML-based threat scoring, custom business logic—the
+                            list grows with every new attack vector and compliance requirement.
+                        </p>
+                        <p>
+                            <strong>Agents are where innovation lives.</strong> By moving complex logic to external processes behind a
+                            stable contract, we get the best of both worlds: a rock-solid dataplane that never crashes, and unlimited
+                            extensibility for security policies. A broken agent cannot crash Sentinel. It gets circuit-broken,
+                            falls back to a safe default, and life goes on.
+                        </p>
+                        <p>
+                            We believe the future of reverse proxies lies in <strong>custom policy enforcement through external processing</strong>.
+                            Not embedded scripting runtimes. Not monolithic rule engines. But modular, isolated, language-agnostic
+                            agents that anyone can build, deploy, and evolve independently.
+                        </p>
+                        <p>
+                            This is how we keep the internet safe: by enabling <em>everyone</em>—from solo developers to enterprise
+                            security teams—to implement their own policies without compromising the stability of the underlying
+                            infrastructure. Your WAF rules, your auth logic, your rate limits, your threat models. Sentinel just
+                            makes sure the traffic flows reliably while your agents make the decisions.
+                        </p>
+                    </div>
+                    <div class="philosophy-principles">
+                        <div class="principle">
+                            <div class="principle-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                            </div>
+                            <div class="principle-text">
+                                <strong>Isolation</strong>
+                                <span>Agent crashes don't crash Sentinel</span>
+                            </div>
+                        </div>
+                        <div class="principle">
+                            <div class="principle-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div class="principle-text">
+                                <strong>Bounded</strong>
+                                <span>Hard timeouts and circuit breakers everywhere</span>
+                            </div>
+                        </div>
+                        <div class="principle">
+                            <div class="principle-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+                            </div>
+                            <div class="principle-text">
+                                <strong>Extensible</strong>
+                                <span>Build agents in any language you want</span>
+                            </div>
+                        </div>
+                        <div class="principle">
+                            <div class="principle-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                            </div>
+                            <div class="principle-text">
+                                <strong>Modular</strong>
+                                <span>Deploy and upgrade agents independently</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        {# How Agents Work - Collapsible #}
+        <details class="create-agent-details" open>
+            <summary class="create-agent-summary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                <span>How Agents Work</span>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <div class="create-agent-content">
+                <p>
+                    Agents are external processes that extend Sentinel's capabilities. They communicate via
+                    <strong>Unix domain sockets</strong> (for local agents) or <strong>gRPC</strong> (for remote/distributed agents),
+                    using the protocol defined in the <a href="https://github.com/raskell-io/sentinel/tree/main/crates/agent-protocol" target="_blank" rel="noopener"><code>agent-protocol</code></a> crate.
+                    This allows you to implement custom security logic in any language.
+                </p>
+
+                <div class="agent-explainer">
+                    <h3>Architecture</h3>
+                    <div class="explainer-grid">
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Process Isolation</strong>
+                                <span>Each agent runs as a separate OS process with its own memory space, providing security boundaries and crash isolation</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18H3"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Unix Socket &amp; gRPC</strong>
+                                <span>Two transport options: <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener">Unix domain sockets</a> for local agents (4-byte length prefix + JSON), or <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener">gRPC</a> for remote/distributed agents</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Connection Pooling</strong>
+                                <span>Sentinel maintains persistent connections to agents, eliminating connection overhead per request</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Language Agnostic</strong>
+                                <span>Write agents in Rust, Go, Python, TypeScript, or any language that can read/write Unix sockets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-explainer">
+                    <h3>Request Lifecycle</h3>
+                    <div class="explainer-grid">
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Event Hooks</strong>
+                                <span>Subscribe to <code>request_headers</code>, <code>request_body</code>, <code>response_headers</code>, and <code>response_body</code> events</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Decision Types</strong>
+                                <span>Return <code>Allow</code>, <code>Deny</code>, <code>Redirect</code>, or <code>Challenge</code> decisions with optional modifications</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Header Manipulation</strong>
+                                <span>Add, modify, or remove request/response headers. Inject correlation IDs, auth tokens, or security headers</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Audit Metadata</strong>
+                                <span>Attach structured tags and metadata to requests for logging, metrics, and downstream processing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-explainer">
+                    <h3>Failure Handling</h3>
+                    <div class="explainer-grid">
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Fail-Open Mode</strong>
+                                <span>Configure agents to allow traffic when unavailable, ensuring availability over strict enforcement</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Timeout Control</strong>
+                                <span>Per-agent timeout configuration (default 100ms) prevents slow agents from blocking the request path</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Auto-Reconnect</strong>
+                                <span>Sentinel automatically reconnects to agents after crashes with exponential backoff</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Health Metrics</strong>
+                                <span>Prometheus metrics for agent latency, error rates, and connection status via <code>/metrics</code> endpoint</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="protocol-docs-links">
+                    <h4>Protocol Documentation</h4>
+                    <div class="docs-grid">
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/architecture.md" target="_blank" rel="noopener" class="doc-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                            Architecture
+                        </a>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener" class="doc-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+                            Wire Protocol
+                        </a>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/handler.md" target="_blank" rel="noopener" class="doc-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Handler Interface
+                        </a>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/api.md" target="_blank" rel="noopener" class="doc-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/><rect width="18" height="14" x="3" y="5" rx="2"/></svg>
+                            Client/Server API
+                        </a>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/errors.md" target="_blank" rel="noopener" class="doc-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                            Error Handling
+                        </a>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/examples.md" target="_blank" rel="noopener" class="doc-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                            Examples
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        {# Create Your Own Agent - Collapsible #}
         <details class="create-agent-details" open>
             <summary class="create-agent-summary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
@@ -284,51 +756,8 @@
             <div class="create-agent-content">
                 <p>
                     Extend Sentinel with custom security logic, authentication, rate limiting, or any HTTP processing you need.
-                    Agents are external processes that communicate with Sentinel over Unix sockets using a simple length-prefixed JSON protocol.
+                    Use one of our official SDKs or implement the protocol directly.
                 </p>
-
-                {# How Agents Work #}
-                <div class="agent-explainer">
-                    <h3>How Agents Work</h3>
-                    <div class="explainer-grid">
-                        <div class="explainer-item">
-                            <div class="explainer-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                            </div>
-                            <div class="explainer-content">
-                                <strong>Isolated Execution</strong>
-                                <span>Agents run as separate processes, providing security isolation and independent deployment</span>
-                            </div>
-                        </div>
-                        <div class="explainer-item">
-                            <div class="explainer-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
-                            </div>
-                            <div class="explainer-content">
-                                <strong>Event-Driven</strong>
-                                <span>Receive request headers, body chunks, and response events as they flow through the proxy</span>
-                            </div>
-                        </div>
-                        <div class="explainer-item">
-                            <div class="explainer-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
-                            </div>
-                            <div class="explainer-content">
-                                <strong>Decision Control</strong>
-                                <span>Allow, block, redirect, or challenge requests. Modify headers and attach audit metadata</span>
-                            </div>
-                        </div>
-                        <div class="explainer-item">
-                            <div class="explainer-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
-                            </div>
-                            <div class="explainer-content">
-                                <strong>Any Language</strong>
-                                <span>Write agents in your preferred language using our official SDKs or implement the protocol directly</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {# SDK Cards #}
                 <h3>Official SDKs</h3>
@@ -337,8 +766,7 @@
                     <a href="https://github.com/raskell-io/sentinel-agent-rust-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo rust">
-                                {# Devicon Rust #}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 128 128" fill="currentColor"><path d="M62.271 10.880c.992-.224 1.984-.16 2.976.032.608 2.048 1.344 4.064 1.792 6.144.992.096 1.984.224 2.976.384.864-1.888 1.728-3.776 2.624-5.664 1.6.416 3.104 1.056 4.544 1.824.128 2.144.256 4.288.32 6.432.928.384 1.856.8 2.752 1.248 1.344-1.568 2.72-3.104 4.096-4.64 1.44.864 2.752 1.888 3.968 3.04-.544 2.048-1.12 4.096-1.728 6.112.8.64 1.568 1.312 2.304 2.016 1.728-1.152 3.488-2.272 5.248-3.392 1.152 1.248 2.176 2.592 3.072 4.032-1.152 1.76-2.336 3.488-3.552 5.216.576.832 1.12 1.696 1.632 2.592 1.984-.608 3.968-1.184 5.984-1.728.736 1.504 1.344 3.072 1.824 4.672-1.696 1.28-3.424 2.528-5.152 3.744.288.928.544 1.888.768 2.848 2.080.032 4.16.096 6.24.192.224 1.568.32 3.168.288 4.768-2.048.672-4.096 1.312-6.144 1.92.032.96.032 1.952 0 2.944 2.016.768 4.032 1.568 6.048 2.368-.128 1.568-.384 3.136-.768 4.672-2.112.096-4.224.16-6.336.192-.256.928-.544 1.856-.864 2.752 1.792 1.344 3.584 2.72 5.344 4.128-.608 1.472-1.344 2.912-2.176 4.288-2.016-.512-4-1.056-5.984-1.632-.512.8-1.056 1.568-1.632 2.336 1.312 1.76 2.592 3.552 3.872 5.344-1.024 1.248-2.144 2.432-3.328 3.52-1.824-1.12-3.616-2.272-5.408-3.456-.704.64-1.44 1.248-2.208 1.824.704 2.016 1.376 4.032 2.048 6.08-1.312.928-2.688 1.76-4.128 2.496-1.44-1.568-2.848-3.168-4.256-4.768-.832.416-1.696.8-2.56 1.152.032 2.144.032 4.288.032 6.432-1.536.48-3.104.832-4.704 1.056-1.024-1.856-2.016-3.744-2.976-5.632-.928.128-1.856.224-2.784.288-.544 2.048-1.088 4.096-1.664 6.144-1.6-.032-3.2-.192-4.768-.48-.384-2.08-.736-4.16-1.056-6.24-.928-.128-1.856-.288-2.752-.48-1.056 1.824-2.144 3.616-3.232 5.408-1.472-.544-2.912-1.216-4.288-1.984.32-2.112.672-4.224 1.056-6.304-.832-.416-1.632-.864-2.432-1.344-1.536 1.472-3.104 2.912-4.672 4.352-1.28-.96-2.496-2.016-3.616-3.168.928-1.888 1.888-3.776 2.88-5.632-.64-.672-1.248-1.376-1.824-2.112-1.888 1.024-3.776 2.016-5.696 2.976-.928-1.28-1.76-2.624-2.464-4.032 1.504-1.536 3.04-3.04 4.608-4.512-.416-.8-.8-1.632-1.152-2.464-2.048.416-4.064.8-6.112 1.152-.48-1.504-.832-3.04-1.056-4.608 1.952-.96 3.904-1.888 5.888-2.784-.096-.896-.16-1.792-.192-2.688-2.048-.288-4.096-.544-6.144-.768-.032-1.568.064-3.136.288-4.672 2.080-.256 4.16-.48 6.24-.672.128-.928.288-1.824.48-2.72-1.92-.96-3.808-1.952-5.696-2.976.416-1.504.96-2.976 1.6-4.416 2.048.352 4.064.736 6.08 1.152.352-.832.736-1.632 1.152-2.432-1.568-1.504-3.104-3.04-4.64-4.576.896-1.312 1.888-2.56 2.976-3.712 1.888 1.024 3.744 2.08 5.6 3.168.576-.672 1.184-1.312 1.824-1.92-1.024-1.888-2.016-3.776-2.976-5.696 1.216-1.056 2.528-2.016 3.904-2.88 1.568 1.504 3.104 3.04 4.608 4.608.768-.48 1.536-.928 2.336-1.344-.352-2.048-.672-4.096-.96-6.144 1.44-.672 2.944-1.216 4.48-1.664.992 1.824 1.952 3.68 2.88 5.536.896-.224 1.792-.416 2.688-.576-.256-2.08-.48-4.16-.672-6.24zm-6.464 36.096c-6.976 2.112-12.48 8.416-13.344 15.68-.864 6.176 1.6 12.576 6.24 16.736 4.768 4.512 11.872 6.176 18.144 4.448 6.272-1.632 11.52-6.464 13.504-12.576 2.144-6.272.576-13.44-4.032-18.272-4.672-5.152-12.256-7.36-18.976-5.984-.544.128-1.056.256-1.536.384zm-.384 7.2c4.128-1.696 9.152-1.056 12.672 1.696 3.648 2.72 5.536 7.392 4.8 11.84-.576 4.192-3.36 7.968-7.168 9.792-3.904 1.952-8.8 1.632-12.416-.864-3.744-2.496-5.856-7.104-5.344-11.552.448-4.736 3.616-9.024 8.032-10.688z"/></svg>
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg" alt="Rust" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Rust SDK</span>
@@ -355,8 +783,7 @@
                     <a href="https://github.com/raskell-io/sentinel-agent-go-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo go">
-                                {# Devicon Go #}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 128 128" fill="currentColor"><path d="M99.617 47.643c-.476-.318-1.023-.637-1.182-.955-.159-.397.238-.715.556-1.112.874-.874 1.589-1.827 1.589-3.019 0-1.271-.556-2.304-1.43-3.178-.715-.715-1.589-1.271-2.304-1.907-.318-.238-.715-.556-.795-.874-.159-.477.238-.795.477-1.112.795-.795 1.668-1.589 2.145-2.622.397-.954.318-2.066-.159-3.019-.556-1.033-1.43-1.827-2.384-2.463-1.192-.795-2.463-1.351-3.814-1.668-2.066-.477-4.211-.636-6.357-.636H63.361c-.715 0-1.271.556-1.271 1.271v46.098c0 .715.556 1.271 1.271 1.271h22.598c1.986 0 4.053-.159 5.96-.636 1.827-.477 3.575-1.192 5.005-2.384 1.51-1.192 2.543-2.86 2.702-4.767.08-1.033-.08-2.066-.397-3.019-.318-.715-.715-1.351-1.192-1.907-.318-.477-.795-.874-1.271-1.192-.318-.238-.715-.477-.874-.795-.159-.397.159-.715.477-1.033.477-.397 1.033-.715 1.43-1.192.795-.795 1.271-1.748 1.43-2.781.238-1.43-.08-2.86-.795-4.053-.318-.636-.795-1.192-1.351-1.668l.001-.002zm-14.895-3.417H73.124v-8.025h12.075c1.351 0 2.702.318 3.655 1.271.477.477.795 1.112.795 1.827.08.795-.159 1.589-.636 2.225-.954 1.509-2.781 2.702-4.291 2.702zm1.748 17.062H73.124v-9.058h13.267c1.112 0 2.304.238 3.178.874.795.556 1.351 1.351 1.43 2.304.08.954-.159 1.907-.715 2.702-1.033 1.827-2.94 3.178-4.804 3.178zM30.334 67.252c-5.801 0-11.124-2.463-14.895-6.357-3.734-3.894-6.277-9.139-6.277-14.782 0-6.038 2.622-11.6 6.754-15.493 3.734-3.575 8.66-5.801 14.179-5.801 5.96 0 11.283 2.622 15.017 6.674 3.575 3.814 5.96 8.978 5.96 14.62 0 5.96-2.543 11.362-6.516 15.176-3.894 3.735-9.058 5.963-14.222 5.963zm-.318-35.947c-4.132 0-7.945 1.668-10.726 4.37-2.702 2.622-4.45 6.277-4.45 10.329 0 4.132 1.748 7.786 4.529 10.488 2.702 2.702 6.516 4.37 10.647 4.37 4.053 0 7.707-1.668 10.329-4.291 2.702-2.702 4.37-6.436 4.37-10.567 0-4.053-1.589-7.707-4.212-10.409-2.701-2.702-6.434-4.29-10.487-4.29z"/></svg>
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original-wordmark.svg" alt="Go" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Go SDK</span>
@@ -370,11 +797,27 @@
                         </div>
                     </a>
 
+                    <a href="https://github.com/raskell-io/sentinel-agent-kotlin-sdk" class="sdk-card" target="_blank" rel="noopener">
+                        <div class="sdk-header">
+                            <div class="sdk-logo kotlin">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kotlin/kotlin-original.svg" alt="Kotlin" width="28" height="28">
+                            </div>
+                            <div class="sdk-info">
+                                <span class="sdk-name">Kotlin SDK</span>
+                                <span class="sdk-package">sentinel-agent-sdk</span>
+                            </div>
+                        </div>
+                        <p class="sdk-description">Coroutine-based async agents with excellent Java interop. Ideal for JVM environments.</p>
+                        <div class="sdk-footer">
+                            <span class="sdk-install">implementation("io.raskell:sentinel-agent-sdk:0.2.0")</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </div>
+                    </a>
+
                     <a href="https://github.com/raskell-io/sentinel-agent-python-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo python">
-                                {# Devicon Python #}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 128 128" fill="currentColor"><path d="M63.391 1.988c-4.222.02-8.252.379-11.8 1.007-10.45 1.846-12.346 5.71-12.346 12.837v9.411h24.693v3.137H29.977c-7.176 0-13.46 4.313-15.426 12.521-2.268 9.405-2.368 15.275 0 25.096 1.755 7.311 5.947 12.519 13.124 12.519h8.491V67.234c0-8.151 7.051-15.34 15.426-15.34h24.665c6.866 0 12.346-5.654 12.346-12.548V15.833c0-6.693-5.646-11.72-12.346-12.837-4.244-.706-8.645-1.027-12.866-1.008zM50.037 9.557c2.55 0 4.634 2.117 4.634 4.721 0 2.593-2.083 4.69-4.634 4.69-2.56 0-4.633-2.097-4.633-4.69-.001-2.604 2.073-4.721 4.633-4.721z"/><path d="M91.682 28.38v10.966c0 8.5-7.208 15.655-15.426 15.655H51.591c-6.756 0-12.346 5.783-12.346 12.549v23.515c0 6.691 5.818 10.628 12.346 12.547 7.816 2.297 15.312 2.713 24.665 0 6.216-1.801 12.346-5.423 12.346-12.547v-9.412H63.938v-3.138h37.012c7.176 0 9.852-5.005 12.348-12.519 2.578-7.735 2.467-15.174 0-25.096-1.774-7.145-5.161-12.521-12.348-12.521h-9.268zM77.809 87.927c2.561 0 4.634 2.097 4.634 4.692 0 2.602-2.074 4.719-4.634 4.719-2.55 0-4.633-2.117-4.633-4.719 0-2.595 2.083-4.692 4.633-4.692z"/></svg>
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="Python" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Python SDK</span>
@@ -391,8 +834,7 @@
                     <a href="https://github.com/raskell-io/sentinel-agent-typescript-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo typescript">
-                                {# Devicon TypeScript #}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 128 128" fill="currentColor"><path d="M2 63.91v62.5h125v-125H2zm100.73-5a15.56 15.56 0 017.82 4.5 20.58 20.58 0 013 4c0 .16-5.4 3.81-8.69 5.85-.12.08-.6-.44-1.13-1.23a7.09 7.09 0 00-5.87-3.53c-3.79-.26-6.23 1.73-6.21 5a4.58 4.58 0 00.54 2.34c.83 1.73 2.38 2.76 7.24 4.86 8.95 3.85 12.78 6.39 15.16 10 2.66 4 3.25 10.46 1.45 15.24-2 5.2-6.9 8.73-13.83 9.9a38.32 38.32 0 01-9.52-.1A23 23 0 0180 109.19c-1.15-1.27-3.39-4.58-3.25-4.82a9.34 9.34 0 011.15-.73l4.6-2.64 3.59-2.08.75 1.11a16.78 16.78 0 004.74 4.54c4 2.1 9.46 1.81 12.16-.62a5.43 5.43 0 00.69-6.92c-1-1.39-3-2.56-8.59-5-6.45-2.78-9.23-4.5-11.77-7.24a16.48 16.48 0 01-3.43-6.25 25 25 0 01-.22-8c1.33-6.23 6-10.58 12.82-11.87a31.66 31.66 0 019.49.26zm-29.34 5.24v5.12H57.16v46.23H45.65V69.26H29.38v-5a49.19 49.19 0 01.14-5.16c.06-.08 10-.12 22-.1h21.81z"/></svg>
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" alt="TypeScript" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">TypeScript SDK</span>
@@ -402,6 +844,23 @@
                         <p class="sdk-description">Full type safety with TypeScript. Works with Node.js, Deno, and Bun runtimes.</p>
                         <div class="sdk-footer">
                             <span class="sdk-install">npm install @sentinel-proxy/agent-sdk</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/raskell-io/sentinel-agent-elixir-sdk" class="sdk-card" target="_blank" rel="noopener">
+                        <div class="sdk-header">
+                            <div class="sdk-logo elixir">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/elixir/elixir-original.svg" alt="Elixir" width="28" height="28">
+                            </div>
+                            <div class="sdk-info">
+                                <span class="sdk-name">Elixir SDK</span>
+                                <span class="sdk-package">sentinel_agent_sdk</span>
+                            </div>
+                        </div>
+                        <p class="sdk-description">Fault-tolerant agents with OTP supervision. Perfect for distributed, resilient systems.</p>
+                        <div class="sdk-footer">
+                            <span class="sdk-install">mix deps.get sentinel_agent_sdk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
@@ -446,11 +905,13 @@
                     <div class="code-tabs">
                         <button class="code-tab active" data-lang="rust">Rust</button>
                         <button class="code-tab" data-lang="go">Go</button>
+                        <button class="code-tab" data-lang="kotlin">Kotlin</button>
                         <button class="code-tab" data-lang="python">Python</button>
                         <button class="code-tab" data-lang="typescript">TypeScript</button>
+                        <button class="code-tab" data-lang="elixir">Elixir</button>
                     </div>
                     <div class="code-panels">
-                        <pre class="code-panel active" data-lang="rust"><code>use sentinel_agent_sdk::{Agent, Decision, Request};
+                        <pre class="code-panel active language-rust" data-lang="rust"><code class="language-rust">use sentinel_agent_sdk::{Agent, Decision, Request};
 
 struct MyAgent;
 
@@ -465,7 +926,7 @@ impl Agent for MyAgent {
         }
     }
 }</code></pre>
-                        <pre class="code-panel" data-lang="go"><code>package main
+                        <pre class="code-panel language-go" data-lang="go"><code class="language-go">package main
 
 import "github.com/raskell-io/sentinel-agent-go-sdk/agent"
 
@@ -479,7 +940,22 @@ func (a *MyAgent) OnRequest(req *agent.Request) *agent.Decision {
     }
     return agent.Allow()
 }</code></pre>
-                        <pre class="code-panel" data-lang="python"><code>from sentinel_agent_sdk import Agent, Decision, Request
+                        <pre class="code-panel language-kotlin" data-lang="kotlin"><code class="language-kotlin">import io.raskell.sentinel.agent.*
+
+class MyAgent : Agent {
+    override val name = "my-agent"
+
+    override suspend fun onRequest(request: Request): Decision {
+        return if (request.path.startsWith("/admin")) {
+            Decision.deny()
+                .withBody("Access denied")
+                .withTag("blocked")
+        } else {
+            Decision.allow()
+        }
+    }
+}</code></pre>
+                        <pre class="code-panel language-python" data-lang="python"><code class="language-python">from sentinel_agent_sdk import Agent, Decision, Request
 
 class MyAgent(Agent):
     @property
@@ -490,7 +966,7 @@ class MyAgent(Agent):
         if request.path_starts_with("/admin"):
             return Decision.deny().with_body("Access denied").with_tag("blocked")
         return Decision.allow()</code></pre>
-                        <pre class="code-panel" data-lang="typescript"><code>import { Agent, Decision, Request } from '@sentinel-proxy/agent-sdk';
+                        <pre class="code-panel language-typescript" data-lang="typescript"><code class="language-typescript">import { Agent, Decision, Request } from '@sentinel-proxy/agent-sdk';
 
 class MyAgent extends Agent {
     name = 'my-agent';
@@ -504,13 +980,30 @@ class MyAgent extends Agent {
         return Decision.allow();
     }
 }</code></pre>
+                        <pre class="code-panel language-elixir" data-lang="elixir"><code class="language-elixir">defmodule MyAgent do
+  use SentinelAgentSdk.Agent
+
+  @impl true
+  def name, do: "my-agent"
+
+  @impl true
+  def on_request(request) do
+    if String.starts_with?(request.path, "/admin") do
+      Decision.deny()
+      |> Decision.with_body("Access denied")
+      |> Decision.with_tag("blocked")
+    else
+      Decision.allow()
+    end
+  end
+end</code></pre>
                     </div>
                 </div>
 
                 {# Sentinel Configuration #}
                 <h3>Sentinel Configuration</h3>
                 <p>Configure Sentinel to connect to your agent:</p>
-                <pre class="config-example"><code>agents {
+                <pre class="config-example language-kdl"><code class="language-kdl">agents {
     agent "my-agent" type="custom" {
         unix-socket path="/tmp/my-agent.sock"
         events "request_headers"
@@ -533,20 +1026,6 @@ routes {
         filters "my-filter"
     }
 }</code></pre>
-
-                <div class="cta-actions">
-                    <a href="https://github.com/raskell-io/sentinel/tree/main/agents/echo" class="btn btn-primary" target="_blank" rel="noopener">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                        Reference: Echo Agent
-                    </a>
-                    <a href="https://crates.io/crates/sentinel-agent-protocol" class="btn btn-secondary" target="_blank" rel="noopener">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                        Protocol Spec
-                    </a>
-                    <a href="https://github.com/raskell-io/sentinel.raskell.io/issues/new?template=new-agent.yml" class="btn btn-ghost">
-                        Submit Your Agent
-                    </a>
-                </div>
             </div>
         </details>
     </div>
@@ -611,6 +1090,54 @@ routes {
             codePanels.forEach(panel => {
                 panel.classList.toggle('active', panel.dataset.lang === lang);
             });
+        });
+    });
+
+})();
+</script>
+
+<!-- Prism.js for syntax highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-elixir.min.js"></script>
+<script>
+(function() {
+    // Define KDL language for Prism (Sentinel config format)
+    Prism.languages.kdl = {
+        'comment': {
+            pattern: /\/\/.*|\/\*[\s\S]*?\*\/|#.*/,
+            greedy: true
+        },
+        'string': {
+            pattern: /"(?:[^"\\]|\\.)*"/,
+            greedy: true
+        },
+        'keyword': /\b(?:true|false|null)\b/,
+        'number': /\b-?(?:0x[\da-fA-F]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b/,
+        'attr-name': /[a-zA-Z_][\w-]*(?=\s*=)/,
+        'property': /\b(?:type|path|events|timeout-ms|failure-mode|agent|matches|upstream|filters|unix-socket)\b/,
+        'node': {
+            pattern: /\b(?:agents|agent|filters|filter|routes|route|upstreams|upstream|listeners|listener)\b/,
+            alias: 'class-name'
+        },
+        'function': /[a-zA-Z_][\w-]*(?=\s*\{)/,
+        'operator': /[=]/,
+        'punctuation': /[{}]/
+    };
+
+    // Highlight all code blocks
+    Prism.highlightAll();
+
+    // Also re-highlight when tabs are switched
+    document.querySelectorAll('.code-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            setTimeout(function() {
+                Prism.highlightAll();
+            }, 10);
         });
     });
 })();
