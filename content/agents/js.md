@@ -133,6 +133,16 @@ return { decision: "deny", status: 403, body: "Access Denied" };
 
 // Redirect to another URL
 return { decision: "redirect", status: 302, body: "https://example.com/login" };
+
+// Challenge the client (CAPTCHA, JS challenge, etc.)
+return {
+    decision: "challenge",
+    challenge_type: "captcha",
+    challenge_params: {
+        site_key: "your-captcha-site-key",
+        action: "login"
+    }
+};
 ```
 
 ### Header Manipulation
@@ -244,6 +254,40 @@ function on_request_headers(request) {
             "X-Rate-Limit-Tier": tier
         }
     };
+}
+```
+
+### Bot Protection with Challenge
+
+```javascript
+function on_request_headers(request) {
+    const ua = request.headers["User-Agent"] || "";
+    const suspiciousBots = ["curl", "wget", "python-requests", "scrapy"];
+
+    // No User-Agent - issue JS challenge
+    if (!ua) {
+        return {
+            decision: "challenge",
+            challenge_type: "js_challenge",
+            tags: ["no-user-agent"]
+        };
+    }
+
+    // Suspicious User-Agent - issue CAPTCHA
+    for (const bot of suspiciousBots) {
+        if (ua.toLowerCase().includes(bot)) {
+            return {
+                decision: "challenge",
+                challenge_type: "captcha",
+                challenge_params: {
+                    site_key: "your-captcha-site-key"
+                },
+                tags: ["suspicious-ua", bot]
+            };
+        }
+    }
+
+    return { decision: "allow" };
 }
 ```
 

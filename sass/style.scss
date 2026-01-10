@@ -1392,8 +1392,10 @@ img {
 // Footer Mascot with floating animation
 .footer-mascot-wrapper {
     position: relative;
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    margin-right: var(--space-sm);
 }
 
 .footer-mascot-glow {
@@ -1401,11 +1403,11 @@ img {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
     background: var(--gradient-primary);
-    filter: blur(12px);
-    opacity: 0.4;
+    filter: blur(16px);
+    opacity: 0.35;
     border-radius: 50%;
     animation: footer-pulse 4s ease-in-out infinite;
 }
@@ -1413,19 +1415,19 @@ img {
 @keyframes footer-pulse {
     0%, 100% {
         transform: translate(-50%, -50%) scale(1);
-        opacity: 0.4;
+        opacity: 0.35;
     }
     50% {
-        transform: translate(-50%, -50%) scale(1.1);
-        opacity: 0.55;
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 0.5;
     }
 }
 
 .footer-mascot {
     position: relative;
-    width: 64px;
-    height: 64px;
-    border-radius: var(--radius-md);
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-lg);
     z-index: 1;
     filter: drop-shadow(var(--shadow-md));
     animation: footer-float 5s ease-in-out infinite;

@@ -145,6 +145,21 @@ return {
 | `"block"` | Block request with status code and body |
 | `"deny"` | Alias for block |
 | `"redirect"` | Redirect to URL specified in `body` field |
+| `"challenge"` | Issue a challenge (CAPTCHA, JS challenge, proof-of-work) |
+
+### Challenge Decision
+
+```lua
+return {
+    decision = "challenge",
+    challenge_type = "captcha",          -- "captcha", "js_challenge", "proof_of_work"
+    challenge_params = {
+        site_key = "your-captcha-site-key",
+        action = "login"
+    },
+    tags = {"bot-challenge"}
+}
+```
 
 ## Examples
 
@@ -267,6 +282,41 @@ function on_request_headers()
                 add_response_headers = {
                     ["Allow"] = "GET, POST, HEAD, OPTIONS"
                 }
+            }
+        end
+    end
+
+    return {decision = "allow"}
+end
+```
+
+### Bot Protection with Challenge
+
+```lua
+function on_request_headers()
+    local ua = request.headers["User-Agent"] or ""
+    local suspicious_bots = {"curl", "wget", "python", "scrapy", "bot"}
+
+    -- No User-Agent - issue JS challenge
+    if ua == "" then
+        return {
+            decision = "challenge",
+            challenge_type = "js_challenge",
+            tags = {"no-user-agent"}
+        }
+    end
+
+    -- Check for suspicious patterns
+    local ua_lower = ua:lower()
+    for _, bot in ipairs(suspicious_bots) do
+        if ua_lower:match(bot) then
+            return {
+                decision = "challenge",
+                challenge_type = "captcha",
+                challenge_params = {
+                    site_key = "your-captcha-site-key"
+                },
+                tags = {"suspicious-ua", bot}
             }
         end
     end

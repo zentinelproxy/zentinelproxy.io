@@ -135,6 +135,21 @@ on_response_headers(ptr: i32, len: i32) -> i64
 | `block` | Block with status (default: 403) and body |
 | `deny` | Same as block |
 | `redirect` | Redirect to URL in `body` field |
+| `challenge` | Issue a challenge (CAPTCHA, JS challenge, proof-of-work) |
+
+### Challenge Decision
+
+```json
+{
+    "decision": "challenge",
+    "challenge_type": "captcha",
+    "challenge_params": {
+        "site_key": "your-captcha-site-key",
+        "action": "login"
+    },
+    "tags": ["bot-challenge"]
+}
+```
 
 ## Rust Module Example
 
@@ -209,6 +224,77 @@ pub extern "C" fn on_request_headers(ptr: i32, len: i32) -> i64 {
 ```bash
 rustup target add wasm32-unknown-unknown
 cargo build --target wasm32-unknown-unknown --release
+```
+
+## Bot Protection Example (Rust)
+
+```rust
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+#[derive(Deserialize)]
+struct Request {
+    uri: String,
+    headers: HashMap<String, String>,
+}
+
+#[derive(Serialize, Default)]
+struct Result {
+    decision: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    challenge_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    challenge_params: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    tags: Vec<String>,
+}
+
+#[no_mangle]
+pub extern "C" fn on_request_headers(ptr: i32, len: i32) -> i64 {
+    let input = unsafe {
+        let slice = std::slice::from_raw_parts(ptr as *const u8, len as usize);
+        std::str::from_utf8(slice).unwrap()
+    };
+
+    let request: Request = serde_json::from_str(input).unwrap();
+    let ua = request.headers.get("User-Agent").map(|s| s.as_str()).unwrap_or("");
+
+    let result = if ua.is_empty() {
+        // No User-Agent - issue JS challenge
+        Result {
+            decision: "challenge".to_string(),
+            challenge_type: Some("js_challenge".to_string()),
+            tags: vec!["no-user-agent".to_string()],
+            ..Default::default()
+        }
+    } else if ua.to_lowercase().contains("bot") || ua.to_lowercase().contains("curl") {
+        // Suspicious UA - issue CAPTCHA
+        let mut params = HashMap::new();
+        params.insert("site_key".to_string(), "your-captcha-site-key".to_string());
+
+        Result {
+            decision: "challenge".to_string(),
+            challenge_type: Some("captcha".to_string()),
+            challenge_params: Some(params),
+            tags: vec!["suspicious-ua".to_string()],
+        }
+    } else {
+        Result {
+            decision: "allow".to_string(),
+            ..Default::default()
+        }
+    };
+
+    // ... encode and return result
+    let output = serde_json::to_string(&result).unwrap();
+    let bytes = output.as_bytes();
+    let len = bytes.len() as i32;
+    let ptr = alloc(len);
+    unsafe {
+        std::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr as *mut u8, bytes.len());
+    }
+    ((ptr as i64) << 32) | (len as i64)
+}
 ```
 
 ## Instance Pooling
