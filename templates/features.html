@@ -1,0 +1,723 @@
+{% extends "base.html" %}
+
+{% block title %}Features | {{ config.title }}{% endblock %}
+{% block description %}Comprehensive feature list of Sentinel reverse proxy with source code references{% endblock %}
+
+{% block content %}
+<div class="features-page">
+    <section class="features-hero">
+        <div class="container">
+            <h1 class="features-title">
+                <span class="gradient-text">Features</span>
+            </h1>
+            <p class="features-subtitle">
+                Comprehensive capabilities of Sentinel reverse proxy, with direct source code references
+            </p>
+
+            <div class="features-stats">
+                <div class="stat-card">
+                    <div class="stat-number">56+</div>
+                    <div class="stat-label">Major Features</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">120+</div>
+                    <div class="stat-label">Source Files</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Rust Code</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-main">
+        <div class="container">
+            <!-- Filter/Search Bar -->
+            <div class="features-filter">
+                <input type="text" id="feature-search" placeholder="Search features..." />
+                <div class="filter-tags">
+                    <button class="filter-tag active" data-category="all">All</button>
+                    <button class="filter-tag" data-category="core">Core</button>
+                    <button class="filter-tag" data-category="security">Security</button>
+                    <button class="filter-tag" data-category="observability">Observability</button>
+                    <button class="filter-tag" data-category="advanced">Advanced</button>
+                    <button class="filter-tag" data-category="config">Configuration</button>
+                    <button class="filter-tag" data-category="performance">Performance</button>
+                </div>
+            </div>
+
+            <!-- Core Proxy Features -->
+            <div class="feature-section" data-category="core">
+                <h2 class="section-title">Core Proxy Features</h2>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>HTTP Routing</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/routing.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            routing.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Advanced request routing with multiple matching strategies and lock-free route caching.</p>
+                    <ul class="feature-list">
+                        <li>Path prefix, exact, and regex matching</li>
+                        <li>Host matching (exact and wildcard)</li>
+                        <li>Header presence/value matching</li>
+                        <li>HTTP method matching</li>
+                        <li>Query parameter matching</li>
+                        <li>Priority-based route evaluation</li>
+                        <li>Lock-free route caching with DashMap</li>
+                    </ul>
+                    <div class="feature-code-ref">
+                        <strong>Structs:</strong> <code>RouteMatcher</code>, <code>CompiledRoute</code>, <code>CompiledMatcher</code>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Load Balancing</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/upstream/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            upstream/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Multiple load balancing algorithms with health-aware target selection.</p>
+                    <ul class="feature-list">
+                        <li><strong>Round-robin</strong> - Equal distribution across backends</li>
+                        <li><strong>Weighted round-robin</strong> - Proportional distribution</li>
+                        <li><strong>Power of Two Choices (P2C)</strong> - Low-latency selection (<code>p2c.rs</code>)</li>
+                        <li><strong>Consistent Hash</strong> - Session affinity (<code>consistent_hash.rs</code>)</li>
+                        <li><strong>Least Tokens Queued</strong> - LLM workload optimization (<code>least_tokens.rs</code>)</li>
+                        <li><strong>Adaptive</strong> - Response time based (<code>adaptive.rs</code>)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Service Discovery</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/discovery.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            discovery.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Dynamic backend discovery from multiple sources.</p>
+                    <ul class="feature-list">
+                        <li><strong>Static</strong> - Fixed backend list</li>
+                        <li><strong>DNS A/AAAA</strong> - DNS record resolution with refresh</li>
+                        <li><strong>DNS SRV</strong> - Service record lookup</li>
+                        <li><strong>Consul</strong> - Consul service catalog integration</li>
+                        <li><strong>Kubernetes</strong> - K8s service endpoints discovery</li>
+                        <li><strong>File</strong> - File-watched backend list</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Scoped Routing</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/scoped_routing.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            scoped_routing.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Namespace and service-aware routing with hierarchical configuration.</p>
+                    <ul class="feature-list">
+                        <li>Per-scope route isolation (global → namespace → service)</li>
+                        <li>Scope-aware visibility rules</li>
+                        <li>Independent route matchers per scope</li>
+                        <li>Qualified ID resolution</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Security Features -->
+            <div class="feature-section" data-category="security">
+                <h2 class="section-title">Security Features</h2>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>TLS/SSL Termination</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/tls.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            tls.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Enterprise-grade TLS with SNI routing and hot certificate reload.</p>
+                    <ul class="feature-list">
+                        <li>SNI (Server Name Indication) based certificate selection</li>
+                        <li>Wildcard certificate matching</li>
+                        <li>mTLS client certificate verification</li>
+                        <li>Certificate hot-reload (SIGHUP trigger)</li>
+                        <li>OCSP stapling support</li>
+                        <li>Upstream TLS configuration</li>
+                    </ul>
+                    <div class="feature-code-ref">
+                        <strong>Structs:</strong> <code>SniResolver</code>, <code>HotReloadableSniResolver</code>, <code>OcspStapler</code>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Rate Limiting</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/rate_limit.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            rate_limit.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Flexible rate limiting with multiple keying strategies and actions.</p>
+                    <ul class="feature-list">
+                        <li>Per-route and per-client rate limiting</li>
+                        <li>Local in-memory limiting (Pingora-based)</li>
+                        <li>Distributed limiting via Redis (<code>distributed_rate_limit.rs</code>)</li>
+                        <li>Distributed limiting via Memcached (<code>memcached_rate_limit.rs</code>)</li>
+                        <li>Keying strategies: ClientIP, UserID, CustomHeader</li>
+                        <li>Actions: Reject (429), Delay, Allow</li>
+                        <li>Burst support with configurable max delay</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Web Application Firewall (WAF)</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/waf.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/waf.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">OWASP CRS-compatible WAF with anomaly scoring and rule tuning.</p>
+                    <ul class="feature-list">
+                        <li>Multiple engines: ModSecurity, Coraza, Custom</li>
+                        <li>OWASP Core Rule Set (CRS) integration</li>
+                        <li>Paranoia levels 1-4 configuration</li>
+                        <li>Anomaly scoring system</li>
+                        <li>Rule exclusions and tuning</li>
+                        <li>Body inspection with content-type allowlist</li>
+                        <li>Audit logging with rule IDs</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>GeoIP Filtering</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/geo_filter.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            geo_filter.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Geographic access control with multiple database support.</p>
+                    <ul class="feature-list">
+                        <li>MaxMind GeoLite2/GeoIP2 support (.mmdb)</li>
+                        <li>IP2Location database support (.bin)</li>
+                        <li>Country-based blocklist/allowlist</li>
+                        <li>Log-only mode for testing</li>
+                        <li>IP→Country caching with TTL</li>
+                        <li>Fail-open/fail-closed policies</li>
+                        <li>X-GeoIP-Country header injection</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Request Decompression & Zip Bomb Protection</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/decompression.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            decompression.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Safe request body decompression with ratio limits to prevent attacks.</p>
+                    <ul class="feature-list">
+                        <li>Zip bomb protection via decompression ratio limits</li>
+                        <li>Size limits for decompressed output</li>
+                        <li>Support for gzip, deflate, brotli</li>
+                        <li>Incremental ratio checking</li>
+                        <li>Statistics tracking</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>External Agent Processing</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/agents/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            agents/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Extensible agent system for authentication, authorization, and custom processing.</p>
+                    <ul class="feature-list">
+                        <li>Unix Domain Socket transport</li>
+                        <li>gRPC transport support</li>
+                        <li>Per-agent queue isolation (semaphore-based)</li>
+                        <li>Circuit breaker per agent</li>
+                        <li>Timeouts with fail-open/fail-closed</li>
+                        <li>Request/response header mutation</li>
+                        <li>Request body streaming</li>
+                        <li>Audit metadata collection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Observability Features -->
+            <div class="feature-section" data-category="observability">
+                <h2 class="section-title">Observability Features</h2>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Structured Logging</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/logging.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            logging.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Comprehensive logging with trace ID correlation and multiple formats.</p>
+                    <ul class="feature-list">
+                        <li><strong>Access logs</strong> - Request/response with trace_id correlation</li>
+                        <li><strong>Error logs</strong> - Errors with context</li>
+                        <li><strong>Audit logs</strong> - Security events with rule IDs</li>
+                        <li><strong>JSON format</strong> - Structured, queryable logs</li>
+                        <li><strong>Combined Log Format</strong> - Apache/nginx compatible</li>
+                        <li>Fields: timestamp, trace_id, method, path, status, duration_ms, client_ip, route_id, upstream</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Distributed Tracing (OpenTelemetry)</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/otel.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            otel.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">OpenTelemetry-based distributed tracing with multiple backend support.</p>
+                    <ul class="feature-list">
+                        <li>W3C Trace Context header propagation</li>
+                        <li>OTLP export to Jaeger, Tempo, or compatible backends</li>
+                        <li>Configurable sampling rates</li>
+                        <li>Request lifecycle spans</li>
+                        <li>Semantic conventions compliance</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Trace ID Generation</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/trace_id.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            trace_id.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Efficient trace ID generation with multiple format support.</p>
+                    <ul class="feature-list">
+                        <li><strong>TinyFlake</strong> - 11-char Base58 ID (time-prefixed for sorting)</li>
+                        <li><strong>UUID</strong> - Standard 36-char UUID format</li>
+                        <li>Header propagation (X-Trace-Id, X-Correlation-Id, X-Request-Id)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Metrics</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/common/src/observability.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            common/observability.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Prometheus-compatible metrics for monitoring and alerting.</p>
+                    <ul class="feature-list">
+                        <li>Per-route latency histograms</li>
+                        <li>Request counts by status code</li>
+                        <li>Upstream health status</li>
+                        <li>Circuit breaker state transitions</li>
+                        <li>Agent latencies and timeouts</li>
+                        <li>Rate limit enforcement outcomes</li>
+                        <li>Cache hit/miss rates</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Advanced Features -->
+            <div class="feature-section" data-category="advanced">
+                <h2 class="section-title">Advanced Features</h2>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>HTTP Response Caching</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/cache.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            cache.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Pingora-based HTTP caching with stampede prevention.</p>
+                    <ul class="feature-list">
+                        <li>Cache key generation</li>
+                        <li>TTL calculation from Cache-Control</li>
+                        <li>LRU eviction management</li>
+                        <li>Cache lock for stampede prevention</li>
+                        <li>Per-route cache configuration</li>
+                        <li>In-memory and pluggable backends</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>In-Memory Caching (S3-FIFO + TinyLFU)</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/memory_cache.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            memory_cache.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Advanced eviction algorithms for hot-data caching.</p>
+                    <ul class="feature-list">
+                        <li>S3-FIFO + TinyLFU eviction</li>
+                        <li>Fast hot-data caching</li>
+                        <li>Configurable TTL per item</li>
+                        <li>Hit rate statistics</li>
+                        <li>Thread-safe concurrent access</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Static File Serving</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/static_files/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            static_files/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">High-performance static file delivery with zero-copy and compression.</p>
+                    <ul class="feature-list">
+                        <li>Range request support (206 Partial Content)</li>
+                        <li>Zero-copy serving via memory-mapped files (>10MB)</li>
+                        <li>On-the-fly gzip/brotli compression</li>
+                        <li>In-memory caching for small files (<1MB)</li>
+                        <li>Directory listing (configurable)</li>
+                        <li>SPA routing with fallback</li>
+                        <li>ETag and last-modified headers</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>WebSocket Proxying</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/websocket/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            websocket/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">RFC 6455 compliant WebSocket support with frame inspection.</p>
+                    <ul class="feature-list">
+                        <li>Frame-level parsing and validation</li>
+                        <li>Masking/unmasking support</li>
+                        <li>Per-frame agent inspection</li>
+                        <li>Configurable max frame size</li>
+                        <li>Bidirectional frame handling</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Traffic Mirroring/Shadowing</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/shadow.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            shadow.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Fire-and-forget request duplication for canary testing.</p>
+                    <ul class="feature-list">
+                        <li>Fire-and-forget duplication to shadow upstreams</li>
+                        <li>Sampling-based mirroring (percentage control)</li>
+                        <li>Header-based sampling</li>
+                        <li>Optional request body buffering</li>
+                        <li>Async execution (non-blocking)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>LLM/Inference Token-Based Rate Limiting</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/inference/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            inference/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Token-aware rate limiting for LLM workloads.</p>
+                    <ul class="feature-list">
+                        <li>Token-based rate limiting (tokens/minute)</li>
+                        <li>Multi-provider support: OpenAI, Anthropic, Generic</li>
+                        <li>Model-aware load balancing (LeastTokensQueued)</li>
+                        <li>Request body parsing for token estimation</li>
+                        <li>Burst token allocation</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Health Checking</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/health.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            health.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Active and passive health checking with multiple protocols.</p>
+                    <ul class="feature-list">
+                        <li><strong>HTTP</strong> - GET request with expected status</li>
+                        <li><strong>TCP</strong> - Connection test</li>
+                        <li><strong>gRPC</strong> - gRPC health check protocol (<code>grpc_health.rs</code>)</li>
+                        <li>Configurable intervals and thresholds</li>
+                        <li>Response time averaging</li>
+                        <li>Passive health inference from failures</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Circuit Breakers</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/scoped_circuit_breaker.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            scoped_circuit_breaker.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Scope-aware circuit breakers for cascading failure prevention.</p>
+                    <ul class="feature-list">
+                        <li>Per-upstream circuit breakers</li>
+                        <li>Scope-aware configuration (global/namespace/service)</li>
+                        <li>States: Closed, Open, Half-open</li>
+                        <li>Configurable failure/success thresholds</li>
+                        <li>Timeout for half-open state</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Configuration Features -->
+            <div class="feature-section" data-category="config">
+                <h2 class="section-title">Configuration Capabilities</h2>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Multiple Configuration Formats</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/lib.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/lib.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Flexible configuration with human-friendly and machine-friendly formats.</p>
+                    <ul class="feature-list">
+                        <li><strong>KDL</strong> - Primary human-friendly format (<code>kdl/mod.rs</code>)</li>
+                        <li><strong>JSON</strong> - Programmatic/API use</li>
+                        <li><strong>TOML</strong> - Alternative text format</li>
+                        <li>Extension auto-detection</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Multi-File Configuration</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/multi_file/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/multi_file/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Directory-based configuration with automatic merging.</p>
+                    <ul class="feature-list">
+                        <li>Load configs from directory with pattern matching</li>
+                        <li>Merge multiple config files</li>
+                        <li>Load order control</li>
+                        <li>Validate merged configuration</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Configuration Validation</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/validation.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/validation.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Comprehensive validation before config application.</p>
+                    <ul class="feature-list">
+                        <li>Schema compliance (JSONSchema)</li>
+                        <li>Referential integrity (routes → upstreams/filters/agents)</li>
+                        <li>Required fields presence</li>
+                        <li>Value ranges and format</li>
+                        <li>Network address validity</li>
+                        <li>Certificate/key accessibility</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Hot Reload (Zero-Downtime)</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/reload/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            reload/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Atomic configuration updates without dropping connections.</p>
+                    <ul class="feature-list">
+                        <li>Zero-downtime config reloading</li>
+                        <li>SIGHUP signal trigger</li>
+                        <li>File change detection</li>
+                        <li>Validation before apply</li>
+                        <li>Atomic config swaps (ArcSwap)</li>
+                        <li>Graceful request draining</li>
+                        <li>Rollback on error</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Schema Versioning</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/lib.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/lib.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Version-aware configuration with compatibility checking.</p>
+                    <ul class="feature-list">
+                        <li>Current schema version: 1.0</li>
+                        <li>Compatibility checking on load</li>
+                        <li>Forward/backward compatibility warnings</li>
+                        <li>Minimum version enforcement</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Namespaces & Service Scoping</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/namespace.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/namespace.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Hierarchical multi-tenancy with resource isolation.</p>
+                    <ul class="feature-list">
+                        <li>Hierarchical organization: Global → Namespace → Service</li>
+                        <li>Per-scope routes, upstreams, agents, filters</li>
+                        <li>Resource visibility rules</li>
+                        <li>Cross-scope resource export</li>
+                        <li>Scope-aware request routing</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Filter Chain Configuration</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/config/src/filters.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            config/filters.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Composable filter pipeline with named instances.</p>
+                    <ul class="feature-list">
+                        <li>Filter types: Agent, RateLimit, Headers, Compress, Custom</li>
+                        <li>Named filter instances (reusable)</li>
+                        <li>Ordered filter pipeline</li>
+                        <li>Per-filter timeout and failure mode</li>
+                        <li>Phase-based execution (request/response)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Performance Features -->
+            <div class="feature-section" data-category="performance">
+                <h2 class="section-title">Performance Features</h2>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Connection Pooling</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/upstream/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            upstream/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Efficient connection reuse with configurable pool sizes.</p>
+                    <ul class="feature-list">
+                        <li>Configurable pool sizes per upstream</li>
+                        <li>Keep-alive timeout</li>
+                        <li>Max requests per connection</li>
+                        <li>Idle connection reuse</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>HTTP/2 Support</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/upstream/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            upstream/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Full HTTP/2 support with request pipelining.</p>
+                    <ul class="feature-list">
+                        <li>HTTP/2 upstream connections</li>
+                        <li>HTTP/1.1 keepalive with automatic reuse</li>
+                        <li>Configurable per upstream</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Lock-Free Data Structures</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/routing.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            routing.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Minimal lock contention for high throughput.</p>
+                    <ul class="feature-list">
+                        <li>DashMap-based route cache</li>
+                        <li>Lock-free rate limiter pools</li>
+                        <li>Concurrent upstream pools</li>
+                        <li>Circuit breaker registry</li>
+                    </ul>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>Memory Efficiency</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/static_files/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            static_files/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Optimized memory usage with bounded resources.</p>
+                    <ul class="feature-list">
+                        <li>Bounded queues (all queues have max size)</li>
+                        <li>Memory-mapped file serving (zero-copy)</li>
+                        <li>Pre-computed compression for static files</li>
+                        <li>S3-FIFO + TinyLFU eviction</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Built with Rust -->
+            <div class="feature-section">
+                <h2 class="section-title">Built with Rust</h2>
+
+                <div class="feature-item rust-highlight">
+                    <div class="feature-header">
+                        <h3>Memory Safety & Performance</h3>
+                        <a href="https://github.com/raskell-io/sentinel" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            GitHub
+                        </a>
+                    </div>
+                    <p class="feature-description">Sentinel is built entirely in Rust for guaranteed memory safety without garbage collection.</p>
+                    <ul class="feature-list">
+                        <li><strong>Zero buffer overflows</strong> - Compile-time memory safety</li>
+                        <li><strong>No null pointer exceptions</strong> - Option types enforce checks</li>
+                        <li><strong>No data races</strong> - Fearless concurrency with ownership</li>
+                        <li><strong>Predictable performance</strong> - No GC pauses</li>
+                        <li><strong>Low memory footprint</strong> - Efficient memory usage</li>
+                        <li><strong>Native performance</strong> - Compiled to machine code</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ get_url(path='js/features.js') | safe }}"></script>
+{% endblock %}
