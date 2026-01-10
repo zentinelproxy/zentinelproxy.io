@@ -1,0 +1,618 @@
+{% extends "base.html" %}
+
+{% block title %}Manifesto | {{ config.title }}{% endblock %}
+{% block description %}Why Sentinel exists: boring infrastructure, explicit security, and guarding the free web{% endblock %}
+
+{% block head %}
+<style>
+    .manifesto-page {
+        --manifesto-max-width: 720px;
+    }
+
+    .manifesto-hero {
+        padding: 6rem 1.5rem 4rem;
+        text-align: center;
+        background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .manifesto-hero .container {
+        max-width: var(--manifesto-max-width);
+    }
+
+    .manifesto-title {
+        font-size: clamp(2.5rem, 6vw, 3.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 1.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .manifesto-opening {
+        font-size: 1.25rem;
+        line-height: 1.7;
+        color: var(--color-text-secondary);
+        margin: 0;
+    }
+
+    .manifesto-opening strong {
+        color: var(--color-text);
+    }
+
+    .manifesto-content {
+        padding: 4rem 1.5rem 6rem;
+    }
+
+    .manifesto-content .container {
+        max-width: var(--manifesto-max-width);
+    }
+
+    .manifesto-intro {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+        margin-bottom: 3rem;
+        padding-bottom: 3rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .manifesto-intro p {
+        margin: 0 0 1.25rem;
+    }
+
+    .manifesto-intro p:last-child {
+        margin-bottom: 0;
+    }
+
+    .manifesto-intro strong {
+        color: var(--color-text);
+    }
+
+    /* Beliefs Section */
+    .beliefs-section {
+        margin-bottom: 4rem;
+    }
+
+    .beliefs-section > h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 2rem;
+        color: var(--color-text);
+    }
+
+    .belief {
+        margin-bottom: 3rem;
+        padding-bottom: 3rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .belief:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .belief-header {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .belief-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        opacity: 0.7;
+    }
+
+    .belief-title {
+        font-size: 1.375rem;
+        font-weight: 600;
+        color: var(--color-text);
+        margin: 0;
+    }
+
+    .belief-content {
+        padding-left: 3.5rem;
+    }
+
+    .belief-content p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+        margin: 0 0 1rem;
+    }
+
+    .belief-content p:last-child {
+        margin-bottom: 0;
+    }
+
+    .belief-content strong {
+        color: var(--color-text);
+    }
+
+    .belief-content em {
+        color: var(--color-primary);
+        font-style: normal;
+    }
+
+    .belief-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0;
+    }
+
+    .belief-list li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text-secondary);
+    }
+
+    .belief-list li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.6em;
+        width: 6px;
+        height: 6px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+
+    /* Future Section */
+    .future-section {
+        margin-bottom: 4rem;
+        padding: 2rem;
+        background: var(--color-bg-subtle);
+        border-radius: 12px;
+        border: 1px solid var(--color-border);
+    }
+
+    .future-section h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem;
+        color: var(--color-text);
+    }
+
+    .future-section p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+        margin: 0 0 1rem;
+    }
+
+    .future-section p:last-child {
+        margin-bottom: 0;
+    }
+
+    .future-section strong {
+        color: var(--color-text);
+    }
+
+    /* Not Section */
+    .not-section {
+        margin-bottom: 4rem;
+    }
+
+    .not-section h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: var(--color-text);
+    }
+
+    .not-section p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+        margin: 0 0 1rem;
+    }
+
+    .not-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.5rem;
+    }
+
+    .not-list li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text-secondary);
+    }
+
+    .not-list li::before {
+        content: "\2715";
+        position: absolute;
+        left: 0;
+        color: var(--color-error, #f38ba8);
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    /* Contributors Section */
+    .contributors-section {
+        margin-bottom: 4rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(203, 166, 247, 0.08) 0%, rgba(137, 180, 250, 0.08) 100%);
+        border-radius: 12px;
+        border: 1px solid rgba(203, 166, 247, 0.2);
+    }
+
+    .contributors-section h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: var(--color-text);
+    }
+
+    .contributors-section p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+        margin: 0 0 1rem;
+    }
+
+    .contributors-questions {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+
+    .contributors-questions li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text);
+        font-style: italic;
+    }
+
+    .contributors-questions li::before {
+        content: "?";
+        position: absolute;
+        left: 0;
+        color: var(--color-primary);
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    .contributors-section p:last-child {
+        margin-bottom: 0;
+        font-style: italic;
+        color: var(--color-text-muted);
+    }
+
+    /* Summary Section */
+    .summary-section {
+        padding-top: 3rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .summary-section h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem;
+        color: var(--color-text);
+    }
+
+    .summary-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .summary-list li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--color-bg-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: 100px;
+        font-size: 0.9375rem;
+        color: var(--color-text);
+    }
+
+    .summary-list li svg {
+        color: var(--color-primary);
+        flex-shrink: 0;
+    }
+
+    .summary-closing {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+    }
+
+    .summary-closing p {
+        margin: 0 0 1rem;
+    }
+
+    .summary-closing p:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-closing strong {
+        color: var(--color-text);
+    }
+
+    .summary-closing em {
+        color: var(--color-primary);
+        font-style: normal;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .manifesto-hero {
+            padding: 4rem 1rem 3rem;
+        }
+
+        .manifesto-content {
+            padding: 3rem 1rem 4rem;
+        }
+
+        .belief-header {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .belief-number {
+            font-size: 1.75rem;
+        }
+
+        .belief-content {
+            padding-left: 0;
+        }
+
+        .future-section,
+        .contributors-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock head %}
+
+{% block content %}
+<div class="manifesto-page">
+    <section class="manifesto-hero">
+        <div class="container">
+            <h1 class="manifesto-title">
+                <span class="gradient-text">Manifesto</span>
+            </h1>
+            <p class="manifesto-opening">
+                Sentinel exists because critical web infrastructure should be <strong>boring, inspectable, and shared</strong>.
+            </p>
+        </div>
+    </section>
+
+    <section class="manifesto-content">
+        <div class="container">
+            <div class="manifesto-intro">
+                <p>
+                    The web runs on systems that sit quietly at the edge, making decisions millions of times per second. When those systems fail, people wake up at 03:00. When they fail in opaque ways, people lose trust in the web itself.
+                </p>
+                <p>
+                    Sentinel is an attempt to do this layer right.
+                </p>
+                <p>
+                    Not bigger. Not smarter. Just <strong>more honest</strong>.
+                </p>
+                <p>
+                    We build on proven foundations. Cloudflare's Pingora has handled trillions of requests. We inherit that battle-tested core and focus on what matters above it: configuration that humans can reason about, extension points that don't destabilize the system, and operational behavior you can trust with your sleep.
+                </p>
+                <p>
+                    Sentinel aspires to be a <strong>reference implementation</strong>&mdash;not because we claim to be the best, but because we aim to demonstrate how this layer <em>should</em> be built: with explicit contracts, bounded resources, and a clear separation between what must be fast and what must be flexible.
+                </p>
+            </div>
+
+            <div class="beliefs-section">
+                <h2>What We Believe</h2>
+
+                <div class="belief">
+                    <div class="belief-header">
+                        <span class="belief-number">1</span>
+                        <h3 class="belief-title">Infrastructure should be calm</h3>
+                    </div>
+                    <div class="belief-content">
+                        <p>A reverse proxy should not surprise you.</p>
+                        <p>It should:</p>
+                        <ul class="belief-list">
+                            <li>have clear limits,</li>
+                            <li>predictable timeouts,</li>
+                            <li>and failure modes you can explain to another human.</li>
+                        </ul>
+                        <p>If a system requires heroics to operate, it is already broken.</p>
+                        <p><strong>Sentinel is built so operators can sleep.</strong></p>
+                    </div>
+                </div>
+
+                <div class="belief">
+                    <div class="belief-header">
+                        <span class="belief-number">2</span>
+                        <h3 class="belief-title">Security must be explicit</h3>
+                    </div>
+                    <div class="belief-content">
+                        <p>Security that relies on hidden behavior is not security.</p>
+                        <p>Every limit, timeout, and decision in Sentinel is meant to be:</p>
+                        <ul class="belief-list">
+                            <li>visible in configuration,</li>
+                            <li>observable in metrics and logs,</li>
+                            <li>and explainable after the fact.</li>
+                        </ul>
+                        <p>There is no "magic". There is no implied policy.</p>
+                        <p>If Sentinel is protecting something, you should be able to point to <strong>where and why</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="belief">
+                    <div class="belief-header">
+                        <span class="belief-number">3</span>
+                        <h3 class="belief-title">The edge is a boundary, not a battleground</h3>
+                    </div>
+                    <div class="belief-content">
+                        <p>Sentinel does not treat the network as a war zone.</p>
+                        <p>It treats it as a <strong>boundary</strong>:</p>
+                        <ul class="belief-list">
+                            <li>where traffic enters,</li>
+                            <li>where limits matter,</li>
+                            <li>and where careful decisions prevent harm upstream.</li>
+                        </ul>
+                        <p>Being a guardian means stepping in <em>only when necessary</em>, and doing so proportionally.</p>
+                    </div>
+                </div>
+
+                <div class="belief">
+                    <div class="belief-header">
+                        <span class="belief-number">4</span>
+                        <h3 class="belief-title">Complexity must be isolated</h3>
+                    </div>
+                    <div class="belief-content">
+                        <p>Complex systems fail in complex ways.</p>
+                        <p>Sentinel keeps the core dataplane intentionally small and predictable. Anything that is:</p>
+                        <ul class="belief-list">
+                            <li>parsing-heavy,</li>
+                            <li>policy-rich,</li>
+                            <li>or operationally risky</li>
+                        </ul>
+                        <p>belongs <strong>outside</strong> the core, behind explicit contracts.</p>
+                        <p>This is why Sentinel favors <strong>external agents</strong> over embedded logic.</p>
+                        <p>The agent architecture is not a workaround or a plugin system bolted on as an afterthought. It is a fundamental design choice: the dataplane does one thing well (moving bytes with bounded resources), while agents handle everything else (WAF inspection, authentication, rate limiting, custom business logic).</p>
+                        <p>A broken extension must never take the whole system down with it. Agents can crash, restart, be upgraded, or be disabled&mdash;independently of the proxy. The blast radius of complexity is contained by process boundaries, not just code boundaries.</p>
+                    </div>
+                </div>
+
+                <div class="belief">
+                    <div class="belief-header">
+                        <span class="belief-number">5</span>
+                        <h3 class="belief-title">The web is a commons</h3>
+                    </div>
+                    <div class="belief-content">
+                        <p>Sentinel is built for the free and open web.</p>
+                        <p>That means:</p>
+                        <ul class="belief-list">
+                            <li>no hidden control planes,</li>
+                            <li>no vendor lock-in by design,</li>
+                            <li>no closed rule engines masquerading as "features".</li>
+                        </ul>
+                        <p>You should be able to:</p>
+                        <ul class="belief-list">
+                            <li>read the code,</li>
+                            <li>fork it,</li>
+                            <li>modify it,</li>
+                            <li>and run it independently.</li>
+                        </ul>
+                        <p>Sentinel exists to keep this layer <strong>shared</strong>, not owned.</p>
+                    </div>
+                </div>
+
+                <div class="belief">
+                    <div class="belief-header">
+                        <span class="belief-number">6</span>
+                        <h3 class="belief-title">Production correctness beats feature breadth</h3>
+                    </div>
+                    <div class="belief-content">
+                        <p>Sentinel will always choose:</p>
+                        <ul class="belief-list">
+                            <li>correctness over cleverness,</li>
+                            <li>boring reliability over shiny features,</li>
+                            <li>and fewer knobs over unsafe defaults.</li>
+                        </ul>
+                        <p>A feature that cannot be:</p>
+                        <ul class="belief-list">
+                            <li>bounded,</li>
+                            <li>observed,</li>
+                            <li>tested,</li>
+                            <li>and rolled back</li>
+                        </ul>
+                        <p>does not belong in the core.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="future-section">
+                <h2>Guarding Tomorrow's Web</h2>
+                <p>The web is changing. New challenges are emerging that reverse proxies must address:</p>
+                <p><strong>Inference traffic is different.</strong> AI workloads don't fit the request-response model we've optimized for decades. Token streams, long-running connections, and cost-per-token economics require new primitives. Sentinel will treat inference as a first-class traffic type&mdash;with token-aware rate limiting, model routing, and semantic guardrails&mdash;without compromising the simplicity of HTTP routing.</p>
+                <p><strong>Identity is becoming workload-native.</strong> The future of security is not firewalls at the perimeter but cryptographic identity at every hop. Sentinel will embrace workload identity (SPIFFE, mTLS, continuous verification) so that every request can answer: <em>who is asking, and should they be allowed?</em></p>
+                <p><strong>Explainability is mandatory.</strong> As edge decisions grow more complex&mdash;WAF rules, rate limits, routing policies, agent verdicts&mdash;operators need to understand <em>why</em> a request was blocked or allowed. Sentinel will make every decision traceable: not just what happened, but which rule, which agent, which configuration line.</p>
+                <p><strong>The attack surface is expanding.</strong> Prompt injection, model jailbreaking, PII leakage through AI APIs&mdash;these are new categories of harm that the edge must help prevent. Sentinel's agent architecture is designed precisely for this: specialized agents can inspect, classify, and guard against threats we haven't fully imagined yet, without requiring changes to the core.</p>
+                <p>We do not know exactly what the web will look like in ten years. But we know that the layer sitting at the boundary&mdash;accepting connections, making decisions, routing traffic&mdash;will still matter. Sentinel is built to evolve with that future, not to predict it.</p>
+            </div>
+
+            <div class="not-section">
+                <h2>What Sentinel Is Not</h2>
+                <p>Sentinel is not:</p>
+                <ul class="not-list">
+                    <li>a platform that needs a sales call,</li>
+                    <li>a framework that reinvents everything below it,</li>
+                    <li>a place to embed arbitrary logic because it "might be useful".</li>
+                </ul>
+                <p>It is not trying to win benchmarks at the cost of operability.</p>
+                <p>It is not trying to centralize power at the edge.</p>
+            </div>
+
+            <div class="contributors-section">
+                <h2>A Note to Contributors</h2>
+                <p>If you contribute to Sentinel, you are helping guard a shared layer of the web.</p>
+                <p>That comes with responsibility.</p>
+                <p>Before adding anything, ask:</p>
+                <ul class="contributors-questions">
+                    <li>Does this introduce ambiguity?</li>
+                    <li>Can this fail loudly and safely?</li>
+                    <li>Will this make someone's on-call worse?</li>
+                </ul>
+                <p>If the answer is unclear, slow down.</p>
+                <p>Sentinel will still be here tomorrow.</p>
+            </div>
+
+            <div class="summary-section">
+                <h2>In Short</h2>
+                <ul class="summary-list">
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Explicit limits
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Predictable behavior
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Observable decisions
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Isolated complexity
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Infrastructure people can trust
+                    </li>
+                </ul>
+                <div class="summary-closing">
+                    <p>We guard not just the web of today&mdash;the HTTP requests, the upstream pools, the TLS handshakes&mdash;but the web of tomorrow: the inference streams, the workload identities, the threats we haven't named yet.</p>
+                    <p>We do this by staying small where it matters, extensible where it counts, and honest everywhere.</p>
+                    <p>Guarding the free web does not require aggression.</p>
+                    <p><em>It requires care.</em></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

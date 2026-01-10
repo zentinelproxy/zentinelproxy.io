@@ -4,13 +4,13 @@ description = "Token bucket rate limiting with configurable windows and limits p
 template = "agent.html"
 
 [taxonomies]
-tags = ["security", "traffic", "core"]
+tags = ["security", "traffic", "deprecated"]
 
 [extra]
 official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
-status = "Stable"
+status = "Deprecated"
 version = "0.1.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-ratelimit"
@@ -25,44 +25,167 @@ docker_image = ""
 min_sentinel_version = "25.12.0"
 +++
 
-## Overview
+<div class="deprecation-notice">
+
+## Deprecated
+
+**This agent is deprecated as of Sentinel v26.01.** Rate limiting is now built into Sentinel core with more features and better performance.
+
+Please use [Sentinel's built-in rate limiting](/configuration/limits/) instead.
+
+</div>
+
+## Migration Guide
+
+Sentinel now includes comprehensive rate limiting natively. Here's how to migrate:
+
+### Before (Agent)
+
+```kdl
+agent "ratelimit" {
+    socket "/var/run/sentinel/ratelimit.sock"
+    timeout 100ms
+
+    config {
+        default-limit 100
+        window-seconds 60
+        burst-size 20
+        key-type "ip"
+    }
+}
+
+route {
+    match { path-prefix "/api/" }
+    agents ["ratelimit"]
+    upstream "backend"
+}
+```
+
+### After (Built-in)
+
+```kdl
+rate-limit "api-limit" {
+    limit 100
+    window 60s
+    burst 20
+    key client-ip
+    action reject
+}
+
+route {
+    match { path-prefix "/api/" }
+    rate-limit "api-limit"
+    upstream "backend"
+}
+```
+
+## Built-in Rate Limiting Features
+
+Sentinel's native rate limiting offers more capabilities than this agent:
+
+| Feature | Agent | Built-in |
+|---------|-------|----------|
+| Token bucket algorithm | Yes | Yes |
+| Key types (IP, header, custom) | Yes | Yes |
+| Per-route limits | Yes | Yes |
+| Distributed (Redis) | No | Yes |
+| Distributed (Memcached) | No | Yes |
+| Challenge action | No | Yes |
+| Delay action | No | Yes |
+| Scope-aware (namespace/service) | No | Yes |
+| Lock-free local limiting | No | Yes |
+
+### Distributed Rate Limiting
+
+The built-in rate limiter supports distributed backends for multi-instance deployments:
+
+```kdl
+rate-limit "global-api-limit" {
+    limit 10000
+    window 60s
+    key api-key
+    action reject
+
+    backend redis {
+        url "redis://localhost:6379"
+        key-prefix "sentinel:ratelimit:"
+    }
+}
+```
+
+### Multiple Actions
+
+Built-in rate limiting supports multiple actions beyond simple rejection:
+
+```kdl
+rate-limit "login-limit" {
+    limit 5
+    window 60s
+    key client-ip
+    action challenge  // Issue CAPTCHA challenge instead of blocking
+}
+
+rate-limit "api-throttle" {
+    limit 100
+    window 1s
+    key client-ip
+    action delay 100ms  // Slow down instead of rejecting
+}
+```
+
+### Scope-Aware Limits
+
+Apply rate limits per namespace or service:
+
+```kdl
+namespace "tenant-a" {
+    rate-limit "tenant-limit" {
+        limit 1000
+        window 60s
+        key client-ip
+    }
+}
+```
+
+## Documentation
+
+For complete documentation on built-in rate limiting, see:
+
+- [Rate Limiting Configuration](/configuration/limits/)
+- [Features: Rate Limiting](/features/#rate-limiting)
+
+---
+
+## Legacy Documentation
+
+The following documentation is preserved for users still migrating from the agent.
+
+### Overview
 
 The Rate Limiter agent provides flexible traffic control using the token bucket algorithm. Protect your upstream services from traffic spikes and abuse.
 
-## Features
+### Features
 
 - **Token Bucket Algorithm**: Industry-standard rate limiting with burst support
 - **Multiple Key Types**: Limit by IP, route, header value, or custom extractors
 - **Sliding Window**: Accurate rate limiting with sliding window counters
 - **Graceful Handling**: Configurable behavior for limit exceeded scenarios
 
-## Installation
+### Installation
 
-### Using Cargo
+#### Using Cargo
 
 ```bash
 cargo install sentinel-agent-ratelimit
 ```
 
-### Using Docker
+#### Using Docker
 
 ```bash
 docker pull ghcr.io/raskell-io/sentinel-agent-ratelimit:latest
 ```
 
-### Docker Compose
-
-```yaml
-services:
-  ratelimit-agent:
-    image: ghcr.io/raskell-io/sentinel-agent-ratelimit:latest
-    volumes:
-      - /var/run/sentinel:/var/run/sentinel
-    environment:
-      - SOCKET_PATH=/var/run/sentinel/ratelimit.sock
-```
-
-## Configuration
+### Configuration
 
 Add the agent to your Sentinel configuration:
 
@@ -81,7 +204,7 @@ agent "ratelimit" {
 }
 ```
 
-### Configuration Options
+#### Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -91,30 +214,7 @@ agent "ratelimit" {
 | `key-type` | string | `"ip"` | Rate limit key: `ip`, `route`, `header` |
 | `header-name` | string | - | Header to use when `key-type` is `header` |
 
-### Per-Route Limits
-
-```kdl
-agent "ratelimit" {
-    socket "/var/run/sentinel/ratelimit.sock"
-
-    config {
-        default-limit 100
-        window-seconds 60
-
-        route "/api/auth/*" {
-            limit 10
-            window-seconds 60
-        }
-
-        route "/api/upload" {
-            limit 5
-            window-seconds 300
-        }
-    }
-}
-```
-
-## Response Headers
+### Response Headers
 
 When enabled, the agent adds standard rate limit headers:
 
@@ -123,76 +223,3 @@ When enabled, the agent adds standard rate limit headers:
 | `X-RateLimit-Limit` | Maximum requests allowed |
 | `X-RateLimit-Remaining` | Requests remaining in window |
 | `X-RateLimit-Reset` | Unix timestamp when the window resets |
-
-## Test Payloads
-
-### Basic Rate Limit Test
-
-```bash
-# Send 10 requests rapidly to trigger rate limiting
-for i in {1..10}; do
-  curl -i http://localhost:8080/api/test
-done
-```
-
-### Expected Response (Rate Limited)
-
-```http
-HTTP/1.1 429 Too Many Requests
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1703520000
-Content-Type: application/json
-
-{"error": "rate_limit_exceeded", "retry_after": 45}
-```
-
-## Examples
-
-### API Gateway with Tiered Limits
-
-```kdl
-agent "ratelimit" {
-    socket "/var/run/sentinel/ratelimit.sock"
-
-    config {
-        // Default for all routes
-        default-limit 1000
-        window-seconds 3600
-
-        // Stricter limits for auth endpoints
-        route "/api/auth/*" {
-            limit 10
-            window-seconds 60
-        }
-
-        // Generous limits for read operations
-        route "/api/v1/read/*" {
-            limit 5000
-            window-seconds 3600
-        }
-
-        // Strict limits for write operations
-        route "/api/v1/write/*" {
-            limit 100
-            window-seconds 3600
-        }
-    }
-}
-```
-
-### IP-Based with Header Fallback
-
-```kdl
-agent "ratelimit" {
-    socket "/var/run/sentinel/ratelimit.sock"
-
-    config {
-        default-limit 100
-        window-seconds 60
-        key-type "header"
-        header-name "X-Forwarded-For"
-        fallback-key-type "ip"
-    }
-}
-```
