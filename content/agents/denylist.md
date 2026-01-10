@@ -164,3 +164,13 @@ agent "denylist" {
     }
 }
 ```
+
+## Related Agents
+
+| Agent | Integration |
+|-------|-------------|
+| **Auth** | Block IPs before auth processing |
+| **WAF** | Combine with attack detection |
+| **ModSecurity** | Full WAF with IP reputation |
+
+> **Note:** For country-level blocking, use [Sentinel's built-in GeoIP filtering](/configuration/geoip/) instead.

@@ -191,10 +191,24 @@
                     </a>
                     <div class="nav-links">
                         {% for link in config.extra.nav_links %}
-                        {% if link.name == "GitHub" %}
+                        {% if link.name == "GitHub" or link.external %}
                         <a href="{{ link.url }}" target="_blank" rel="noopener" class="nav-icon-link" aria-label="GitHub repository">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
                         </a>
+                        {% elif link.children %}
+                        <div class="nav-dropdown">
+                            <button class="nav-dropdown__trigger" type="button" aria-expanded="false" aria-haspopup="true">
+                                {{ link.name }}
+                                <svg class="nav-dropdown__chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <div class="nav-dropdown__menu" role="menu">
+                                {% for child in link.children %}
+                                <a href="{{ child.url }}" role="menuitem"{% if child.external %} target="_blank" rel="noopener"{% endif %}>
+                                    {{ child.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
                         {% else %}
                         <a href="{{ link.url }}" {% if link.url is starting_with("http") %}target="_blank" rel="noopener"{% endif %}>
                             {{ link.name }}
@@ -222,11 +236,20 @@
             </button>
             <nav class="mobile-menu-content" role="navigation" aria-label="Mobile navigation">
                 {% for link in config.extra.nav_links %}
-                {% if link.name == "GitHub" %}
+                {% if link.name == "GitHub" or link.external %}
                 <a href="{{ link.url }}" class="mobile-menu-link mobile-menu-link--icon" target="_blank" rel="noopener">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
                     GitHub
                 </a>
+                {% elif link.children %}
+                <div class="mobile-nav-group">
+                    <span class="mobile-nav-group__label">{{ link.name }}</span>
+                    {% for child in link.children %}
+                    <a href="{{ child.url }}" class="mobile-menu-link" {% if child.external %}target="_blank" rel="noopener"{% endif %}>
+                        {{ child.name }}
+                    </a>
+                    {% endfor %}
+                </div>
                 {% else %}
                 <a href="{{ link.url }}" class="mobile-menu-link" {% if link.url is starting_with("http") %}target="_blank" rel="noopener"{% endif %}>
                     {{ link.name }}
@@ -368,6 +391,69 @@
                 closeMobileMenu();
             }
         });
+
+        // Navigation Dropdowns
+        (function() {
+            const dropdowns = document.querySelectorAll('.nav-dropdown');
+            let activeDropdown = null;
+
+            dropdowns.forEach(dropdown => {
+                const trigger = dropdown.querySelector('.nav-dropdown__trigger');
+                const menu = dropdown.querySelector('.nav-dropdown__menu');
+
+                if (trigger && menu) {
+                    trigger.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const isOpen = dropdown.classList.contains('open');
+
+                        // Close any other open dropdown
+                        if (activeDropdown && activeDropdown !== dropdown) {
+                            activeDropdown.classList.remove('open');
+                            activeDropdown.querySelector('.nav-dropdown__trigger').setAttribute('aria-expanded', 'false');
+                        }
+
+                        if (isOpen) {
+                            dropdown.classList.remove('open');
+                            trigger.setAttribute('aria-expanded', 'false');
+                            activeDropdown = null;
+                        } else {
+                            dropdown.classList.add('open');
+                            trigger.setAttribute('aria-expanded', 'true');
+                            activeDropdown = dropdown;
+                        }
+                    });
+
+                    // Close on menu link click
+                    menu.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', () => {
+                            dropdown.classList.remove('open');
+                            trigger.setAttribute('aria-expanded', 'false');
+                            activeDropdown = null;
+                        });
+                    });
+                }
+            });
+
+            // Close on outside click
+            document.addEventListener('click', (e) => {
+                if (activeDropdown && !activeDropdown.contains(e.target)) {
+                    activeDropdown.classList.remove('open');
+                    activeDropdown.querySelector('.nav-dropdown__trigger').setAttribute('aria-expanded', 'false');
+                    activeDropdown = null;
+                }
+            });
+
+            // Close on escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && activeDropdown) {
+                    activeDropdown.classList.remove('open');
+                    activeDropdown.querySelector('.nav-dropdown__trigger').setAttribute('aria-expanded', 'false');
+                    activeDropdown = null;
+                }
+            });
+        })();
     </script>
 
     {% block scripts %}{% endblock %}

@@ -190,4 +190,6 @@ SecAction "id:900000,phase:1,pass,t:none,nolog,setvar:tx.blocking_paranoia_level
 |-------|-------------|
 | **WAF** | Lightweight, pure Rust alternative |
 | **AI Gateway** | AI-specific security controls |
-| **Rate Limiter** | Combine with rate limiting |
+| **Auth** | Combine with authentication |
+
+> **Note:** For rate limiting, use [Sentinel's built-in rate limiting](/configuration/limits/) instead of an agent.

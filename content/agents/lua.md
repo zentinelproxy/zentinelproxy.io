@@ -22,7 +22,7 @@ crate_name = "sentinel-agent-lua"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "0.1.0"
+min_sentinel_version = "25.12.0"
 +++
 
 ## Overview
@@ -288,13 +288,16 @@ The error message is included in the `reason_codes` audit field.
 
 ```kdl
 agent "lua" {
-    type "lua"
-    transport "unix_socket" {
-        path "/tmp/sentinel-lua.sock"
-    }
-    events ["request_headers", "response_headers"]
-    timeout-ms 50
-    failure-mode "open"
+    socket "/tmp/sentinel-lua.sock"
+    timeout 50ms
+    events ["request_headers" "response_headers"]
+    failure-mode open
+}
+
+route {
+    match { path-prefix "/" }
+    agents ["lua"]
+    upstream "backend"
 }
 ```
 
@@ -307,3 +310,11 @@ agent "lua" {
 | Performance | Fast startup | Fast startup |
 | Use case | Simple scripts | Complex logic |
 | String handling | Pattern matching | Full regex |
+
+## Related Agents
+
+| Agent | Integration |
+|-------|-------------|
+| **JavaScript** | Alternative scripting with full regex |
+| **WebAssembly** | High-performance custom logic |
+| **WAF** | Combine with security rules |

@@ -241,3 +241,13 @@ agent "auth" {
     }
 }
 ```
+
+## Related Agents
+
+| Agent | Integration |
+|-------|-------------|
+| **WAF** | Combine auth with attack detection |
+| **AI Gateway** | Auth for AI API endpoints |
+| **Denylist** | Block IPs before auth processing |
+
+> **Note:** For rate limiting authenticated users, use [Sentinel's built-in rate limiting](/configuration/limits/) with `key api-key` or `key user`.

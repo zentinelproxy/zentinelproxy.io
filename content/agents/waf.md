@@ -199,4 +199,6 @@ X-WAF-Rule: 942100
 |-------|-------------|
 | **ModSecurity** | Full OWASP CRS with 800+ rules |
 | **AI Gateway** | AI-specific security controls |
-| **Rate Limiter** | Combine with rate limiting |
+| **Auth** | Combine with authentication |
+
+> **Note:** For rate limiting, use [Sentinel's built-in rate limiting](/configuration/limits/) instead of an agent.

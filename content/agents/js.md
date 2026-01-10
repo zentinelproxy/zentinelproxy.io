@@ -278,6 +278,6 @@ function on_request_headers(request) {
 
 | Agent | Integration |
 |-------|-------------|
-| **Lua** | More powerful scripting alternative |
+| **Lua** | Alternative scripting with Lua syntax |
 | **WebAssembly** | High-performance custom logic |
 | **WAF** | Combine with security rules |
