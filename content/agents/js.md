@@ -102,7 +102,11 @@ function on_request_headers(request) {
 | Hook | Description |
 |------|-------------|
 | `on_request_headers(request)` | Called when request headers are received |
+| `on_request_body(request)` | Called when request body is available |
 | `on_response_headers(response)` | Called when response headers are received |
+| `on_response_body(response)` | Called when response body is available |
+
+> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Sentinel configuration.
 
 ### Request Object
 
@@ -173,6 +177,132 @@ function on_request_headers(request) {
             tags: ["bot-detected", "monitoring"]
         };
     }
+    return { decision: "allow" };
+}
+```
+
+### Extended Audit Metadata
+
+For detailed audit logging, you can include rule IDs, confidence scores, and reason codes:
+
+```javascript
+function on_request_headers(request) {
+    if (request.uri.includes("..")) {
+        return {
+            decision: "block",
+            status: 403,
+            tags: ["path-traversal"],
+            rule_ids: ["SEC-001", "OWASP-930"],
+            confidence: 0.95,
+            reason_codes: ["PATH_TRAVERSAL_DETECTED"]
+        };
+    }
+    return { decision: "allow" };
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tags` | array | Freeform tags for categorization |
+| `rule_ids` | array | Specific rule identifiers that triggered |
+| `confidence` | number | Confidence score (0.0 to 1.0) |
+| `reason_codes` | array | Structured reason codes |
+
+### Routing Metadata
+
+Control upstream selection dynamically:
+
+```javascript
+function on_request_headers(request) {
+    // Route to different backends based on request
+    if (request.uri.startsWith("/api/v2")) {
+        return {
+            decision: "allow",
+            routing_metadata: {
+                upstream: "api-v2-backend",
+                priority: "high"
+            }
+        };
+    }
+
+    // A/B testing: route 10% to canary
+    if (Math.random() < 0.1) {
+        return {
+            decision: "allow",
+            routing_metadata: {
+                upstream: "canary-backend"
+            },
+            tags: ["canary"]
+        };
+    }
+
+    return { decision: "allow" };
+}
+```
+
+### Body Mutation
+
+Modify request or response bodies:
+
+```javascript
+function on_request_body(request) {
+    // Pass through unchanged
+    return {
+        decision: "allow",
+        request_body_mutation: {
+            action: "pass_through",
+            chunk_index: 0
+        }
+    };
+}
+
+function on_response_body(response) {
+    // Replace response body content
+    return {
+        decision: "allow",
+        response_body_mutation: {
+            action: "replace",
+            chunk_index: 0,
+            data: "Modified response content"
+        }
+    };
+}
+```
+
+| Action | Description |
+|--------|-------------|
+| `pass_through` | Pass the chunk unchanged |
+| `replace` | Replace chunk with `data` field content |
+| `drop` | Drop the chunk entirely |
+
+### Needs More Data
+
+Signal that you need the request body before making a decision:
+
+```javascript
+function on_request_headers(request) {
+    // For POST requests, wait for body before deciding
+    if (request.method === "POST" && request.uri.startsWith("/api/")) {
+        return {
+            decision: "allow",
+            needs_more: true  // Wait for body
+        };
+    }
+    return { decision: "allow" };
+}
+
+function on_request_body(request) {
+    // Now inspect the body
+    const body = request.body || "";
+
+    if (body.includes("malicious_pattern")) {
+        return {
+            decision: "block",
+            status: 403,
+            body: "Request blocked"
+        };
+    }
+
     return { decision: "allow" };
 }
 ```

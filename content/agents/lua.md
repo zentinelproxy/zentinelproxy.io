@@ -161,6 +161,140 @@ return {
 }
 ```
 
+### Extended Audit Metadata
+
+For detailed audit logging, include rule IDs, confidence scores, and reason codes:
+
+```lua
+return {
+    decision = "block",
+    status = 403,
+    tags = {"path-traversal"},
+    rule_ids = {"SEC-001", "OWASP-930"},
+    confidence = 0.95,
+    reason_codes = {"PATH_TRAVERSAL_DETECTED"}
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tags` | table | Freeform tags for categorization |
+| `rule_ids` | table | Specific rule identifiers that triggered |
+| `confidence` | number | Confidence score (0.0 to 1.0) |
+| `reason_codes` | table | Structured reason codes |
+
+### Routing Metadata
+
+Control upstream selection dynamically:
+
+```lua
+function on_request_headers()
+    -- Route to different backends based on request
+    if request.uri:match("^/api/v2") then
+        return {
+            decision = "allow",
+            routing_metadata = {
+                upstream = "api-v2-backend",
+                priority = "high"
+            }
+        }
+    end
+
+    -- A/B testing: route 10% to canary
+    if math.random() < 0.1 then
+        return {
+            decision = "allow",
+            routing_metadata = {
+                upstream = "canary-backend"
+            },
+            tags = {"canary"}
+        }
+    end
+
+    return {decision = "allow"}
+end
+```
+
+### Body Hooks
+
+For body inspection, additional hooks are available:
+
+| Hook | Description |
+|------|-------------|
+| `on_request_headers()` | Called when request headers are received |
+| `on_request_body()` | Called when request body is available |
+| `on_response_headers()` | Called when response headers are received |
+| `on_response_body()` | Called when response body is available |
+
+> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Sentinel configuration.
+
+### Body Mutation
+
+Modify request or response bodies:
+
+```lua
+function on_request_body()
+    -- Pass through unchanged
+    return {
+        decision = "allow",
+        request_body_mutation = {
+            action = "pass_through",
+            chunk_index = 0
+        }
+    }
+end
+
+function on_response_body()
+    -- Replace response body content
+    return {
+        decision = "allow",
+        response_body_mutation = {
+            action = "replace",
+            chunk_index = 0,
+            data = "Modified response content"
+        }
+    }
+end
+```
+
+| Action | Description |
+|--------|-------------|
+| `pass_through` | Pass the chunk unchanged |
+| `replace` | Replace chunk with `data` field content |
+| `drop` | Drop the chunk entirely |
+
+### Needs More Data
+
+Signal that you need the request body before making a decision:
+
+```lua
+function on_request_headers()
+    -- For POST requests, wait for body before deciding
+    if request.method == "POST" and request.uri:match("^/api/") then
+        return {
+            decision = "allow",
+            needs_more = true  -- Wait for body
+        }
+    end
+    return {decision = "allow"}
+end
+
+function on_request_body()
+    -- Now inspect the body
+    local body = request.body or ""
+
+    if body:match("malicious_pattern") then
+        return {
+            decision = "block",
+            status = 403,
+            body = "Request blocked"
+        }
+    end
+
+    return {decision = "allow"}
+end
+```
+
 ## Examples
 
 ### Block by IP Range

@@ -151,6 +151,99 @@ on_response_headers(ptr: i32, len: i32) -> i64
 }
 ```
 
+### Extended Audit Metadata
+
+For detailed audit logging, include rule IDs, confidence scores, and reason codes:
+
+```json
+{
+    "decision": "block",
+    "status": 403,
+    "tags": ["path-traversal"],
+    "rule_ids": ["SEC-001", "OWASP-930"],
+    "confidence": 0.95,
+    "reason_codes": ["PATH_TRAVERSAL_DETECTED"]
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tags` | array | Freeform tags for categorization |
+| `rule_ids` | array | Specific rule identifiers that triggered |
+| `confidence` | number | Confidence score (0.0 to 1.0) |
+| `reason_codes` | array | Structured reason codes |
+
+### Routing Metadata
+
+Control upstream selection dynamically:
+
+```json
+{
+    "decision": "allow",
+    "routing_metadata": {
+        "upstream": "api-v2-backend",
+        "priority": "high"
+    }
+}
+```
+
+### Body Hooks
+
+For body inspection, additional handler functions are available:
+
+| Hook | Description |
+|------|-------------|
+| `on_request_headers(ptr, len) -> i64` | Called when request headers are received |
+| `on_request_body(ptr, len) -> i64` | Called when request body is available |
+| `on_response_headers(ptr, len) -> i64` | Called when response headers are received |
+| `on_response_body(ptr, len) -> i64` | Called when response body is available |
+
+> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Sentinel configuration.
+
+### Body Mutation
+
+Modify request or response bodies:
+
+```json
+{
+    "decision": "allow",
+    "request_body_mutation": {
+        "action": "pass_through",
+        "chunk_index": 0
+    }
+}
+```
+
+```json
+{
+    "decision": "allow",
+    "response_body_mutation": {
+        "action": "replace",
+        "chunk_index": 0,
+        "data": "Modified response content"
+    }
+}
+```
+
+| Action | Description |
+|--------|-------------|
+| `pass_through` | Pass the chunk unchanged |
+| `replace` | Replace chunk with `data` field content |
+| `drop` | Drop the chunk entirely |
+
+### Needs More Data
+
+Signal that you need the request body before making a decision:
+
+```json
+{
+    "decision": "allow",
+    "needs_more": true
+}
+```
+
+Return this from `on_request_headers` to receive the body in `on_request_body` before the final decision.
+
 ## Rust Module Example
 
 ```rust
