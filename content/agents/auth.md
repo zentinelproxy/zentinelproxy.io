@@ -1,10 +1,10 @@
 +++
 title = "Auth"
-description = "Authentication agent supporting JWT, API keys, Basic auth, and SAML SSO with session persistence."
+description = "Authentication and authorization agent supporting JWT, OIDC, API keys, Basic auth, SAML SSO, mTLS, Cedar policies, and token exchange."
 template = "agent.html"
 
 [taxonomies]
-tags = ["security", "auth", "core"]
+tags = ["security", "auth", "core", "authorization", "oidc", "mtls"]
 
 [extra]
 official = true
@@ -27,14 +27,25 @@ min_sentinel_version = "25.12.0"
 
 ## Overview
 
-The Auth agent provides authentication for your services. It supports JWT/Bearer tokens, API keys, Basic authentication, and SAML SSO with built-in session persistence.
+The Auth agent provides comprehensive authentication and authorization for your services. It supports multiple authentication methods including JWT, OIDC/OAuth 2.0, API keys, Basic auth, SAML SSO, and mTLS client certificates. Authorization is powered by the Cedar policy engine for fine-grained access control.
 
 ## Features
 
+### Authentication (AuthN)
 - **JWT Validation**: Verify JWTs with HS256, RS256, ES256 algorithms
+- **OIDC/OAuth 2.0**: OpenID Connect with automatic JWKS key rotation
 - **API Keys**: Simple header-based authentication
 - **Basic Auth**: Username/password authentication (RFC 7617)
 - **SAML SSO**: Enterprise single sign-on with SP-initiated flow
+- **mTLS Client Certificates**: X.509 certificate-based authentication
+
+### Authorization (AuthZ)
+- **Cedar Policy Engine**: Fine-grained, policy-as-code authorization
+
+### Token Services
+- **Token Exchange (RFC 8693)**: Convert between token types (SAML→JWT, external→internal)
+
+### General
 - **Session Persistence**: Built-in session store using embedded database
 - **Claims Forwarding**: Pass validated claims/attributes to upstream services
 - **Fail-Open Mode**: Graceful degradation for non-critical paths
@@ -196,6 +207,112 @@ Client request:
 curl -u "admin:secretpass" http://localhost:8080/api
 ```
 
+### OIDC/OAuth 2.0
+
+OIDC authentication with automatic JWKS key fetching and rotation:
+
+```kdl
+config {
+    oidc {
+        enabled true
+        issuer "https://auth.example.com"
+        jwks-url "https://auth.example.com/.well-known/jwks.json"
+        audience "my-api"
+        required-scopes ["read" "write"]
+        jwks-refresh-secs 3600
+    }
+}
+```
+
+Client request:
+```bash
+curl -H "Authorization: Bearer <oauth2-access-token>" http://localhost:8080/api
+```
+
+#### OIDC Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | bool | `false` | Enable OIDC authentication |
+| `issuer` | string | *required* | Expected token issuer |
+| `jwks-url` | string | *required* | URL to fetch JWKS |
+| `audience` | string | - | Expected audience claim |
+| `required-scopes` | array | `[]` | Scopes that must be present |
+| `jwks-refresh-secs` | int | `3600` | JWKS cache refresh interval |
+| `clock-skew-secs` | int | `30` | Clock tolerance |
+
+#### OIDC Provider Examples
+
+**Auth0:**
+```kdl
+oidc {
+    enabled true
+    issuer "https://your-tenant.auth0.com/"
+    jwks-url "https://your-tenant.auth0.com/.well-known/jwks.json"
+    audience "https://your-api.example.com"
+}
+```
+
+**Okta:**
+```kdl
+oidc {
+    enabled true
+    issuer "https://your-org.okta.com/oauth2/default"
+    jwks-url "https://your-org.okta.com/oauth2/default/v1/keys"
+    audience "api://your-api"
+}
+```
+
+**Azure AD:**
+```kdl
+oidc {
+    enabled true
+    issuer "https://login.microsoftonline.com/{tenant-id}/v2.0"
+    jwks-url "https://login.microsoftonline.com/{tenant-id}/discovery/v2.0/keys"
+    audience "api://{client-id}"
+}
+```
+
+### mTLS Client Certificates
+
+Authenticate services using X.509 client certificates. The Sentinel proxy terminates TLS and forwards the certificate:
+
+```kdl
+config {
+    mtls {
+        enabled true
+        client-cert-header "X-Client-Cert"
+        allowed-dns ["CN=api-gateway,O=Example Corp" "CN=backend-service,O=Example Corp"]
+        allowed-sans ["service@example.com"]
+        extract-cn-as-user true
+    }
+}
+```
+
+#### Sentinel Proxy mTLS Configuration
+
+```kdl
+listener {
+    tls {
+        client-auth "require"
+        forward-client-cert-header "X-Client-Cert"
+        ca-cert-file "/etc/ssl/ca.crt"
+    }
+}
+```
+
+#### mTLS Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | bool | `false` | Enable mTLS authentication |
+| `client-cert-header` | string | `X-Client-Cert` | Header with client certificate |
+| `ca-cert-path` | string | - | CA cert for chain validation |
+| `allowed-dns` | array | `[]` | Allowed Distinguished Names |
+| `allowed-sans` | array | `[]` | Allowed Subject Alternative Names |
+| `extract-cn-as-user` | bool | `true` | Use CN as user ID |
+| `extract-san-email-as-user` | bool | `false` | Use SAN email as user ID |
+
 ## SAML SSO
 
 The agent supports SAML 2.0 SP-initiated SSO with built-in session persistence.
@@ -330,6 +447,146 @@ SAML sessions are persisted using an embedded database (redb), allowing sessions
 | `session-ttl-secs` | `28800` | Session lifetime (8 hours) |
 | `cleanup-interval-secs` | `300` | Cleanup task interval (5 min) |
 
+## Authorization (Cedar Policy Engine)
+
+After authentication, the Cedar policy engine evaluates whether the request is authorized.
+
+### Authorization Configuration
+
+```kdl
+config {
+    authz {
+        enabled true
+        policy-file "/etc/sentinel/policies/auth.cedar"
+        default-decision "deny"
+        principal-claim "sub"
+        roles-claim "roles"
+    }
+}
+```
+
+### Authorization Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | bool | `false` | Enable authorization |
+| `policy-file` | string | - | Path to Cedar policy file |
+| `policy-inline` | string | - | Inline Cedar policy text |
+| `default-decision` | string | `deny` | Decision when no policy matches |
+| `principal-claim` | string | `sub` | JWT claim for principal ID |
+| `roles-claim` | string | - | JWT claim containing roles |
+
+### Cedar Policy Example
+
+```cedar
+// Allow authenticated users to read public API
+permit(
+    principal,
+    action == Action::"GET",
+    resource
+) when {
+    resource.path like "/api/public/*"
+};
+
+// Allow admins full access
+permit(
+    principal,
+    action,
+    resource
+) when {
+    context.roles.contains("admin")
+};
+
+// Users can only access their own resources
+permit(
+    principal,
+    action,
+    resource
+) when {
+    resource.path like "/api/users/*" &&
+    resource.path.endsWith(principal.id)
+};
+
+// Deny access to admin endpoints for non-admins
+forbid(
+    principal,
+    action,
+    resource
+) when {
+    resource.path like "/admin/*" &&
+    !context.roles.contains("admin")
+};
+```
+
+### Cedar Request Context
+
+The agent builds Cedar requests with:
+
+| Entity | Source | Example |
+|--------|--------|---------|
+| Principal | User ID | `User::"john@example.com"` |
+| Action | HTTP method | `Action::"GET"` |
+| Resource | Request path | `Resource::"/api/users/123"` |
+| Context | Claims, roles | `{"roles": ["admin"], "claims": {...}}` |
+
+## Token Exchange (RFC 8693)
+
+Exchange one token type for another (e.g., SAML assertion → JWT).
+
+### Token Exchange Configuration
+
+```kdl
+config {
+    token-exchange {
+        enabled true
+        endpoint-path "/token/exchange"
+        issuer "https://auth.internal.example.com"
+        signing-key-file "/etc/sentinel/jwt-private.pem"
+        signing-algorithm "RS256"
+        token-ttl-secs 3600
+        allowed-exchanges [
+            { subject-token-type "saml2" issued-token-type "access_token" }
+            { subject-token-type "jwt" issued-token-type "access_token" }
+        ]
+    }
+}
+```
+
+### Token Exchange Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | bool | `false` | Enable token exchange |
+| `endpoint-path` | string | `/token/exchange` | Exchange endpoint path |
+| `issuer` | string | *required* | Issuer for new tokens |
+| `signing-key-file` | string | *required* | Path to signing key |
+| `signing-algorithm` | string | `RS256` | Algorithm: RS256, ES256, HS256 |
+| `token-ttl-secs` | int | `3600` | Token lifetime |
+| `allowed-exchanges` | array | `[]` | Allowed conversions |
+
+### Token Exchange Request
+
+```bash
+curl -X POST http://localhost:8080/token/exchange \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
+  -d "subject_token=<saml_assertion_or_jwt>" \
+  -d "subject_token_type=urn:ietf:params:oauth:token-type:saml2" \
+  -d "requested_token_type=urn:ietf:params:oauth:token-type:access_token" \
+  -d "audience=my-api"
+```
+
+### Token Exchange Response
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:access_token",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
 ## Headers Added
 
 On successful authentication, the agent adds headers to the request:
@@ -337,8 +594,10 @@ On successful authentication, the agent adds headers to the request:
 | Header | Description | Auth Methods |
 |--------|-------------|--------------|
 | `X-User-Id` | Authenticated user identifier | All |
-| `X-Auth-Method` | Method used: `jwt`, `api_key`, `basic`, `saml` | All |
-| `X-Auth-Claim-{name}` | JWT claims (flattened) | JWT |
+| `X-Auth-Method` | Method used: `jwt`, `oidc`, `mtls`, `api_key`, `basic`, `saml` | All |
+| `X-Auth-Claim-{name}` | Token claims (flattened) | JWT, OIDC |
+| `X-Client-Cert-CN` | Certificate Common Name | mTLS |
+| `X-Client-Cert-DN` | Certificate Distinguished Name | mTLS |
 | Custom headers | Via `attribute-mapping` | SAML |
 
 ### JWT Claims Example
@@ -360,8 +619,9 @@ X-Auth-Claim-org_id: acme
 |--------|-----------|
 | 401 | Missing or invalid credentials |
 | 401 | Expired token |
+| 403 | Authorization denied (Cedar policy) |
 | 302 | SAML redirect to IdP |
-| (passthrough) | Valid credentials, request forwarded |
+| (passthrough) | Valid credentials and authorized, request forwarded |
 
 The agent adds `WWW-Authenticate: Bearer realm="sentinel"` header on 401 responses.
 
@@ -369,12 +629,14 @@ The agent adds `WWW-Authenticate: Bearer realm="sentinel"` header on 401 respons
 
 When multiple auth methods are configured, they are checked in order:
 
-1. **Session cookie** (SAML) - if present and valid
-2. **Authorization: Bearer** (JWT) - if header present
-3. **API Key header** - if configured header present
-4. **Authorization: Basic** - if header present
+1. **mTLS Client Certificate** - if `X-Client-Cert` header present
+2. **Session cookie** (SAML) - if present and valid
+3. **Authorization: Bearer** (OIDC) - if OIDC configured and header present
+4. **Authorization: Bearer** (JWT) - if JWT configured and header present
+5. **API Key header** - if configured header present
+6. **Authorization: Basic** - if header present
 
-The first successful authentication wins.
+The first successful authentication wins. After authentication, if authorization is enabled, the Cedar policy engine evaluates the request.
 
 ## Examples
 
@@ -447,10 +709,14 @@ spec:
 1. **Use environment variables** for secrets, not command-line args
 2. **Use RS256/ES256** for JWT in production (asymmetric keys)
 3. **Set `fail-open: false`** for security-critical routes
-4. **Use HTTPS** for all SAML endpoints (required by spec)
-5. **Rotate secrets** regularly (JWT secrets, API keys)
+4. **Use HTTPS** for all SAML and OIDC endpoints (required by spec)
+5. **Rotate secrets** regularly (JWT secrets, API keys, signing keys)
 6. **Limit session TTL** based on security requirements
 7. **Secure session store** file permissions (0600)
+8. **Use default deny** for Cedar authorization policies
+9. **Validate JWKS sources** - only configure trusted issuer URLs
+10. **Use CA validation** for mTLS when possible
+11. **Rate limit token exchange** endpoint to prevent abuse
 
 ## Related Agents
 
@@ -464,4 +730,8 @@ spec:
 - [GitHub Repository](https://github.com/raskell-io/sentinel-agent-auth)
 - [Configuration Reference](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/configuration.md)
 - [SAML Setup Guide](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/saml.md)
+- [OIDC Authentication](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/oidc.md)
+- [mTLS Authentication](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/mtls.md)
+- [Authorization (Cedar)](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/authorization.md)
+- [Token Exchange](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/token-exchange.md)
 - [Session Management](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/session-management.md)
