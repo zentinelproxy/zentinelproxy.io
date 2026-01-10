@@ -275,7 +275,7 @@
         </details>
 
         {# Create Your Own Agent CTA - Collapsible #}
-        <details class="create-agent-details">
+        <details class="create-agent-details" open>
             <summary class="create-agent-summary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
                 <span>Create Your Own Agent</span>
@@ -283,50 +283,264 @@
             </summary>
             <div class="create-agent-content">
                 <p>
-                    Extend Sentinel with custom functionality. Agents communicate via Unix sockets using the
-                    <a href="https://crates.io/crates/sentinel-agent-protocol" target="_blank" rel="noopener">sentinel-agent-protocol</a> crate.
+                    Extend Sentinel with custom security logic, authentication, rate limiting, or any HTTP processing you need.
+                    Agents are external processes that communicate with Sentinel over Unix sockets using a simple length-prefixed JSON protocol.
                 </p>
+
+                {# How Agents Work #}
+                <div class="agent-explainer">
+                    <h3>How Agents Work</h3>
+                    <div class="explainer-grid">
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Isolated Execution</strong>
+                                <span>Agents run as separate processes, providing security isolation and independent deployment</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Event-Driven</strong>
+                                <span>Receive request headers, body chunks, and response events as they flow through the proxy</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Decision Control</strong>
+                                <span>Allow, block, redirect, or challenge requests. Modify headers and attach audit metadata</span>
+                            </div>
+                        </div>
+                        <div class="explainer-item">
+                            <div class="explainer-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
+                            </div>
+                            <div class="explainer-content">
+                                <strong>Any Language</strong>
+                                <span>Write agents in your preferred language using our official SDKs or implement the protocol directly</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# SDK Cards #}
+                <h3>Official SDKs</h3>
+                <p class="sdk-intro">Choose the SDK for your preferred language. Each provides a simple, idiomatic API for building agents.</p>
+                <div class="sdk-grid">
+                    <a href="https://github.com/raskell-io/sentinel-agent-rust-sdk" class="sdk-card" target="_blank" rel="noopener">
+                        <div class="sdk-header">
+                            <div class="sdk-logo rust">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M15.948 1.49a1.27 1.27 0 0 1 .615-.161l.135.005a1.29 1.29 0 0 1 1.141 1.443l-.005.072l-.12 1.432a12.7 12.7 0 0 1 3.083 1.266l1.115-.929l.063-.047a1.29 1.29 0 0 1 1.765 1.865l-.052.063l-.927 1.115c.557.463 1.063.984 1.505 1.552l1.401-.235h.073a1.29 1.29 0 0 1 .355 2.547l-.073.01l-1.427.24a12.8 12.8 0 0 1 .572 3.313l1.396.235l.072.016a1.29 1.29 0 0 1-.281 2.537l-.073-.005l-1.427-.24c-.219.755-.52 1.475-.895 2.151l.927 1.115l.047.063a1.29 1.29 0 0 1-1.864 1.765l-.063-.052l-1.115-.927a12.7 12.7 0 0 1-2.145 1.64l.235 1.401l.011.073a1.29 1.29 0 0 1-2.547.355l-.016-.073l-.24-1.427a12.8 12.8 0 0 1-1.656.141v1.432l-.005.073a1.29 1.29 0 0 1-2.573-.073v-1.432a12.8 12.8 0 0 1-3.177-.583l-.24 1.427l-.016.073a1.29 1.29 0 0 1-2.547-.355l.011-.073l.235-1.401a12.7 12.7 0 0 1-2.62-1.807l-1.115.927l-.063.047a1.29 1.29 0 0 1-1.765-1.864l.052-.063l.927-1.115a12.7 12.7 0 0 1-1.267-2.459l-1.427.24h-.073a1.29 1.29 0 0 1-.281-2.537l.072-.016l1.396-.235c-.069-.62-.099-1.251-.088-1.891a13 13 0 0 1 .192-1.819l-1.401-.235l-.073-.011a1.29 1.29 0 0 1 .355-2.547h.073l1.401.235a12.7 12.7 0 0 1 1.505-2.537l-.927-1.115l-.047-.063a1.29 1.29 0 0 1 1.864-1.765l.063.052l1.115.927a12.7 12.7 0 0 1 2.609-1.505l-.24-1.427l-.011-.073a1.29 1.29 0 0 1 2.547-.355l.016.073l.24 1.427q.803-.183 1.635-.271l.12-1.432l.005-.073a1.29 1.29 0 0 1 1.208-1.129m.303 6.943c-4.157 0-7.528 3.371-7.528 7.531s3.371 7.531 7.528 7.531s7.531-3.371 7.531-7.531c0-4.156-3.375-7.531-7.531-7.531"/></svg>
+                            </div>
+                            <div class="sdk-info">
+                                <span class="sdk-name">Rust SDK</span>
+                                <span class="sdk-package">sentinel-agent-sdk</span>
+                            </div>
+                        </div>
+                        <p class="sdk-description">Native performance with zero-cost abstractions. Uses the same protocol crate as Sentinel itself.</p>
+                        <div class="sdk-footer">
+                            <span class="sdk-install">cargo add sentinel-agent-sdk</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/raskell-io/sentinel-agent-go-sdk" class="sdk-card" target="_blank" rel="noopener">
+                        <div class="sdk-header">
+                            <div class="sdk-logo go">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M5.906 10.594c-.073 0-.104-.042-.073-.104l.448-.578c.031-.063.104-.104.177-.104h7.578c.073 0 .104.052.073.115l-.365.557c-.031.063-.104.104-.167.104zm-2.76 1.74c-.073 0-.104-.042-.073-.104l.448-.578c.031-.063.104-.104.177-.104h9.688c.073 0 .115.052.094.115l-.177.536c-.01.073-.083.115-.156.115zm4.427 1.74c-.073 0-.104-.052-.073-.115l.292-.547c.031-.063.094-.115.167-.115h4.25c.073 0 .115.052.115.125l-.042.526c0 .073-.063.125-.125.125zm12.552-1.01c-1.177.302-1.979.531-3.135.833c-.292.073-.313.083-.573-.188c-.292-.313-.51-.521-.922-.708c-1.24-.583-2.448-.417-3.563.26c-1.333.813-2.021 2.021-2 3.573c.021 1.531 1.073 2.792 2.583 2.979c1.302.156 2.406-.333 3.292-1.323c.177-.208.333-.427.531-.688H13.48c-.406 0-.51-.25-.375-.583c.25-.604.708-1.615.979-2.115c.063-.115.198-.302.469-.302h7.031c-.042.479-.042.958-.115 1.438c-.208 1.406-.74 2.698-1.594 3.844c-1.385 1.865-3.208 3.01-5.479 3.385c-1.854.302-3.594.042-5.135-.958c-1.417-.917-2.302-2.188-2.625-3.854c-.375-1.937.073-3.74 1.021-5.406c1.073-1.896 2.615-3.219 4.604-3.99c1.625-.635 3.292-.729 4.99-.25c1.323.375 2.396 1.104 3.229 2.177c.135.177.135.271-.083.396c-.76.427-1.51.865-2.271 1.292c-.146.083-.26.042-.365-.073c-.375-.5-.854-.885-1.458-1.073c-1.302-.406-2.531-.167-3.583.75c-.854.74-1.313 1.708-1.354 2.854c-.042 1.125.542 2.177 1.521 2.719c.854.469 1.75.531 2.677.219c1.01-.344 1.719-.99 2.188-1.917c.063-.125.094-.271.198-.469z"/></svg>
+                            </div>
+                            <div class="sdk-info">
+                                <span class="sdk-name">Go SDK</span>
+                                <span class="sdk-package">sentinel-agent-sdk</span>
+                            </div>
+                        </div>
+                        <p class="sdk-description">Idiomatic Go with goroutine-per-connection model. Simple, fast, and production-ready.</p>
+                        <div class="sdk-footer">
+                            <span class="sdk-install">go get github.com/raskell-io/sentinel-agent-go-sdk</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/raskell-io/sentinel-agent-python-sdk" class="sdk-card" target="_blank" rel="noopener">
+                        <div class="sdk-header">
+                            <div class="sdk-logo python">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M15.885 2.001c-7.052 0-6.615 3.063-6.615 3.063l.008 3.167h6.734v.953H5.901s-4.516-.51-4.516 6.604s3.943 6.865 3.943 6.865h2.354v-3.297s-.13-3.943 3.88-3.943h6.682s3.755.063 3.755-3.627V5.786s.573-3.786-6.115-3.786zM11.651 3.9c.682 0 1.24.557 1.24 1.24s-.557 1.24-1.24 1.24s-1.24-.557-1.24-1.24s.557-1.24 1.24-1.24z"/><path fill="currentColor" d="M16.115 29.999c7.052 0 6.615-3.063 6.615-3.063l-.008-3.167h-6.734v-.953h10.111s4.516.51 4.516-6.604s-3.943-6.865-3.943-6.865H24.32v3.297s.13 3.943-3.88 3.943h-6.682s-3.755-.063-3.755 3.627v6s-.573 3.786 6.115 3.786zm4.234-1.901c-.682 0-1.24-.557-1.24-1.24s.557-1.24 1.24-1.24s1.24.557 1.24 1.24s-.557 1.24-1.24 1.24z"/></svg>
+                            </div>
+                            <div class="sdk-info">
+                                <span class="sdk-name">Python SDK</span>
+                                <span class="sdk-package">sentinel-agent-sdk</span>
+                            </div>
+                        </div>
+                        <p class="sdk-description">Async-first design with asyncio. Fluent Decision builder and typed configuration support.</p>
+                        <div class="sdk-footer">
+                            <span class="sdk-install">pip install sentinel-agent-sdk</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/raskell-io/sentinel-agent-typescript-sdk" class="sdk-card" target="_blank" rel="noopener">
+                        <div class="sdk-header">
+                            <div class="sdk-logo typescript">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M0 16v16h32V0H0zm25.786-1.276c.563.132 1.005.333 1.401.635c.208.161.521.5.547.583c.01.021-1 .703-1.62 1.094c-.021.016-.104-.078-.203-.229c-.292-.443-.594-.635-1.047-.672c-.667-.047-1.094.302-1.094.917c0 .177.026.286.094.427c.141.302.401.479 1.198.849c1.469.682 2.099 1.13 2.505 1.776c.453.719.552 1.87.24 2.729c-.344.943-1.198 1.583-2.396 1.802c-.365.063-1.24.052-1.641-.021c-.875-.161-1.703-.583-2.25-1.151c-.214-.224-.625-.812-.604-.849c.016-.021.141-.099.286-.182l.922-.531l.714-.417l.151.219c.203.313.656.74.922.87c.766.359 1.818.302 2.328-.104a.88.88 0 0 0 .359-.766a.813.813 0 0 0-.141-.505c-.182-.255-.557-.469-1.5-.875c-1.078-.474-1.542-.76-2.016-1.25c-.271-.286-.521-.693-.641-1.021c-.099-.323-.12-.448-.12-.922c0-.469.016-.594.109-.885c.287-.911 1.005-1.542 1.979-1.74c.38-.078 1.281-.052 1.667.047zm-6.245 1.109l.01.963h-3.052v8.661h-2.073v-8.661H11.38v-.948c0-.521.016-.958.031-.974c.016-.021 1.854-.031 4.078-.026l4.047.01z"/></svg>
+                            </div>
+                            <div class="sdk-info">
+                                <span class="sdk-name">TypeScript SDK</span>
+                                <span class="sdk-package">@sentinel-proxy/agent-sdk</span>
+                            </div>
+                        </div>
+                        <p class="sdk-description">Full type safety with TypeScript. Works with Node.js, Deno, and Bun runtimes.</p>
+                        <div class="sdk-footer">
+                            <span class="sdk-install">npm install @sentinel-proxy/agent-sdk</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </div>
+                    </a>
+                </div>
+
+                {# Getting Started Steps #}
+                <h3>Quick Start</h3>
                 <div class="cta-steps">
                     <div class="cta-step">
                         <span class="step-number">1</span>
                         <div class="step-content">
-                            <strong>Start from the echo agent</strong>
-                            <span>Clone the <a href="https://github.com/raskell-io/sentinel/tree/main/agents/echo" target="_blank" rel="noopener">reference implementation</a> as your starting point</span>
+                            <strong>Install an SDK</strong>
+                            <span>Choose your preferred language and install the SDK using your package manager</span>
                         </div>
                     </div>
                     <div class="cta-step">
                         <span class="step-number">2</span>
                         <div class="step-content">
-                            <strong>Add the protocol dependency</strong>
-                            <code>cargo add sentinel-agent-protocol</code>
+                            <strong>Implement your agent</strong>
+                            <span>Create an agent class that handles <code>on_request</code> and returns a decision (allow, block, redirect)</span>
                         </div>
                     </div>
                     <div class="cta-step">
                         <span class="step-number">3</span>
                         <div class="step-content">
-                            <strong>Implement your logic</strong>
-                            <span>Handle request/response events in your agent binary</span>
+                            <strong>Configure Sentinel</strong>
+                            <span>Add your agent to the Sentinel config with a Unix socket path and attach it to routes via filters</span>
                         </div>
                     </div>
                     <div class="cta-step">
                         <span class="step-number">4</span>
                         <div class="step-content">
-                            <strong>Submit to registry</strong>
-                            <span>Open an issue to get your agent listed</span>
+                            <strong>Run and test</strong>
+                            <span>Start your agent, reload Sentinel, and verify your logic with test requests</span>
                         </div>
                     </div>
                 </div>
+
+                {# Code Example #}
+                <h3>Example: Block Admin Paths</h3>
+                <div class="code-example">
+                    <div class="code-tabs">
+                        <button class="code-tab active" data-lang="rust">Rust</button>
+                        <button class="code-tab" data-lang="go">Go</button>
+                        <button class="code-tab" data-lang="python">Python</button>
+                        <button class="code-tab" data-lang="typescript">TypeScript</button>
+                    </div>
+                    <div class="code-panels">
+                        <pre class="code-panel active" data-lang="rust"><code>use sentinel_agent_sdk::{Agent, Decision, Request};
+
+struct MyAgent;
+
+impl Agent for MyAgent {
+    async fn on_request(&amp;self, req: &amp;Request) -&gt; Decision {
+        if req.path().starts_with("/admin") {
+            Decision::deny()
+                .with_body("Access denied")
+                .with_tag("blocked")
+        } else {
+            Decision::allow()
+        }
+    }
+}</code></pre>
+                        <pre class="code-panel" data-lang="go"><code>package main
+
+import "github.com/raskell-io/sentinel-agent-go-sdk/agent"
+
+type MyAgent struct{}
+
+func (a *MyAgent) OnRequest(req *agent.Request) *agent.Decision {
+    if strings.HasPrefix(req.Path(), "/admin") {
+        return agent.Deny().
+            WithBody("Access denied").
+            WithTag("blocked")
+    }
+    return agent.Allow()
+}</code></pre>
+                        <pre class="code-panel" data-lang="python"><code>from sentinel_agent_sdk import Agent, Decision, Request
+
+class MyAgent(Agent):
+    @property
+    def name(self) -> str:
+        return "my-agent"
+
+    async def on_request(self, request: Request) -> Decision:
+        if request.path_starts_with("/admin"):
+            return Decision.deny().with_body("Access denied").with_tag("blocked")
+        return Decision.allow()</code></pre>
+                        <pre class="code-panel" data-lang="typescript"><code>import { Agent, Decision, Request } from '@sentinel-proxy/agent-sdk';
+
+class MyAgent extends Agent {
+    name = 'my-agent';
+
+    async onRequest(request: Request): Promise&lt;Decision&gt; {
+        if (request.path.startsWith('/admin')) {
+            return Decision.deny()
+                .withBody('Access denied')
+                .withTag('blocked');
+        }
+        return Decision.allow();
+    }
+}</code></pre>
+                    </div>
+                </div>
+
+                {# Sentinel Configuration #}
+                <h3>Sentinel Configuration</h3>
+                <p>Configure Sentinel to connect to your agent:</p>
+                <pre class="config-example"><code>agents {
+    agent "my-agent" type="custom" {
+        unix-socket path="/tmp/my-agent.sock"
+        events "request_headers"
+        timeout-ms 100
+        failure-mode "open"
+    }
+}
+
+filters {
+    filter "my-filter" {
+        type "agent"
+        agent "my-agent"
+    }
+}
+
+routes {
+    route "api" {
+        matches { path-prefix "/api/" }
+        upstream "backend"
+        filters "my-filter"
+    }
+}</code></pre>
+
                 <div class="cta-actions">
                     <a href="https://github.com/raskell-io/sentinel/tree/main/agents/echo" class="btn btn-primary" target="_blank" rel="noopener">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                        Echo Agent
+                        Reference: Echo Agent
                     </a>
                     <a href="https://crates.io/crates/sentinel-agent-protocol" class="btn btn-secondary" target="_blank" rel="noopener">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                        Protocol Crate
+                        Protocol Spec
                     </a>
                     <a href="https://github.com/raskell-io/sentinel.raskell.io/issues/new?template=new-agent.yml" class="btn btn-ghost">
-                        Submit Agent
+                        Submit Your Agent
                     </a>
                 </div>
             </div>
@@ -336,6 +550,7 @@
 
 <script>
 (function() {
+    // Agent search functionality
     const searchInput = document.getElementById('agent-search');
     const agentCards = document.querySelectorAll('.agent-card[data-agent-name]');
     const categories = document.querySelectorAll('.agents-category');
@@ -373,6 +588,25 @@
             if (query !== '' && visibleCards.length > 0) {
                 category.open = true;
             }
+        });
+    });
+
+    // Code example tabs
+    const codeTabs = document.querySelectorAll('.code-tab');
+    const codePanels = document.querySelectorAll('.code-panel');
+
+    codeTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const lang = this.dataset.lang;
+
+            // Update active tab
+            codeTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Update active panel
+            codePanels.forEach(panel => {
+                panel.classList.toggle('active', panel.dataset.lang === lang);
+            });
         });
     });
 })();
