@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}Benchmarks | {{ config.title }}{% endblock %}
+{% block description %}Performance, soak testing, and chaos engineering results for Sentinel reverse proxy{% endblock %}
+
+{% block head %}
+<style>
+/* Benchmark-specific styles */
+.benchmarks-hero {
+    text-align: center;
+    padding: var(--space-3xl) 0 var(--space-2xl);
+    background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+}
+
+.benchmarks-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+}
+
+.benchmarks-subtitle {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Stats cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-2xl) 0;
+}
+
+.stat-card {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-card--highlight {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, rgba(203, 166, 247, 0.1) 0%, rgba(245, 194, 231, 0.05) 100%);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1.2;
+}
+
+.stat-value--success {
+    color: var(--color-success);
+}
+
+.stat-label {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-top: var(--space-xs);
+}
+
+.stat-detail {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    margin-top: var(--space-xs);
+}
+
+/* Bar charts */
+.chart-container {
+    margin: var(--space-xl) 0;
+}
+
+.chart-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    color: var(--color-text);
+}
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.bar-item {
+    display: grid;
+    grid-template-columns: 120px 1fr 80px;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.bar-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.bar-track {
+    height: 32px;
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: var(--radius-md);
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    transition: width 0.8s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--space-sm);
+}
+
+.bar-fill--secondary {
+    background: linear-gradient(90deg, var(--color-text-subtle) 0%, var(--color-text-muted) 100%);
+}
+
+.bar-fill--success {
+    background: linear-gradient(90deg, var(--color-success) 0%, #94e2d5 100%);
+}
+
+.bar-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-align: right;
+}
+
+/* Latency distribution chart */
+.latency-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 200px;
+    padding: var(--space-lg);
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    margin: var(--space-xl) 0;
+}
+
+.latency-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+    max-width: 80px;
+}
+
+.latency-bar {
+    width: 100%;
+    max-width: 48px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    transition: height 0.5s ease-out;
+}
+
+.latency-bar--p50 { background: var(--color-success); }
+.latency-bar--p95 { background: var(--color-warning); }
+.latency-bar--p99 { background: var(--color-accent); }
+
+.latency-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.latency-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* Circuit breaker diagram */
+.circuit-diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-2xl);
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    margin: var(--space-xl) 0;
+    overflow-x: auto;
+}
+
+.circuit-diagram svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Memory chart */
+.memory-chart {
+    position: relative;
+    height: 180px;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    padding: var(--space-lg);
+    margin: var(--space-xl) 0;
+    overflow: hidden;
+}
+
+.memory-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Comparison table highlight */
+.comparison-winner {
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+/* Timeline */
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    margin: var(--space-xl) 0;
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: var(--space-xl);
+    right: var(--space-xl);
+    height: 2px;
+    background: var(--color-border);
+    z-index: 0;
+}
+
+.timeline-point {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    z-index: 1;
+    background: var(--color-bg-elevated);
+    padding: 0 var(--space-sm);
+}
+
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 3px solid var(--color-bg-elevated);
+    box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.timeline-dot--success {
+    background: var(--color-success);
+    box-shadow: 0 0 0 2px var(--color-success);
+}
+
+.timeline-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.timeline-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Gauge chart */
+.gauge-container {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2xl);
+    flex-wrap: wrap;
+    margin: var(--space-xl) 0;
+}
+
+.gauge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.gauge-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.gauge-ring svg {
+    transform: rotate(-90deg);
+}
+
+.gauge-ring circle {
+    fill: none;
+    stroke-width: 8;
+}
+
+.gauge-ring .track {
+    stroke: var(--color-bg-subtle);
+}
+
+.gauge-ring .progress {
+    stroke: var(--color-success);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.gauge-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.gauge-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+/* Section styling */
+.benchmark-section {
+    margin: var(--space-3xl) 0;
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+}
+
+.benchmark-section:first-of-type {
+    border-top: none;
+    padding-top: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Result badges */
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.result-badge--pass {
+    background: rgba(166, 227, 161, 0.2);
+    color: var(--color-success);
+}
+
+.result-badge--warn {
+    background: rgba(249, 226, 175, 0.2);
+    color: var(--color-warning);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .bar-item {
+        grid-template-columns: 1fr;
+        gap: var(--space-xs);
+    }
+
+    .bar-value {
+        text-align: left;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gauge-container {
+        gap: var(--space-lg);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="benchmarks-hero">
+    <div class="container">
+        <h1 class="benchmarks-title">
+            <span class="gradient-text">Benchmarks</span> & Testing
+        </h1>
+        <p class="benchmarks-subtitle">
+            Performance, soak testing, and chaos engineering results from actual test runs
+        </p>
+    </div>
+</div>
+
+<article class="article">
+    <div class="container container-narrow">
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card stat-card--highlight">
+                <div class="stat-value">23,098</div>
+                <div class="stat-label">Requests/sec</div>
+                <div class="stat-detail">Native performance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3.5ms</div>
+                <div class="stat-label">p50 Latency</div>
+                <div class="stat-detail">Median response time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value stat-value--success">99.95%</div>
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-detail">1-hour soak test</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value stat-value--success">-91%</div>
+                <div class="stat-label">Memory Growth</div>
+                <div class="stat-detail">No leaks detected</div>
+            </div>
+        </div>
+
+        <div class="article-content prose">
+            {{ page.content | safe }}
+        </div>
+    </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Animate stats on scroll
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.stat-card, .chart-container').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}
