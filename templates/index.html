@@ -219,6 +219,29 @@
     </div>
 </section>
 
+<section class="stats-bar">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">56+</span>
+                <span class="stat-label">Features</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">10+</span>
+                <span class="stat-label">Agents</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">0</span>
+                <span class="stat-label">GC Pauses</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Memory Safe</span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="features" id="features">
     <div class="container">
         <div class="section-header">
@@ -420,6 +443,106 @@
     </div>
 </section>
 
+<section class="agents-showcase" id="agents">
+    <div class="container">
+        <div class="section-header">
+            <h2>Extensible Agent Architecture</h2>
+            <p>
+                First-class agents hook into every request phase. Security, transformation, and observability—all isolated and composable.
+            </p>
+        </div>
+        <div class="agents-grid">
+            <a href="/agents/waf/" class="agent-card">
+                <div class="agent-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div class="agent-content">
+                    <h3>WAF</h3>
+                    <span class="agent-status stable">Stable</span>
+                    <p>ModSecurity-compatible rules engine with OWASP CRS support. Block SQLi, XSS, and more.</p>
+                </div>
+            </a>
+            <a href="/agents/ai-gateway/" class="agent-card">
+                <div class="agent-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                </div>
+                <div class="agent-content">
+                    <h3>AI Gateway</h3>
+                    <span class="agent-status stable">Stable</span>
+                    <p>Token-based rate limiting, provider routing, and content guardrails for LLM workloads.</p>
+                </div>
+            </a>
+            <a href="/agents/ratelimit/" class="agent-card">
+                <div class="agent-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m6.8 14-3.5 2"/><path d="m20.7 16-3.5-2"/><path d="M6.8 10 3.3 8"/><path d="m20.7 8-3.5 2"/><circle cx="12" cy="12" r="6"/></svg>
+                </div>
+                <div class="agent-content">
+                    <h3>Rate Limiter</h3>
+                    <span class="agent-status stable">Stable</span>
+                    <p>Token bucket, sliding window, and GCRA algorithms. Redis-backed for distributed deployments.</p>
+                </div>
+            </a>
+            <a href="/agents/auth/" class="agent-card">
+                <div class="agent-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+                </div>
+                <div class="agent-content">
+                    <h3>Auth</h3>
+                    <span class="agent-status stable">Stable</span>
+                    <p>JWT validation, OAuth2 introspection, API keys, and mTLS. RBAC with flexible claim mapping.</p>
+                </div>
+            </a>
+        </div>
+        <div class="agents-cta">
+            <a href="/agents/" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></svg>
+                Browse All Agents
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="use-cases">
+    <div class="container">
+        <div class="section-header">
+            <h2>Built for Your Stack</h2>
+            <p>
+                From API gateways to AI infrastructure—Sentinel adapts to your architecture.
+            </p>
+        </div>
+        <div class="use-cases-grid">
+            <div class="use-case-card">
+                <div class="use-case-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                </div>
+                <h3>API Gateway</h3>
+                <p>Route, rate-limit, and secure your APIs. JWT validation, request transformation, and backend load balancing out of the box.</p>
+            </div>
+            <div class="use-case-card">
+                <div class="use-case-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <h3>Edge Security</h3>
+                <p>WAF rules, IP denylists, and threat detection at the edge. Block attacks before they reach your infrastructure.</p>
+            </div>
+            <div class="use-case-card">
+                <div class="use-case-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                </div>
+                <h3>LLM Proxy</h3>
+                <p>Token-based rate limiting, provider failover, and content guardrails. Purpose-built for AI/ML inference workloads.</p>
+            </div>
+            <div class="use-case-card">
+                <div class="use-case-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+                </div>
+                <h3>Static + Dynamic</h3>
+                <p>Serve static files with zero-copy I/O while proxying dynamic requests. SPA routing, compression, and caching built-in.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="why-sentinel" id="why">
     <div class="container">
         <div class="why-header">
@@ -507,23 +630,92 @@
     </div>
 </section>
 
+<section class="manifesto-teaser">
+    <div class="container">
+        <div class="manifesto-content">
+            <div class="manifesto-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+            </div>
+            <div class="manifesto-text">
+                <h2>Read the Manifesto</h2>
+                <p>
+                    Why we believe in boring infrastructure, explicit security, and guarding the free web.
+                    Our principles guide every decision—from code architecture to community governance.
+                </p>
+                <a href="/manifesto/" class="manifesto-link">
+                    Explore our philosophy
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="cta">
     <div class="container">
         <div class="cta-content">
             <h2>Ready to guard your infrastructure?</h2>
             <p>
-                Get started with Sentinel in minutes. Read the docs or explore
-                the agent registry.
+                Get started in minutes. Explore the docs, try the interactive playground, or dive into the agent registry.
             </p>
-            <div class="cta-actions">
-                <a href="/customize/" class="btn btn-primary">Get Started</a>
-                <a href="/playground/" class="btn btn-ghost">Try Playground</a>
-                <a
-                    href="{{ config.extra.docs_external_url }}"
-                    class="btn btn-ghost"
-                    >Documentation</a
-                >
+            <div class="cta-grid">
+                <a href="/customize/" class="cta-card cta-card--primary">
+                    <div class="cta-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32" fill="currentColor"><path d="m23.043 4.65l-.404-2.313l-1.59 1.727l-2.324-.33l1.15 2.045l-1.03 2.107l2.3-.463l1.687 1.633l.27-2.332l2.075-1.1l-2.135-.976zm3.174 13.548l-.182-1.25l-.882.905l-1.245-.214l.588 1.117l-.588 1.118l1.245-.214l.882.906l.182-1.25l1.133-.56zM4.92 7.672l.948-.372l.844.57l-.062-1.017l.802-.627l-.985-.256l-.35-.957l-.546.86l-1.017.035l.647.786l-.28.978zm5.52 2.833l1.02-1.096l1.48.218l-.726-1.31l.667-1.34l-1.47.286l-1.068-1.048l-.182 1.487l-1.328.693l1.358.632l.25 1.477zm6.794 2.216c-.588-.367-1.172-.617-1.692-.728c-.492-.09-1.04-.15-1.425.374L2.562 30.788h6.68l9.67-15.416c.302-.576.01-1.04-.284-1.447c-.325-.417-.806-.835-1.394-1.204m-3.62 9.216c-.255-.396-.74-.857-1.374-1.254c-.632-.396-1.258-.634-1.726-.69l4.42-7.052c.065-.013.263-.02.544.066c.346.092.785.285 1.225.562c.504.313.908.677 1.133.97a1.1 1.1 0 0 1 .2.35z"/></svg>
+                    </div>
+                    <h3>Get Started</h3>
+                    <p>Install Sentinel and run your first proxy in minutes</p>
+                </a>
+                <a href="/playground/" class="cta-card">
+                    <div class="cta-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    </div>
+                    <h3>Try Playground</h3>
+                    <p>Interactive config editor with live validation</p>
+                </a>
+                <a href="/features/" class="cta-card">
+                    <div class="cta-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>
+                    </div>
+                    <h3>View Features</h3>
+                    <p>56+ features across security, routing, and observability</p>
+                </a>
+                <a href="/agents/" class="cta-card">
+                    <div class="cta-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></svg>
+                    </div>
+                    <h3>Browse Agents</h3>
+                    <p>Explore the extensible agent registry</p>
+                </a>
             </div>
+        </div>
+    </div>
+</section>
+
+<section class="community">
+    <div class="container">
+        <div class="section-header">
+            <h2>Join the Community</h2>
+            <p>
+                Sentinel is open source and community-driven. Contribute, discuss, and help shape the future.
+            </p>
+        </div>
+        <div class="community-grid">
+            <a href="{{ config.extra.github }}" class="community-card" target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                <h3>GitHub</h3>
+                <p>Star the repo, report issues, and submit PRs</p>
+            </a>
+            <a href="{{ config.extra.github }}/blob/main/CONTRIBUTING.md" class="community-card" target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <h3>Contribute</h3>
+                <p>Read our contributor guide and get involved</p>
+            </a>
+            <a href="{{ config.extra.github }}/discussions" class="community-card" target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+                <h3>Discussions</h3>
+                <p>Ask questions and share ideas with the community</p>
+            </a>
         </div>
     </div>
 </section>
