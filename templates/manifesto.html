@@ -18,21 +18,79 @@
 
     .manifesto-hero .container {
         max-width: var(--manifesto-max-width);
+        margin: 0 auto;
+    }
+
+    /* Hidden SVG for filter definitions */
+    .heat-wave-defs {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    /* Closing visual section */
+    .manifesto-visual {
+        position: relative;
+        height: 400px;
+        overflow: hidden;
+    }
+
+    .manifesto-visual__bg {
+        position: absolute;
+        inset: 0;
+    }
+
+    .manifesto-visual__bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 30%;
+        filter: url(#heat-wave);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .manifesto-visual__bg img {
+            filter: none;
+        }
+    }
+
+    .manifesto-visual__bg::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(
+            180deg,
+            var(--color-bg) 0%,
+            transparent 30%,
+            transparent 70%,
+            var(--color-bg) 100%
+        );
+    }
+
+    @media (max-width: 640px) {
+        .manifesto-visual {
+            height: 280px;
+        }
     }
 
     .manifesto-title {
         font-size: clamp(2.5rem, 6vw, 3.5rem);
         font-weight: 700;
         line-height: 1.1;
-        margin: 0 0 1.5rem;
+        margin: 0 auto 1.5rem;
         letter-spacing: -0.02em;
+        text-align: center;
     }
 
     .manifesto-opening {
         font-size: 1.25rem;
         line-height: 1.7;
         color: var(--color-text-secondary);
-        margin: 0;
+        margin: 0 auto;
+        text-align: center;
     }
 
     .manifesto-opening strong {
@@ -45,6 +103,7 @@
 
     .manifesto-content .container {
         max-width: var(--manifesto-max-width);
+        margin: 0 auto;
     }
 
     .manifesto-intro {
@@ -390,6 +449,33 @@
 
 {% block content %}
 <div class="manifesto-page">
+    <!-- Heat wave distortion filter for tropical background -->
+    <svg class="heat-wave-defs" width="0" height="0" aria-hidden="true" style="position:absolute;">
+        <defs>
+            <filter id="heat-wave" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence
+                    type="fractalNoise"
+                    baseFrequency="0.008 0.002"
+                    numOctaves="2"
+                    seed="2"
+                    result="noise">
+                    <animate
+                        attributeName="baseFrequency"
+                        dur="25s"
+                        values="0.008 0.002;0.010 0.0025;0.008 0.002"
+                        calcMode="spline"
+                        keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
+                        repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap
+                    in="SourceGraphic"
+                    in2="noise"
+                    scale="10"
+                    xChannelSelector="R"
+                    yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
     <section class="manifesto-hero">
         <div class="container">
             <h1 class="manifesto-title">
@@ -612,6 +698,12 @@
                     <p><em>It requires care.</em></p>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="manifesto-visual" aria-hidden="true">
+        <div class="manifesto-visual__bg">
+            <img src="{{ get_url(path='img/shisa-gate-landscape.avif') | safe }}" alt="" loading="lazy">
         </div>
     </section>
 </div>
