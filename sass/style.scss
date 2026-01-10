@@ -266,15 +266,13 @@ img {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
-        border: 1px solid var(--color-border);
+        padding: var(--space-sm);
         border-radius: var(--radius-md);
         transition: all var(--transition-fast);
+        margin-left: calc(-1 * var(--space-sm));
 
         &:hover {
             background: var(--color-bg-elevated);
-            border-color: var(--color-border);
         }
     }
 }
@@ -283,19 +281,18 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    padding: var(--space-sm);
     background: transparent;
-    border: 1px solid var(--color-border);
+    border: none;
     border-radius: var(--radius-md);
     color: var(--color-text-muted);
     cursor: pointer;
     transition: all var(--transition-fast);
+    margin-left: calc(-1 * var(--space-sm));
 
     &:hover {
         background: var(--color-bg-elevated);
         color: var(--color-text);
-        border-color: var(--color-border);
     }
 
     .icon-sun {
@@ -1673,6 +1670,7 @@ img {
 }
 
 .agent-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: var(--space-xl);
@@ -1680,6 +1678,7 @@ img {
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-lg);
     transition: all var(--transition-base);
+    cursor: pointer;
 
     &:hover {
         border-color: var(--color-primary);
@@ -1719,6 +1718,14 @@ img {
 
         &:hover {
             color: var(--color-primary);
+        }
+
+        // Stretched link - makes entire card clickable
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
         }
     }
 }
@@ -1796,6 +1803,7 @@ img {
     border-style: dashed;
     border-color: var(--color-border);
     background: transparent;
+    cursor: default;
 
     &:hover {
         border-color: var(--color-primary);
