@@ -85,14 +85,20 @@
                             upstream/mod.rs
                         </a>
                     </div>
-                    <p class="feature-description">Multiple load balancing algorithms with health-aware target selection.</p>
+                    <p class="feature-description">14 load balancing algorithms with health-aware target selection.</p>
                     <ul class="feature-list">
                         <li><strong>Round-robin</strong> - Equal distribution across backends</li>
-                        <li><strong>Weighted round-robin</strong> - Proportional distribution</li>
-                        <li><strong>Power of Two Choices (P2C)</strong> - Low-latency selection (<code>p2c.rs</code>)</li>
-                        <li><strong>Consistent Hash</strong> - Session affinity (<code>consistent_hash.rs</code>)</li>
-                        <li><strong>Least Tokens Queued</strong> - LLM workload optimization (<code>least_tokens.rs</code>)</li>
+                        <li><strong>Weighted</strong> - Proportional distribution by weight</li>
+                        <li><strong>Least Connections</strong> - Fewest active connections</li>
+                        <li><strong>Weighted Least Conn</strong> - Connection/weight ratio (<code>weighted_least_conn.rs</code>)</li>
+                        <li><strong>Maglev</strong> - Google's consistent hashing, O(1) lookup (<code>maglev.rs</code>)</li>
+                        <li><strong>Peak EWMA</strong> - Latency-based selection (<code>peak_ewma.rs</code>)</li>
+                        <li><strong>Locality-Aware</strong> - Zone-preference routing (<code>locality.rs</code>)</li>
+                        <li><strong>Deterministic Subset</strong> - Subset per proxy for large clusters (<code>subset.rs</code>)</li>
+                        <li><strong>Power of Two Choices</strong> - Best of two random (<code>p2c.rs</code>)</li>
+                        <li><strong>Consistent Hash</strong> - Ring-based affinity (<code>consistent_hash.rs</code>)</li>
                         <li><strong>Adaptive</strong> - Response time based (<code>adaptive.rs</code>)</li>
+                        <li><strong>Least Tokens Queued</strong> - LLM workload optimization (<code>least_tokens.rs</code>)</li>
                     </ul>
                 </div>
 
