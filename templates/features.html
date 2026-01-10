@@ -16,7 +16,7 @@
 
             <div class="features-stats">
                 <div class="stat-card">
-                    <div class="stat-number">56+</div>
+                    <div class="stat-number">57+</div>
                     <div class="stat-label">Major Features</div>
                 </div>
                 <div class="stat-card">
@@ -146,13 +146,34 @@
                     <ul class="feature-list">
                         <li>SNI (Server Name Indication) based certificate selection</li>
                         <li>Wildcard certificate matching</li>
-                        <li>mTLS client certificate verification</li>
+                        <li>mTLS client certificate verification (inbound)</li>
                         <li>Certificate hot-reload (SIGHUP trigger)</li>
                         <li>OCSP stapling support</li>
-                        <li>Upstream TLS configuration</li>
                     </ul>
                     <div class="feature-code-ref">
                         <strong>Structs:</strong> <code>SniResolver</code>, <code>HotReloadableSniResolver</code>, <code>OcspStapler</code>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <h3>mTLS to Upstreams</h3>
+                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/proxy/src/upstream/mod.rs" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            upstream/mod.rs
+                        </a>
+                    </div>
+                    <p class="feature-description">Mutual TLS for secure backend connections in zero-trust architectures.</p>
+                    <ul class="feature-list">
+                        <li><strong>Client certificate authentication</strong> - Present certificates to upstreams</li>
+                        <li><strong>Custom CA verification</strong> - Verify upstream server certificates</li>
+                        <li><strong>SNI configuration</strong> - Per-upstream Server Name Indication</li>
+                        <li><strong>Certificate chain support</strong> - Include intermediate certificates</li>
+                        <li><strong>Combined PEM files</strong> - Cert and key in single file</li>
+                    </ul>
+                    <div class="feature-code-ref">
+                        <strong>Functions:</strong> <code>load_client_cert_key</code>, <code>build_upstream_tls_config</code>
+                        <br><a href="/docs/mtls-upstreams/" style="font-size: 0.9em;">View configuration guide &rarr;</a>
                     </div>
                 </div>
 
@@ -386,9 +407,9 @@
                     <p class="feature-description">High-performance static file delivery with zero-copy and compression.</p>
                     <ul class="feature-list">
                         <li>Range request support (206 Partial Content)</li>
-                        <li>Zero-copy serving via memory-mapped files (>10MB)</li>
+                        <li>Zero-copy serving via memory-mapped files (&gt;10MB)</li>
                         <li>On-the-fly gzip/brotli compression</li>
-                        <li>In-memory caching for small files (<1MB)</li>
+                        <li>In-memory caching for small files (&lt;1MB)</li>
                         <li>Directory listing (configurable)</li>
                         <li>SPA routing with fallback</li>
                         <li>ETag and last-modified headers</li>
