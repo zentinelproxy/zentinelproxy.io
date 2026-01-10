@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tag.classList.add('active');
 
             // Update current filter
-            currentFilter = tag.dataset.filter;
+            currentFilter = tag.dataset.category;
 
             // Filter features
             filterFeatures();
