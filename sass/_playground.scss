@@ -1375,3 +1375,507 @@ $editor-padding: var(--space-md);
         border-radius: var(--radius-sm);
     }
 }
+
+// =============================================================================
+// Agent Simulation Styles
+// =============================================================================
+
+// Agents builder container
+.agents-builder {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    flex: 1;
+}
+
+// Empty state
+.agents-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-muted);
+    flex: 1;
+    min-height: 200px;
+
+    svg {
+        margin-bottom: var(--space-md);
+        opacity: 0.5;
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .agents-hint {
+        font-size: 0.75rem;
+        margin-top: var(--space-sm);
+        color: var(--color-text-subtle);
+
+        code {
+            background: var(--color-bg);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+        }
+    }
+}
+
+// Agents list
+.agents-list {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-md);
+    flex: 1;
+    overflow-y: auto;
+}
+
+// Agent card
+.agent-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-elevated);
+    overflow: hidden;
+
+    &.collapsed .agent-card-body {
+        display: none;
+    }
+
+    &.collapsed .agent-collapse-icon svg {
+        transform: rotate(-90deg);
+    }
+
+    // Decision type indicators
+    &[data-decision="allow"] {
+        .agent-card-header {
+            border-left: 3px solid var(--color-success);
+        }
+    }
+
+    &[data-decision="block"] {
+        .agent-card-header {
+            border-left: 3px solid var(--color-error);
+        }
+    }
+
+    &[data-decision="redirect"] {
+        .agent-card-header {
+            border-left: 3px solid var(--color-warning);
+        }
+    }
+}
+
+.agent-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+
+    &:hover {
+        background: var(--color-bg-subtle);
+    }
+}
+
+.agent-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.agent-collapse-icon {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-muted);
+
+    svg {
+        transition: transform var(--transition-fast);
+    }
+}
+
+.agent-name {
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text);
+}
+
+.agent-type {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+}
+
+.agent-decision-quick {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+        border-color: var(--ctp-mauve);
+    }
+}
+
+.agent-card-body {
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    border-top: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-subtle);
+}
+
+.agent-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.agent-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-subtle);
+}
+
+.agent-decision {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8125rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+        border-color: var(--ctp-mauve);
+    }
+}
+
+// Decision details (show/hide based on decision type)
+.decision-details {
+    display: none;
+    padding: var(--space-md);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    &.visible {
+        display: block;
+    }
+}
+
+.decision-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        font-size: 0.6875rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+    }
+
+    input {
+        padding: var(--space-sm);
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        background: var(--color-bg-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        color: var(--color-text);
+
+        &:focus {
+            outline: none;
+            border-color: var(--ctp-mauve);
+        }
+
+        &::placeholder {
+            color: var(--color-text-subtle);
+        }
+    }
+
+    input[type="number"] {
+        max-width: 100px;
+    }
+}
+
+// Header mutations
+.header-mutations {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.header-mutation-row {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr auto;
+    gap: var(--space-sm);
+    align-items: center;
+
+    select {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        color: var(--color-text);
+    }
+
+    input {
+        padding: var(--space-xs) var(--space-sm);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        color: var(--color-text);
+
+        &::placeholder {
+            color: var(--color-text-subtle);
+        }
+
+        &:focus {
+            outline: none;
+            border-color: var(--ctp-mauve);
+        }
+    }
+}
+
+.mutation-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-subtle);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+        background: rgba(243, 139, 168, 0.15);
+        color: var(--color-error);
+    }
+}
+
+.add-mutation-btn {
+    align-self: flex-start;
+}
+
+// Audit fields
+.audit-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.audit-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    label {
+        font-size: 0.6875rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+    }
+
+    input {
+        padding: var(--space-sm);
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        color: var(--color-text);
+
+        &:focus {
+            outline: none;
+            border-color: var(--ctp-mauve);
+        }
+
+        &::placeholder {
+            color: var(--color-text-subtle);
+        }
+    }
+}
+
+// =============================================================================
+// Agent Flow Diagram Styles
+// =============================================================================
+
+.flow-node-agent-allow {
+    border-color: var(--color-success) !important;
+    background: rgba(166, 227, 161, 0.1) !important;
+}
+
+.flow-node-agent-block {
+    border-color: var(--color-error) !important;
+    background: rgba(243, 139, 168, 0.1) !important;
+}
+
+.flow-node-agent-redirect {
+    border-color: var(--color-warning) !important;
+    background: rgba(249, 226, 175, 0.1) !important;
+}
+
+.flow-node-short-circuit {
+    box-shadow: 0 0 0 2px var(--color-error);
+}
+
+.flow-arrow-blocked {
+    color: var(--color-error) !important;
+    opacity: 0.5;
+}
+
+// =============================================================================
+// Agent Trace Styles
+// =============================================================================
+
+.trace-agent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    font-size: 0.8125rem;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid var(--color-border-subtle);
+        padding-bottom: var(--space-sm);
+    }
+
+    .agent-id {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        color: var(--color-text);
+        min-width: 100px;
+    }
+
+    .agent-decision {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        background: var(--color-bg);
+
+        &.decision-allow {
+            color: var(--color-success);
+            background: rgba(166, 227, 161, 0.15);
+        }
+
+        &.decision-block {
+            color: var(--color-error);
+            background: rgba(243, 139, 168, 0.15);
+        }
+
+        &.decision-redirect {
+            color: var(--color-warning);
+            background: rgba(249, 226, 175, 0.15);
+        }
+    }
+
+    .agent-mutations {
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+    }
+
+    .agent-short-circuit {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--color-error);
+        padding: 2px 8px;
+        background: rgba(243, 139, 168, 0.1);
+        border-radius: var(--radius-sm);
+    }
+}
+
+// Request transformations trace
+.trace-transforms {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.transform-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+
+    .transform-op {
+        font-weight: 700;
+        width: 16px;
+        text-align: center;
+    }
+
+    .transform-text {
+        color: var(--color-text-muted);
+    }
+
+    &.transform-add .transform-op {
+        color: var(--color-success);
+    }
+
+    &.transform-remove .transform-op {
+        color: var(--color-error);
+    }
+
+    &.transform-modify .transform-op {
+        color: var(--color-warning);
+    }
+}
+
+// Audit trail trace
+.trace-audit {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    font-size: 0.8125rem;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid var(--color-border-subtle);
+        padding-bottom: var(--space-sm);
+    }
+
+    .audit-agent {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        color: var(--color-text);
+        min-width: 100px;
+    }
+
+    .audit-rules,
+    .audit-tags {
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+    }
+}

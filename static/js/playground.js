@@ -6,6 +6,7 @@
 import init, {
     validate,
     simulate,
+    simulate_with_agents,
     create_sample_request,
     init_panic_hook,
     get_version
@@ -15,6 +16,7 @@ import init, {
 let wasmReady = false;
 let lastValidation = null;
 let debounceTimer = null;
+let detectedAgents = [];
 
 // Template Configurations
 const TEMPLATES = {
@@ -921,6 +923,9 @@ const configPanel = document.getElementById('config-panel');
 const copyConfigBtn = document.getElementById('copy-config-btn');
 const fullscreenConfigBtn = document.getElementById('fullscreen-config-btn');
 const responseFlowDiagram = document.getElementById('response-flow-diagram');
+const agentsEmpty = document.getElementById('agents-empty');
+const agentsList = document.getElementById('agents-list');
+const simulateAgentsBtn = document.getElementById('simulate-agents-btn');
 
 // =============================================================================
 // KDL Syntax Highlighting
@@ -1123,10 +1128,15 @@ function validateConfig() {
                 errorDisplay.classList.remove('visible');
             }
             simulateBtn.disabled = false;
+            // Detect agents when config is valid
+            detectAgentsFromConfig();
         } else {
             setStatus('invalid', 'Invalid');
             showErrors(lastValidation.errors);
             simulateBtn.disabled = true;
+            // Clear agents when config is invalid
+            detectedAgents = [];
+            updateAgentsUI();
         }
     } catch (e) {
         setStatus('invalid', 'Parse Error');
@@ -1436,6 +1446,607 @@ function renderTrace(result) {
     }
 }
 
+// =============================================================================
+// Agent Simulation
+// =============================================================================
+
+// Detect agents from configuration
+function detectAgentsFromConfig() {
+    if (!wasmReady || !lastValidation?.valid) {
+        detectedAgents = [];
+        updateAgentsUI();
+        return;
+    }
+
+    const config = configEditor.value;
+    try {
+        // Run a basic simulate to get agent_hooks
+        const request = create_sample_request('GET', 'example.com', '/');
+        const result = simulate(config, JSON.stringify(request));
+        detectedAgents = result.agent_hooks || [];
+        updateAgentsUI();
+    } catch (e) {
+        console.warn('Agent detection failed:', e);
+        detectedAgents = [];
+        updateAgentsUI();
+    }
+}
+
+// Update agents UI based on detected agents
+function updateAgentsUI() {
+    if (!agentsEmpty || !agentsList || !simulateAgentsBtn) return;
+
+    if (detectedAgents.length === 0) {
+        agentsEmpty.style.display = 'flex';
+        agentsList.style.display = 'none';
+        simulateAgentsBtn.disabled = true;
+    } else {
+        agentsEmpty.style.display = 'none';
+        agentsList.style.display = 'flex';
+        simulateAgentsBtn.disabled = false;
+        renderAgentCards();
+    }
+}
+
+// Render agent cards
+function renderAgentCards() {
+    if (!agentsList) return;
+
+    // Group agents by ID to avoid duplicates
+    const uniqueAgents = new Map();
+    detectedAgents.forEach(agent => {
+        if (!uniqueAgents.has(agent.agent_id)) {
+            uniqueAgents.set(agent.agent_id, agent);
+        }
+    });
+
+    agentsList.innerHTML = Array.from(uniqueAgents.values()).map(agent => `
+        <div class="agent-card" data-agent-id="${escapeHtml(agent.agent_id)}" data-decision="allow">
+            <div class="agent-card-header">
+                <div class="agent-header-left">
+                    <span class="agent-collapse-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
+                    <span class="agent-name">${escapeHtml(agent.agent_id)}</span>
+                    <span class="agent-type">${escapeHtml(agent.hook)}</span>
+                </div>
+                <select class="agent-decision-quick" onchange="updateAgentDecision(this)">
+                    <option value="allow" selected>Allow</option>
+                    <option value="block">Block</option>
+                    <option value="redirect">Redirect</option>
+                </select>
+            </div>
+            <div class="agent-card-body">
+                <div class="agent-section">
+                    <label class="agent-label">Decision</label>
+                    <select class="agent-decision" onchange="updateAgentDecisionFromBody(this)">
+                        <option value="allow" selected>Allow - Let request pass</option>
+                        <option value="block">Block - Return error response</option>
+                        <option value="redirect">Redirect - Send to different URL</option>
+                    </select>
+                </div>
+
+                <div class="decision-details decision-block">
+                    <div class="decision-row">
+                        <label>Status Code</label>
+                        <input type="number" class="block-status" value="403" min="400" max="599">
+                    </div>
+                    <div class="decision-row">
+                        <label>Response Body</label>
+                        <input type="text" class="block-body" placeholder="Blocked by agent">
+                    </div>
+                </div>
+
+                <div class="decision-details decision-redirect">
+                    <div class="decision-row">
+                        <label>Redirect URL</label>
+                        <input type="text" class="redirect-url" placeholder="https://example.com/blocked">
+                    </div>
+                    <div class="decision-row">
+                        <label>Status Code</label>
+                        <input type="number" class="redirect-status" value="302" min="300" max="399">
+                    </div>
+                </div>
+
+                <div class="agent-section">
+                    <label class="agent-label">Request Header Mutations</label>
+                    <div class="header-mutations">
+                        <!-- Mutations populated here -->
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-small add-mutation-btn" onclick="addHeaderMutation(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Header Mutation
+                    </button>
+                </div>
+
+                <div class="agent-section">
+                    <label class="agent-label">Audit (optional)</label>
+                    <div class="audit-fields">
+                        <div class="audit-row">
+                            <label>Rule IDs</label>
+                            <input type="text" class="audit-rule-ids" placeholder="942100, 941100">
+                        </div>
+                        <div class="audit-row">
+                            <label>Tags</label>
+                            <input type="text" class="audit-tags" placeholder="sql-injection, xss">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Add click handlers for collapse
+    agentsList.querySelectorAll('.agent-card-header').forEach(header => {
+        header.addEventListener('click', (e) => {
+            // Don't toggle if clicking on select
+            if (e.target.tagName === 'SELECT') return;
+            const card = header.closest('.agent-card');
+            card.classList.toggle('collapsed');
+        });
+    });
+}
+
+// Update agent decision from quick select
+window.updateAgentDecision = function(select) {
+    const card = select.closest('.agent-card');
+    const decision = select.value;
+    card.dataset.decision = decision;
+
+    // Sync with body select
+    const bodySelect = card.querySelector('.agent-decision');
+    if (bodySelect) bodySelect.value = decision;
+
+    updateDecisionDetails(card, decision);
+};
+
+// Update agent decision from body select
+window.updateAgentDecisionFromBody = function(select) {
+    const card = select.closest('.agent-card');
+    const decision = select.value;
+    card.dataset.decision = decision;
+
+    // Sync with quick select
+    const quickSelect = card.querySelector('.agent-decision-quick');
+    if (quickSelect) quickSelect.value = decision;
+
+    updateDecisionDetails(card, decision);
+};
+
+// Show/hide decision details based on type
+function updateDecisionDetails(card, decision) {
+    const blockDetails = card.querySelector('.decision-block');
+    const redirectDetails = card.querySelector('.decision-redirect');
+
+    if (blockDetails) {
+        blockDetails.classList.toggle('visible', decision === 'block');
+    }
+    if (redirectDetails) {
+        redirectDetails.classList.toggle('visible', decision === 'redirect');
+    }
+}
+
+// Add header mutation row
+window.addHeaderMutation = function(btn) {
+    const mutationsContainer = btn.previousElementSibling;
+    const row = document.createElement('div');
+    row.className = 'header-mutation-row';
+    row.innerHTML = `
+        <select class="mutation-op">
+            <option value="set">Set</option>
+            <option value="add">Add</option>
+            <option value="remove">Remove</option>
+        </select>
+        <input type="text" class="mutation-name" placeholder="Header name">
+        <input type="text" class="mutation-value" placeholder="Value">
+        <button type="button" class="mutation-remove" onclick="this.parentElement.remove()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    `;
+
+    // Toggle value field based on operation
+    const opSelect = row.querySelector('.mutation-op');
+    const valueInput = row.querySelector('.mutation-value');
+    opSelect.addEventListener('change', () => {
+        valueInput.style.display = opSelect.value === 'remove' ? 'none' : '';
+    });
+
+    mutationsContainer.appendChild(row);
+};
+
+// Collect agent response from a card
+function getAgentResponseFromCard(card) {
+    const agentId = card.dataset.agentId;
+    const decision = card.dataset.decision || 'allow';
+
+    let decisionObj = { type: decision };
+
+    if (decision === 'block') {
+        const status = parseInt(card.querySelector('.block-status')?.value) || 403;
+        const body = card.querySelector('.block-body')?.value || null;
+        decisionObj.status = status;
+        if (body) decisionObj.body = body;
+    } else if (decision === 'redirect') {
+        const url = card.querySelector('.redirect-url')?.value || '';
+        const status = parseInt(card.querySelector('.redirect-status')?.value) || 302;
+        decisionObj.url = url;
+        decisionObj.status = status;
+    }
+
+    // Collect header mutations
+    const requestHeaders = [];
+    card.querySelectorAll('.header-mutation-row').forEach(row => {
+        const op = row.querySelector('.mutation-op')?.value;
+        const name = row.querySelector('.mutation-name')?.value?.trim();
+        const value = row.querySelector('.mutation-value')?.value;
+        if (name) {
+            if (op === 'remove') {
+                requestHeaders.push({ op, name });
+            } else {
+                requestHeaders.push({ op, name, value: value || '' });
+            }
+        }
+    });
+
+    // Collect audit info
+    const ruleIdsRaw = card.querySelector('.audit-rule-ids')?.value || '';
+    const tagsRaw = card.querySelector('.audit-tags')?.value || '';
+    const ruleIds = ruleIdsRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const tags = tagsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+    return {
+        agent_id: agentId,
+        decision: decisionObj,
+        request_headers: requestHeaders,
+        response_headers: [],
+        audit: { rule_ids: ruleIds, tags: tags }
+    };
+}
+
+// Run agent simulation
+function runAgentSimulation() {
+    if (!wasmReady || !lastValidation?.valid) return;
+
+    const config = configEditor.value;
+    const method = document.getElementById('request-method').value;
+    const host = document.getElementById('request-host').value;
+    const path = document.getElementById('request-path').value;
+
+    // Collect headers from builder tab
+    const headers = {};
+    document.querySelectorAll('.header-row').forEach(row => {
+        const key = row.querySelector('.header-key')?.value?.trim();
+        const value = row.querySelector('.header-value')?.value?.trim();
+        if (key) headers[key] = value || '';
+    });
+
+    // Collect agent responses
+    const agentResponses = [];
+    document.querySelectorAll('.agent-card').forEach(card => {
+        agentResponses.push(getAgentResponseFromCard(card));
+    });
+
+    try {
+        const request = create_sample_request(method, host, path);
+        request.headers = headers;
+
+        const result = simulate_with_agents(
+            config,
+            JSON.stringify(request),
+            JSON.stringify(agentResponses)
+        );
+
+        renderAgentFlowDiagram(result, { method, host, path });
+        renderAgentResponseFlow(result);
+        renderAgentTrace(result);
+    } catch (e) {
+        console.error('Agent simulation error:', e);
+        flowDiagram.innerHTML = `<div class="flow-error">Agent simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
+        responseFlowDiagram.innerHTML = `<div class="flow-error">Agent simulation failed</div>`;
+    }
+}
+
+// Render flow diagram with agents
+function renderAgentFlowDiagram(result, request) {
+    const matched = result.matched_route;
+    const upstream = result.upstream_selection;
+    const agentChain = result.agent_chain || [];
+
+    const nodes = [
+        { id: 'client', label: 'Client', sublabel: `${request.method} ${request.path}`, type: 'client' },
+    ];
+
+    if (matched) {
+        nodes.push({
+            id: 'route',
+            label: `Route: ${matched.id}`,
+            sublabel: `priority: ${matched.priority}`,
+            type: 'route'
+        });
+
+        // Add agent nodes
+        agentChain.forEach((step, i) => {
+            const decision = step.decision.toLowerCase();
+            nodes.push({
+                id: `agent-${i}`,
+                label: step.agent_id,
+                sublabel: decision.toUpperCase(),
+                type: `agent-${decision}`,
+                shortCircuited: step.short_circuited
+            });
+
+            // If this agent blocked/redirected, don't add more nodes
+            if (step.short_circuited) return;
+        });
+
+        // Add upstream if not short-circuited
+        const wasShortCircuited = agentChain.some(s => s.short_circuited);
+        if (!wasShortCircuited && upstream) {
+            nodes.push({
+                id: 'upstream',
+                label: `Upstream: ${upstream.upstream_id}`,
+                sublabel: upstream.selected_target || '',
+                type: 'upstream'
+            });
+        }
+    } else {
+        nodes.push({
+            id: 'route',
+            label: 'No Match',
+            sublabel: '',
+            type: 'nomatch'
+        });
+    }
+
+    flowDiagram.innerHTML = `
+        <div class="flow-nodes">
+            ${nodes.map((node, i) => `
+                <div class="flow-node flow-node-${node.type}${node.shortCircuited ? ' flow-node-short-circuit' : ''}" data-node="${node.id}" data-index="${i}">
+                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
+                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
+                </div>
+                ${i < nodes.length - 1 ? `<div class="flow-arrow${node.shortCircuited ? ' flow-arrow-blocked' : ''}" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
+            `).join('')}
+        </div>
+    `;
+
+    // Animate nodes appearing
+    requestAnimationFrame(() => {
+        flowDiagram.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
+            el.style.animationDelay = `${i * 0.1}s`;
+            el.classList.add('flow-animate');
+        });
+    });
+}
+
+// Render response flow for agent simulation
+function renderAgentResponseFlow(result) {
+    const matched = result.matched_route;
+    const upstream = result.upstream_selection;
+    const agentChain = result.agent_chain || [];
+    const wasShortCircuited = agentChain.some(s => s.short_circuited);
+    const blockingAgent = agentChain.find(s => s.short_circuited);
+
+    const nodes = [];
+
+    if (matched) {
+        if (wasShortCircuited && blockingAgent) {
+            // Show the blocking response
+            const decision = blockingAgent.decision.toLowerCase();
+            nodes.push({
+                id: 'block-response',
+                label: decision === 'block' ? 'Block Response' : 'Redirect',
+                sublabel: `from ${blockingAgent.agent_id}`,
+                type: `agent-${decision}`
+            });
+        } else if (upstream) {
+            nodes.push({
+                id: 'upstream',
+                label: `Upstream: ${upstream.upstream_id}`,
+                sublabel: upstream.selected_target || '',
+                type: 'upstream'
+            });
+        }
+
+        nodes.push({
+            id: 'proxy',
+            label: 'Sentinel Proxy',
+            sublabel: wasShortCircuited ? 'short-circuited' : 'response processing',
+            type: wasShortCircuited ? 'agent-block' : 'route'
+        });
+    } else {
+        nodes.push({
+            id: 'proxy',
+            label: 'Sentinel Proxy',
+            sublabel: '404 - no route matched',
+            type: 'nomatch'
+        });
+    }
+
+    nodes.push({
+        id: 'client',
+        label: 'Client',
+        sublabel: wasShortCircuited ?
+            (blockingAgent?.decision === 'redirect' ? '302 Redirect' : '403 Blocked') :
+            (matched ? '200 OK' : '404 Not Found'),
+        type: 'client'
+    });
+
+    responseFlowDiagram.innerHTML = `
+        <div class="flow-nodes">
+            ${nodes.map((node, i) => `
+                <div class="flow-node flow-node-${node.type}" data-node="${node.id}" data-index="${i}">
+                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
+                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
+                </div>
+                ${i < nodes.length - 1 ? `<div class="flow-arrow" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
+            `).join('')}
+        </div>
+    `;
+
+    // Animate nodes appearing
+    requestAnimationFrame(() => {
+        responseFlowDiagram.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
+            el.style.animationDelay = `${i * 0.1}s`;
+            el.classList.add('flow-animate');
+        });
+    });
+}
+
+// Render trace with agent chain
+function renderAgentTrace(result) {
+    const sections = [];
+
+    // Agent chain section (show first if agents were involved)
+    const agentChain = result.agent_chain || [];
+    if (agentChain.length > 0) {
+        sections.push(`
+            <details class="trace-section" open>
+                <summary class="trace-summary">
+                    <span class="trace-icon">${icons.valid}</span>
+                    Agent Chain (${agentChain.length} agent${agentChain.length > 1 ? 's' : ''})
+                </summary>
+                <div class="trace-details">
+                    ${agentChain.map(step => `
+                        <div class="trace-agent trace-agent-${step.decision.toLowerCase()}">
+                            <span class="agent-id">${escapeHtml(step.agent_id)}</span>
+                            <span class="agent-decision decision-${step.decision.toLowerCase()}">${step.decision.toUpperCase()}</span>
+                            ${step.mutations_applied > 0 ? `<span class="agent-mutations">${step.mutations_applied} mutation${step.mutations_applied > 1 ? 's' : ''}</span>` : ''}
+                            ${step.short_circuited ? `<span class="agent-short-circuit">short-circuited</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </details>
+        `);
+    }
+
+    // Transformed request section
+    if (result.final_request) {
+        const req = result.final_request;
+        const changes = [];
+
+        if (req.added_headers && req.added_headers.length > 0) {
+            req.added_headers.forEach(h => changes.push({ type: 'add', text: h }));
+        }
+        if (req.modified_headers && req.modified_headers.length > 0) {
+            req.modified_headers.forEach(h => changes.push({ type: 'modify', text: h }));
+        }
+        if (req.removed_headers && req.removed_headers.length > 0) {
+            req.removed_headers.forEach(h => changes.push({ type: 'remove', text: h }));
+        }
+
+        if (changes.length > 0) {
+            sections.push(`
+                <details class="trace-section">
+                    <summary class="trace-summary">
+                        <span class="trace-icon">${icons.valid}</span>
+                        Request Transformations (${changes.length})
+                    </summary>
+                    <div class="trace-details">
+                        <div class="trace-transforms">
+                            ${changes.map(c => `
+                                <div class="transform-item transform-${c.type}">
+                                    <span class="transform-op">${c.type === 'add' ? '+' : c.type === 'remove' ? '-' : '~'}</span>
+                                    <span class="transform-text">${escapeHtml(c.text)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </details>
+            `);
+        }
+    }
+
+    // Audit trail section
+    if (result.audit_trail && result.audit_trail.length > 0) {
+        sections.push(`
+            <details class="trace-section">
+                <summary class="trace-summary">
+                    <span class="trace-icon">${icons.valid}</span>
+                    Audit Trail (${result.audit_trail.length})
+                </summary>
+                <div class="trace-details">
+                    ${result.audit_trail.map(entry => `
+                        <div class="trace-audit">
+                            <span class="audit-agent">${escapeHtml(entry.agent_id)}</span>
+                            ${entry.rule_ids && entry.rule_ids.length > 0 ? `<span class="audit-rules">Rules: ${entry.rule_ids.join(', ')}</span>` : ''}
+                            ${entry.tags && entry.tags.length > 0 ? `<span class="audit-tags">Tags: ${entry.tags.join(', ')}</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </details>
+        `);
+    }
+
+    // Route matching trace
+    if (result.match_trace && result.match_trace.length > 0) {
+        sections.push(`
+            <details class="trace-section">
+                <summary class="trace-summary">
+                    <span class="trace-icon">${icons.valid}</span>
+                    Route Matching
+                </summary>
+                <div class="trace-details">
+                    ${result.match_trace.map(step => `
+                        <div class="trace-step trace-step-${step.result}">
+                            <span class="trace-step-route">${escapeHtml(step.route_id)}</span>
+                            <span class="trace-step-result">${step.result === 'match' ? '✓ Match' : '✗ No match'}</span>
+                            <span class="trace-step-reason">${escapeHtml(step.reason)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </details>
+        `);
+    }
+
+    // Upstream selection
+    if (result.upstream_selection) {
+        const us = result.upstream_selection;
+        sections.push(`
+            <details class="trace-section">
+                <summary class="trace-summary">
+                    <span class="trace-icon">${icons.valid}</span>
+                    Upstream Selection
+                </summary>
+                <div class="trace-details">
+                    <div class="trace-upstream">
+                        <div><strong>Upstream:</strong> ${escapeHtml(us.upstream_id)}</div>
+                        <div><strong>Target:</strong> ${escapeHtml(us.selected_target)}</div>
+                        <div><strong>Algorithm:</strong> ${escapeHtml(us.load_balancer)}</div>
+                        ${us.selection_reason ? `<div><strong>Reason:</strong> ${escapeHtml(us.selection_reason)}</div>` : ''}
+                    </div>
+                </div>
+            </details>
+        `);
+    }
+
+    // Warnings
+    if (result.warnings && result.warnings.length > 0) {
+        sections.push(`
+            <details class="trace-section trace-section-warning">
+                <summary class="trace-summary">
+                    <span class="trace-icon">${icons.warning}</span>
+                    Warnings (${result.warnings.length})
+                </summary>
+                <div class="trace-details">
+                    ${result.warnings.map(w => `
+                        <div class="trace-warning">
+                            ${w.code ? `<span class="warning-code">${escapeHtml(w.code)}</span>` : ''}
+                            <span class="warning-message">${escapeHtml(w.message)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </details>
+        `);
+    }
+
+    if (sections.length === 0) {
+        traceContent.innerHTML = '<div class="trace-empty">No simulation results</div>';
+    } else {
+        traceContent.innerHTML = sections.join('');
+    }
+}
+
 // Add header row
 function addHeaderRow(key = '', value = '') {
     const row = document.createElement('div');
@@ -1493,6 +2104,9 @@ configEditor.addEventListener('input', (e) => {
 configEditor.addEventListener('scroll', syncScroll);
 simulateBtn.addEventListener('click', runSimulation);
 addHeaderBtn.addEventListener('click', () => addHeaderRow());
+if (simulateAgentsBtn) {
+    simulateAgentsBtn.addEventListener('click', runAgentSimulation);
+}
 
 // Copy configuration button
 copyConfigBtn.addEventListener('click', async () => {
