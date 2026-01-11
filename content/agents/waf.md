@@ -1,6 +1,6 @@
 +++
 title = "WAF (Web Application Firewall)"
-description = "Lightweight WAF with native Rust regex patterns for SQL injection, XSS, and attack detection."
+description = "Next-generation WAF with 200+ detection rules, anomaly scoring, and comprehensive attack coverage."
 template = "agent.html"
 
 [taxonomies]
@@ -11,7 +11,7 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Beta"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-waf"
 homepage = "https://sentinel.raskell.io/agents/waf/"
@@ -27,22 +27,25 @@ min_sentinel_version = "25.12.0"
 
 ## Overview
 
-A lightweight Web Application Firewall agent for Sentinel using **native Rust regex patterns**. Provides zero-dependency attack detection without requiring libmodsecurity or other C libraries.
-
-> **Note:** This agent implements a curated subset of detection rules inspired by OWASP CRS rule IDs, but does not use the full CRS ruleset. For full OWASP CRS compatibility with 800+ rules, see [ModSecurity agent](/agents/modsec/).
+A next-generation Web Application Firewall agent for Sentinel featuring **200+ detection rules** and **anomaly-based scoring** to reduce false positives. Built with native Rust regex patterns for zero-dependency attack detection.
 
 ## Features
 
+- **200+ Detection Rules**: Comprehensive coverage across 12 attack categories
+- **Anomaly Scoring**: Cumulative risk scores instead of binary block/allow
 - **Pure Rust**: No external C dependencies
-- **SQL Injection Detection**: UNION-based, blind, time-based
-- **XSS Detection**: Script tags, event handlers, JavaScript URIs
-- **Path Traversal**: Directory traversal, encoded attacks
-- **Command Injection**: Shell commands, pipe injection
-- **Scanner Detection**: Block known security scanners
+- **SQL Injection**: UNION-based, error-based, blind, time-based, NoSQL
+- **XSS Detection**: Script tags, event handlers, DOM-based, polyglots
+- **Command Injection**: Unix, Windows, PowerShell
+- **Path Traversal**: Directory traversal, encoded attacks, LFI/RFI
+- **SSTI**: Server-Side Template Injection (Jinja2, Twig, Freemarker)
+- **SSRF**: Cloud metadata, internal IPs, protocol handlers
+- **Deserialization**: Java, PHP, Python, .NET, Ruby gadget chains
+- **Scanner Detection**: SQLMap, Nikto, Nmap, Burp Suite
 - **Request Body Inspection**: JSON, form data, all content types
-- **Response Body Inspection**: Detect attacks in server responses (optional)
+- **Response Body Inspection**: Detect attacks in server responses
+- **Rule Management**: Enable/disable rules, exclusions, score overrides
 - **Paranoia Levels**: 1-4 for tuning sensitivity
-- **Detect-Only Mode**: Monitor without blocking
 
 ## Installation
 
@@ -94,45 +97,202 @@ route {
 }
 ```
 
+### Dynamic Configuration
+
+Configure scoring thresholds and rule management via the agent protocol:
+
+```json
+{
+  "paranoia-level": 2,
+  "block-mode": true,
+  "scoring": {
+    "enabled": true,
+    "block-threshold": 25,
+    "log-threshold": 10
+  },
+  "rules": {
+    "disabled": ["942140", "941200"],
+    "exclusions": [
+      {
+        "rules": ["942*"],
+        "conditions": { "paths": ["/api/search"] }
+      }
+    ]
+  }
+}
+```
+
+## Anomaly Scoring
+
+Instead of blocking on the first rule match, the WAF accumulates anomaly scores and makes decisions based on thresholds.
+
+### Score Calculation
+
+```
+final_score = base_score × location_weight × severity_multiplier
+```
+
+**Location Weights:**
+| Location | Weight |
+|----------|--------|
+| Query String | 1.5x |
+| Cookie | 1.3x |
+| Path | 1.2x |
+| Body | 1.2x |
+| Headers | 1.0x |
+
+**Severity Multipliers:**
+| Severity | Multiplier |
+|----------|------------|
+| Critical | 2.0x |
+| High | 1.5x |
+| Medium | 1.0x |
+| Low | 0.7x |
+
+### Decision Logic
+
+| Total Score | Action |
+|-------------|--------|
+| < 10 | Allow |
+| 10-24 | Allow with warning (logged, `X-WAF-Detected` header) |
+| ≥ 25 | Block (403 Forbidden) |
+
+This approach reduces false positives by requiring multiple suspicious patterns or high-confidence attacks before blocking.
+
 ## Paranoia Levels
 
 | Level | Description |
 |-------|-------------|
 | 1 | High-confidence detections only (recommended for production) |
-| 2 | Adds medium-confidence rules, more false positives possible |
+| 2 | Adds medium-confidence rules, more patterns detected |
 | 3 | Adds low-confidence rules, requires tuning |
 | 4 | Maximum sensitivity, expect false positives |
 
 ## Detection Rules
 
-Rules follow OWASP CRS numbering conventions for familiarity.
+Rules follow OWASP CRS numbering conventions for familiarity. **200+ rules** across 12 categories:
 
-### SQL Injection (942xxx)
-- UNION-based injection
-- Tautology attacks (`OR 1=1`)
-- Comment injection (`--`, `#`, `/**/`)
-- Time-based blind injection (`SLEEP()`, `BENCHMARK()`)
+### SQL Injection (942xxx) - 66 rules
+- UNION-based injection (SELECT, ALL, INTO)
+- Error-based injection (CONVERT, EXTRACTVALUE)
+- Blind injection (boolean, time-based)
+- Stacked queries, comment injection
+- NoSQL injection (MongoDB, Redis, Elasticsearch)
 
-### Cross-Site Scripting (941xxx)
-- Script tag injection (`<script>`)
-- Event handler injection (`onclick=`, `onerror=`)
-- JavaScript URI (`javascript:`)
-- Data URI (`data:text/html`)
+### Cross-Site Scripting (941xxx) - 35 rules
+- Script tag injection (`<script>`, `</script>`)
+- Event handlers (`onclick`, `onerror`, `onload`)
+- JavaScript/VBScript URIs
+- Data URIs with HTML content
+- DOM-based XSS sinks (`innerHTML`, `eval`)
+- CSS-based XSS (`expression()`, `-moz-binding`)
+- Polyglot payloads
 
-### Path Traversal (930xxx)
+### Command Injection (932xxx) - 25 rules
+- Unix commands (`; ls`, `| cat`, backticks)
+- Command substitution (`$(...)`)
+- Windows commands (`& dir`, `| type`)
+- PowerShell execution
+
+### Path Traversal (930xxx) - 15 rules
 - Directory traversal (`../`, `..\\`)
 - URL-encoded traversal (`%2e%2e%2f`)
 - OS file access (`/etc/passwd`, `c:\\windows`)
+- PHP wrappers (`php://filter`, `php://input`)
+- Remote File Inclusion (HTTP/FTP includes)
 
-### Command Injection (932xxx)
-- Shell command injection (`; ls`, `| cat`)
-- Unix command execution (`$(...)`, backticks)
-- Windows command execution
+### Server-Side Template Injection (934xxx) - 10 rules
+- Jinja2/Twig (`{{...}}`, `{%...%}`)
+- Freemarker (`<#...>`, `${...}`)
+- Velocity (`#set`, `$class`)
+- Expression Language (`${T(...)}`)
 
-### Protocol Attacks (920xxx)
-- Scanner detection (Nikto, SQLMap, etc.)
+### SSRF (936xxx) - 13 rules
+- Cloud metadata endpoints (AWS, GCP, Azure)
+- Internal IP ranges (10.x, 172.16.x, 192.168.x)
+- Localhost/loopback access
+- Protocol handlers (`file://`, `gopher://`, `dict://`)
+- IP encoding bypasses (octal, decimal, hex)
+
+### Deserialization (937xxx) - 14 rules
+- Java serialized objects, gadget chains (Commons Collections, Spring)
+- Java JNDI injection (Log4Shell)
+- PHP object serialization, POP chains
+- Python pickle, PyYAML
+- .NET BinaryFormatter, ViewState
+- Ruby Marshal
+
+### LDAP Injection (933xxx) - 8 rules
+- Filter injection (`*`, `)(`, `|`)
+- Attribute injection
+- DN manipulation
+
+### XPath Injection (935xxx) - 6 rules
+- XPath operators and functions
+- Boolean blind injection
+- Error-based injection
+
+### Protocol Attacks (920xxx) - 10 rules
 - Request smuggling patterns
+- HTTP method override
 - Control characters
+
+### Scanner Detection (913xxx) - 12 rules
+- SQLMap, Nikto, Nessus, Acunetix
+- Burp Suite, Nmap, DirBuster
+- WPScan, Metasploit, Hydra
+
+## Rule Management
+
+### Disable Specific Rules
+
+```json
+{
+  "rules": {
+    "disabled": ["942100", "941110"]
+  }
+}
+```
+
+### Disable by Pattern
+
+```json
+{
+  "rules": {
+    "disabled": ["942*"]
+  }
+}
+```
+
+### Exclusions by Path
+
+```json
+{
+  "rules": {
+    "exclusions": [
+      {
+        "rules": ["942*"],
+        "conditions": { "paths": ["/api/search", "/graphql"] }
+      }
+    ]
+  }
+}
+```
+
+### Exclusions by Tag
+
+```json
+{
+  "rules": {
+    "exclusions": [
+      {
+        "rules": ["@sqli-union"],
+        "conditions": { "paths": ["/reports"] }
+      }
+    ]
+  }
+}
+```
 
 ## Response Headers
 
@@ -140,7 +300,9 @@ Rules follow OWASP CRS numbering conventions for familiarity.
 |--------|-------------|
 | `X-WAF-Blocked` | `true` if request was blocked |
 | `X-WAF-Rule` | Rule ID that triggered block |
-| `X-WAF-Detected` | Rule IDs detected (detect-only mode) |
+| `X-WAF-Score` | Total anomaly score |
+| `X-WAF-Detected` | Rule IDs detected (below block threshold) |
+| `X-WAF-Response-Detected` | Detections in response body |
 
 ## Test Payloads
 
@@ -156,21 +318,29 @@ curl -i "http://localhost:8080/api/users?id=1' OR '1'='1"
 curl -i "http://localhost:8080/search?q=<script>alert(1)</script>"
 ```
 
+### SSTI Test
+
+```bash
+curl -i "http://localhost:8080/render?template={{7*7}}"
+```
+
 ### Expected Response (Blocked)
 
 ```http
 HTTP/1.1 403 Forbidden
 X-WAF-Blocked: true
 X-WAF-Rule: 942100
+X-WAF-Score: 27
 ```
 
 ## Comparison with ModSecurity Agent
 
 | Feature | WAF | ModSecurity |
 |---------|-----|-------------|
-| Detection Rules | ~20 rules | 800+ CRS rules |
+| Detection Rules | 200+ rules | 800+ CRS rules |
+| Anomaly Scoring | Yes | Yes |
 | SecLang Support | No | Yes |
-| Custom Rules | No | Yes |
+| Custom Rules | Via config | Full SecLang |
 | Dependencies | Pure Rust | libmodsecurity (C) |
 | Binary Size | ~5MB | ~50MB |
 | Memory Usage | Low | Higher |
@@ -179,19 +349,22 @@ X-WAF-Rule: 942100
 **Use WAF when:**
 - You want zero-dependency deployment
 - You need low latency and minimal resources
-- Basic attack detection is sufficient
+- Anomaly scoring with 200+ rules is sufficient
+- You prefer configuration-based rule management
 
 **Use [ModSecurity](/agents/modsec/) when:**
 - You need full OWASP CRS compatibility
 - You have existing ModSecurity/SecLang rules
-- You require comprehensive 800+ rule protection
+- You require 800+ rules with full SecLang syntax
 
 ## False Positive Handling
 
-1. **Lower paranoia level** - Start with level 1, increase gradually
-2. **Exclude paths** - Skip known-safe endpoints (`--exclude-paths`)
-3. **Detect-only mode** - Monitor before enabling blocking
-4. **Switch to ModSecurity** - For fine-grained rule tuning
+1. **Anomaly scoring** - Single low-confidence matches won't block
+2. **Lower paranoia level** - Start with level 1, increase gradually
+3. **Exclude paths** - Skip known-safe endpoints
+4. **Disable rules** - Turn off specific problematic rules
+5. **Adjust thresholds** - Increase `block-threshold` if needed
+6. **Detect-only mode** - Monitor before enabling blocking
 
 ## Related Agents
 
