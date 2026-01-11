@@ -58,10 +58,6 @@ github = "https://github.com/raskell-io/sentinel"
 
 # Navigation (supports dropdowns via children array)
 [[extra.nav_links]]
-name = "Docs"
-url = "/docs/"
-
-[[extra.nav_links]]
 name = "Get Started"
 [[extra.nav_links.children]]
 name = "Install"
@@ -84,6 +80,10 @@ url = "/agents/"
 [[extra.nav_links.children]]
 name = "Manifesto"
 url = "/manifesto/"
+
+[[extra.nav_links]]
+name = "Docs"
+url = "/docs/"
 
 [[extra.nav_links]]
 name = "GitHub"

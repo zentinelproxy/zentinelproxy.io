@@ -392,10 +392,38 @@
             }
         });
 
-        // Navigation Dropdowns
+        // Navigation Dropdowns (portal approach for backdrop-filter compatibility)
         (function() {
             const dropdowns = document.querySelectorAll('.nav-dropdown');
             let activeDropdown = null;
+            let activeMenu = null;
+            let activeTrigger = null;
+            let originalParent = null;
+
+            function positionDropdown(trigger, menu) {
+                const rect = trigger.getBoundingClientRect();
+                const header = document.querySelector('.header');
+                const headerBottom = header ? header.getBoundingClientRect().bottom : rect.bottom + 8;
+                const menuWidth = menu.offsetWidth || 180;
+                const left = rect.left + (rect.width / 2) - (menuWidth / 2);
+
+                menu.style.left = Math.max(8, left) + 'px';
+                menu.style.top = headerBottom + 'px';
+            }
+
+            function closeActiveDropdown() {
+                if (activeDropdown && activeMenu && originalParent) {
+                    activeDropdown.classList.remove('open');
+                    activeMenu.classList.remove('open');
+                    activeTrigger.setAttribute('aria-expanded', 'false');
+                    // Move menu back to original parent
+                    originalParent.appendChild(activeMenu);
+                    activeDropdown = null;
+                    activeMenu = null;
+                    activeTrigger = null;
+                    originalParent = null;
+                }
+            }
 
             dropdowns.forEach(dropdown => {
                 const trigger = dropdown.querySelector('.nav-dropdown__trigger');
@@ -410,47 +438,56 @@
 
                         // Close any other open dropdown
                         if (activeDropdown && activeDropdown !== dropdown) {
-                            activeDropdown.classList.remove('open');
-                            activeDropdown.querySelector('.nav-dropdown__trigger').setAttribute('aria-expanded', 'false');
+                            closeActiveDropdown();
                         }
 
                         if (isOpen) {
-                            dropdown.classList.remove('open');
-                            trigger.setAttribute('aria-expanded', 'false');
-                            activeDropdown = null;
+                            closeActiveDropdown();
                         } else {
                             dropdown.classList.add('open');
                             trigger.setAttribute('aria-expanded', 'true');
                             activeDropdown = dropdown;
+                            activeMenu = menu;
+                            activeTrigger = trigger;
+                            originalParent = menu.parentElement;
+                            // Move menu to body (portal) for backdrop-filter to work
+                            document.body.appendChild(menu);
+                            positionDropdown(trigger, menu);
+                            menu.classList.add('open');
                         }
                     });
 
                     // Close on menu link click
                     menu.querySelectorAll('a').forEach(link => {
-                        link.addEventListener('click', () => {
-                            dropdown.classList.remove('open');
-                            trigger.setAttribute('aria-expanded', 'false');
-                            activeDropdown = null;
-                        });
+                        link.addEventListener('click', closeActiveDropdown);
                     });
                 }
             });
 
+            // Reposition on scroll/resize
+            window.addEventListener('scroll', () => {
+                if (activeDropdown && activeMenu && activeTrigger) {
+                    positionDropdown(activeTrigger, activeMenu);
+                }
+            }, { passive: true });
+
+            window.addEventListener('resize', () => {
+                if (activeDropdown && activeMenu && activeTrigger) {
+                    positionDropdown(activeTrigger, activeMenu);
+                }
+            }, { passive: true });
+
             // Close on outside click
             document.addEventListener('click', (e) => {
-                if (activeDropdown && !activeDropdown.contains(e.target)) {
-                    activeDropdown.classList.remove('open');
-                    activeDropdown.querySelector('.nav-dropdown__trigger').setAttribute('aria-expanded', 'false');
-                    activeDropdown = null;
+                if (activeDropdown && !activeDropdown.contains(e.target) && !activeMenu.contains(e.target)) {
+                    closeActiveDropdown();
                 }
             });
 
             // Close on escape
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && activeDropdown) {
-                    activeDropdown.classList.remove('open');
-                    activeDropdown.querySelector('.nav-dropdown__trigger').setAttribute('aria-expanded', 'false');
-                    activeDropdown = null;
+                    closeActiveDropdown();
                 }
             });
         })();

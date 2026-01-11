@@ -215,10 +215,10 @@ img {
     top: 0;
     z-index: 100;
     height: var(--header-height);
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-bg) 70%, transparent);
     backdrop-filter: blur(12px);
-    background: rgba(var(--color-bg), 0.8);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .nav {
@@ -314,29 +314,28 @@ img {
     }
 
     .nav-dropdown__menu {
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 50%;
-        transform: translateX(-50%) translateY(4px);
+        position: fixed;
         min-width: 180px;
         padding: 6px;
-        background: var(--color-bg);
+        background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid var(--color-border);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-        z-index: 100;
+        pointer-events: none;
+        transition: opacity 0.15s ease, visibility 0.15s;
+        z-index: 1000;
 
         // Invisible bridge to prevent menu from closing when moving mouse to it
         &::before {
             content: "";
             position: absolute;
-            top: -12px;
+            top: -21px;
             left: 0;
             right: 0;
-            height: 12px;
+            height: 21px;
         }
 
         a {
@@ -359,7 +358,46 @@ img {
     .nav-dropdown.open .nav-dropdown__menu {
         opacity: 1;
         visibility: visible;
-        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+    }
+}
+
+// Dropdown menu when portaled to body (for backdrop-filter compatibility)
+body > .nav-dropdown__menu {
+    position: fixed;
+    min-width: 180px;
+    padding: 6px;
+    background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0.15s;
+    z-index: 1000;
+
+    &.open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    a {
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        transition: all var(--transition-fast);
+
+        &:hover {
+            background: var(--color-bg-elevated);
+            color: var(--color-text);
+        }
     }
 }
 
