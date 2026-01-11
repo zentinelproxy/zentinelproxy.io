@@ -486,8 +486,8 @@
                 </div>
                 <div class="agent-content">
                     <h3>WAF</h3>
-                    <span class="agent-status stable">Stable</span>
-                    <p>ModSecurity-compatible rules engine with OWASP CRS support. Block SQLi, XSS, and more.</p>
+                    <span class="agent-status beta">Beta</span>
+                    <p>Lightweight WAF with native Rust regex patterns for SQL injection, XSS, and attack detection.</p>
                 </div>
             </a>
             <a href="/agents/ai-gateway/" class="agent-card">
@@ -496,18 +496,18 @@
                 </div>
                 <div class="agent-content">
                     <h3>AI Gateway</h3>
-                    <span class="agent-status stable">Stable</span>
-                    <p>Token-based rate limiting, provider routing, and content guardrails for LLM workloads.</p>
+                    <span class="agent-status beta">Beta</span>
+                    <p>Semantic security for AI APIs: prompt injection detection, jailbreak prevention, and PII filtering.</p>
                 </div>
             </a>
-            <a href="/agents/ratelimit/" class="agent-card">
+            <a href="/agents/denylist/" class="agent-card">
                 <div class="agent-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m6.8 14-3.5 2"/><path d="m20.7 16-3.5-2"/><path d="M6.8 10 3.3 8"/><path d="m20.7 8-3.5 2"/><circle cx="12" cy="12" r="6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
                 </div>
                 <div class="agent-content">
-                    <h3>Rate Limiter</h3>
+                    <h3>Denylist</h3>
                     <span class="agent-status stable">Stable</span>
-                    <p>Token bucket, sliding window, and GCRA algorithms. Redis-backed for distributed deployments.</p>
+                    <p>Block requests based on IP addresses, CIDR ranges, or custom patterns with real-time updates.</p>
                 </div>
             </a>
             <a href="/agents/auth/" class="agent-card">
