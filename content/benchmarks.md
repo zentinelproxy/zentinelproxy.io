@@ -241,9 +241,12 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
 - **Body processing** scales linearly at ~40 MB/s throughput
 - **Pure Rust** - zero C/C++ dependencies, full OWASP CRS compatibility
 
-### Comparison vs libmodsecurity (C++)
+### Rust vs C++: sentinel-modsec vs libmodsecurity
 
-Direct benchmark comparison against libmodsecurity 3.0.14 (the reference C++ implementation).
+<div class="highlight-box" style="background: linear-gradient(135deg, var(--color-success-bg) 0%, var(--color-primary-bg) 100%); border: 2px solid var(--color-success); border-radius: 8px; padding: var(--space-lg); margin: var(--space-lg) 0;">
+    <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: var(--space-sm);">Pure Rust outperforms C++ by 10-30x</div>
+    <div style="color: var(--color-text-muted);">Direct benchmark comparison against libmodsecurity 3.0.14, the reference C++ ModSecurity implementation used by nginx and Apache.</div>
+</div>
 
 <div class="stats-grid">
     <div class="stat-card">
@@ -260,6 +263,11 @@ Direct benchmark comparison against libmodsecurity 3.0.14 (the reference C++ imp
         <div class="stat-value stat-value--success">10x</div>
         <div class="stat-label">Faster</div>
         <div class="stat-detail">Body processing</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">6.2M</div>
+        <div class="stat-label">Requests/sec</div>
+        <div class="stat-detail">vs 207K for libmodsec</div>
     </div>
 </div>
 
@@ -317,14 +325,17 @@ Direct benchmark comparison against libmodsecurity 3.0.14 (the reference C++ imp
 | **Simple rule** | 1.21 µs | 3.28 µs | **2.7x faster** |
 | **Complex rule** | 2.75 µs | 10.07 µs | **3.6x faster** |
 
-PHF (perfect hash functions) for O(1) operator/variable lookup and lazy regex compilation make sentinel-modsec faster at parsing ModSecurity rules.
+<div class="highlight-box" style="background: var(--color-surface); border-left: 4px solid var(--color-success); padding: var(--space-md); margin: var(--space-lg) 0;">
+<strong>Why is the Rust implementation faster?</strong>
 
-**Why is sentinel-modsec faster?**
-- Pure Rust with zero-copy parsing where possible
-- Aho-Corasick for O(n) multi-pattern matching
-- RegexSet for single-pass multi-regex evaluation
-- No C FFI overhead or memory allocation crossing language boundaries
-- Optimized data structures (no std::string copies)
+- **Zero-copy parsing** - `Cow<str>` avoids allocations when data is unchanged
+- **PHF (Perfect Hash Functions)** - O(1) operator/variable name lookup vs linear search
+- **Lazy regex compilation** - defer compilation to first use, not parse time
+- **Aho-Corasick** - O(n) multi-pattern matching for `@pm` operator
+- **RegexSet** - single-pass evaluation of multiple regex patterns
+- **No FFI overhead** - no memory allocation crossing language boundaries
+- **No std::string copies** - Rust's ownership model eliminates defensive copying
+</div>
 
 ---
 
