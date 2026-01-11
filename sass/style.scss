@@ -1503,6 +1503,11 @@ body > .nav-dropdown__menu {
         background: var(--color-info);
         color: var(--color-bg);
     }
+
+    &.alpha {
+        background: var(--color-primary);
+        color: var(--color-bg);
+    }
 }
 
 .agents-cta {
@@ -2457,6 +2462,10 @@ body > .nav-dropdown__menu {
 
     &.planned {
         background: var(--color-info);
+    }
+
+    &.alpha {
+        background: var(--color-primary);
     }
 }
 
