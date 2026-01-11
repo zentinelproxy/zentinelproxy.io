@@ -40,7 +40,7 @@ include_title = true
 include_description = true
 include_path = true
 include_content = true
-index_format = "elasticlunr_json"
+index_format = "elasticlunr_javascript"
 
 [extra]
 # Site metadata
