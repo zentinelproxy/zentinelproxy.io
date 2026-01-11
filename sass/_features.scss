@@ -170,7 +170,18 @@
         margin-bottom: var(--space-xl);
         padding-bottom: var(--space-md);
         border-bottom: 2px solid var(--color-border-subtle);
+
+        &.section-title--with-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
     }
+}
+
+.section-logo {
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
 }
 
 .feature-section-header {
@@ -247,6 +258,25 @@
             border-color: var(--color-peach, #fab387);
         }
     }
+
+    &.pingora-highlight {
+        background: var(--color-bg-elevated);
+        border-color: var(--color-border);
+
+        &:hover {
+            border-color: var(--color-sky, #89dceb);
+        }
+    }
+}
+
+.feature-note {
+    margin-top: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    border-left: 3px solid var(--color-primary);
 }
 
 .feature-header {

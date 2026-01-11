@@ -1,0 +1,430 @@
+// Manifesto Page Styles
+
+.manifesto-page {
+    --manifesto-max-width: 720px;
+}
+
+.manifesto-hero {
+    padding: 6rem 1.5rem 4rem;
+    text-align: center;
+    background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+    border-bottom: 1px solid var(--color-border);
+
+    .container {
+        max-width: var(--manifesto-max-width);
+    }
+}
+
+// Hidden SVG for filter definitions
+.heat-wave-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+// Closing visual section
+.manifesto-visual {
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+
+    @media (max-width: 640px) {
+        height: 280px;
+    }
+}
+
+.manifesto-visual__bg {
+    position: absolute;
+    inset: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 30%;
+        filter: url(#heat-wave);
+
+        @media (prefers-reduced-motion: reduce) {
+            filter: none;
+        }
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(
+            180deg,
+            var(--color-bg) 0%,
+            transparent 30%,
+            transparent 70%,
+            var(--color-bg) 100%
+        );
+    }
+}
+
+.manifesto-title {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 auto 1.5rem;
+    letter-spacing: -0.02em;
+    text-align: center;
+}
+
+.manifesto-opening {
+    font-size: 1.25rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 auto;
+    text-align: center;
+
+    strong {
+        color: var(--color-text);
+    }
+}
+
+.manifesto-content {
+    padding: 4rem 0 6rem;
+
+    .container {
+        max-width: var(--manifesto-max-width);
+    }
+
+    @media (max-width: 640px) {
+        padding: 3rem 1rem 4rem;
+    }
+}
+
+.manifesto-intro {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--color-border);
+
+    p {
+        margin: 0 0 1.25rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    strong {
+        color: var(--color-text);
+    }
+}
+
+// Beliefs Section
+.beliefs-section {
+    margin-bottom: 4rem;
+
+    > h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 2rem;
+        color: var(--color-text);
+    }
+}
+
+.belief {
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+}
+
+.belief-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+
+.belief-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+
+    @media (max-width: 640px) {
+        font-size: 1.75rem;
+    }
+}
+
+.belief-title {
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.belief-content {
+    padding-left: 3.5rem;
+
+    @media (max-width: 640px) {
+        padding-left: 0;
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-muted);
+        margin: 0 0 1rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    strong {
+        color: var(--color-text);
+    }
+
+    em {
+        color: var(--color-primary);
+        font-style: normal;
+    }
+}
+
+.belief-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+
+    li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text-muted);
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.6em;
+            width: 6px;
+            height: 6px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+    }
+}
+
+// Future Section
+.future-section {
+    margin-bottom: 4rem;
+    padding: 2rem;
+    background: var(--color-bg-subtle);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+
+    @media (max-width: 640px) {
+        padding: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem;
+        color: var(--color-text);
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-muted);
+        margin: 0 0 1rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    strong {
+        color: var(--color-text);
+    }
+}
+
+// Not Section
+.not-section {
+    margin-bottom: 4rem;
+
+    h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: var(--color-text);
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-muted);
+        margin: 0 0 1rem;
+    }
+}
+
+.not-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+
+    li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text-muted);
+
+        &::before {
+            content: "\2715";
+            position: absolute;
+            left: 0;
+            color: var(--color-error, #f38ba8);
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+    }
+}
+
+// Contributors Section
+.contributors-section {
+    margin-bottom: 4rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(203, 166, 247, 0.08) 0%, rgba(137, 180, 250, 0.08) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(203, 166, 247, 0.2);
+
+    @media (max-width: 640px) {
+        padding: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: var(--color-text);
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--color-text-muted);
+        margin: 0 0 1rem;
+
+        &:last-child {
+            margin-bottom: 0;
+            font-style: italic;
+        }
+    }
+}
+
+.contributors-questions {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+
+    li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--color-text);
+        font-style: italic;
+
+        &::before {
+            content: "?";
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+            font-weight: 600;
+            font-style: normal;
+        }
+    }
+}
+
+// Summary Section
+.summary-section {
+    padding-top: 3rem;
+    border-top: 1px solid var(--color-border);
+
+    h2 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem;
+        color: var(--color-text);
+    }
+}
+
+.summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--color-bg-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: 100px;
+        font-size: 0.9375rem;
+        color: var(--color-text);
+
+        svg {
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+    }
+}
+
+.summary-closing {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+
+    p {
+        margin: 0 0 1rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    strong {
+        color: var(--color-text);
+    }
+
+    em {
+        color: var(--color-primary);
+        font-style: normal;
+        font-weight: 500;
+    }
+}

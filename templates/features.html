@@ -722,7 +722,10 @@
 
             <!-- Built with Rust -->
             <div class="feature-section">
-                <h2 class="section-title">Built with Rust</h2>
+                <h2 class="section-title section-title--with-logo">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg" alt="" class="section-logo" width="32" height="32">
+                    Built with Rust
+                </h2>
 
                 <div class="feature-item rust-highlight">
                     <div class="feature-header">
@@ -741,6 +744,35 @@
                         <li><strong>Low memory footprint</strong> - Efficient memory usage</li>
                         <li><strong>Native performance</strong> - Compiled to machine code</li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- Powered by Pingora -->
+            <div class="feature-section">
+                <h2 class="section-title section-title--with-logo">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg" alt="" class="section-logo" width="32" height="32">
+                    Powered by Pingora
+                </h2>
+
+                <div class="feature-item pingora-highlight">
+                    <div class="feature-header">
+                        <h3>Cloudflare's Battle-Tested Framework</h3>
+                        <a href="https://github.com/cloudflare/pingora" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            Pingora on GitHub
+                        </a>
+                    </div>
+                    <p class="feature-description">Sentinel is built on <a href="https://blog.cloudflare.com/pingora-open-source" target="_blank" rel="noopener">Pingora</a>, Cloudflare's open-source Rust framework that handles over a trillion requests per day in production.</p>
+                    <ul class="feature-list">
+                        <li><strong>Production proven</strong> - Powers Cloudflare's global edge network</li>
+                        <li><strong>Async-first architecture</strong> - Built on Tokio for maximum concurrency</li>
+                        <li><strong>HTTP/1.1 & HTTP/2</strong> - Full protocol support with connection reuse</li>
+                        <li><strong>Connection pooling</strong> - Efficient upstream connection management</li>
+                        <li><strong>TLS termination</strong> - Native rustls integration with modern cipher suites</li>
+                        <li><strong>Zero-downtime upgrades</strong> - Graceful restarts without dropping connections</li>
+                        <li><strong>Extensible architecture</strong> - Filter and callback system for custom logic</li>
+                    </ul>
+                    <p class="feature-note">Pingora provides the high-performance networking foundation, while Sentinel adds security-first configuration, the external agent system, and production-ready defaults.</p>
                 </div>
             </div>
         </div>

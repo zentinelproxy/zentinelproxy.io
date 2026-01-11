@@ -1682,24 +1682,6 @@ body > .nav-dropdown__menu {
     }
 }
 
-.manifesto-content {
-    max-width: 600px;
-    color: #fff;
-
-    h2 {
-        font-size: clamp(1.75rem, 4vw, 2.5rem);
-        font-weight: 700;
-        margin-bottom: var(--space-md);
-        line-height: 1.2;
-    }
-
-    p {
-        font-size: 1.0625rem;
-        line-height: 1.7;
-        opacity: 0.9;
-        margin-bottom: var(--space-xl);
-    }
-}
 
 .manifesto-label {
     display: inline-block;
@@ -3763,3 +3745,8 @@ body > .nav-dropdown__menu {
 // Features Page
 // =============================================================================
 @import 'features';
+
+// =============================================================================
+// Manifesto Page
+// =============================================================================
+@import 'manifesto';
