@@ -1,7 +1,13 @@
 +++
 title = "Content Scanner"
-description = "Malware scanning agent using ClamAV daemon"
-weight = 60
+description = "Malware scanning agent using ClamAV daemon for file upload protection"
+template = "agent.html"
+
+[taxonomies]
+tags = ["content-scanner", "malware", "clamav", "security", "file-upload"]
+
+[extra]
+official = true
 +++
 
 # Content Scanner Agent
