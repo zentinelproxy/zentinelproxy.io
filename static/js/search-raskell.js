@@ -78,10 +78,10 @@
 
     searchOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
-    // Delay focus slightly to ensure modal is visible after CSS transition starts
-    requestAnimationFrame(() => {
+    // Delay focus to ensure visibility transition has completed
+    setTimeout(() => {
       searchInput.focus();
-    });
+    }, 50);
   }
 
   function closeSearch() {
