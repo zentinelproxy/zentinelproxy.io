@@ -1490,13 +1490,18 @@ body > .nav-dropdown__menu {
     margin-bottom: var(--space-xs);
 
     &.stable {
-        background: color-mix(in srgb, var(--color-success) 15%, transparent);
-        color: var(--color-success);
+        background: var(--color-success);
+        color: var(--color-bg);
     }
 
     &.beta {
-        background: color-mix(in srgb, var(--color-warning) 15%, transparent);
-        color: var(--color-warning);
+        background: var(--color-warning);
+        color: var(--color-bg);
+    }
+
+    &.planned {
+        background: var(--color-info);
+        color: var(--color-bg);
     }
 }
 
