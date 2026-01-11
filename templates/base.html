@@ -104,7 +104,51 @@
                 "publisher": {
                     "@id": "{{ config.base_url | safe }}/#organization"
                 },
-                "inLanguage": "{{ lang | default(value='en') }}"
+                "inLanguage": "{{ lang | default(value='en') }}",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": {
+                        "@type": "EntryPoint",
+                        "urlTemplate": "{{ config.base_url | safe }}/?q={search_term_string}"
+                    },
+                    "query-input": "required name=search_term_string"
+                }
+            },
+            {
+                "@type": "SoftwareApplication",
+                "@id": "{{ config.base_url | safe }}/#software",
+                "name": "Sentinel",
+                "description": "A security-first reverse proxy built on Cloudflare Pingora for production deployments",
+                "url": "{{ config.base_url | safe }}",
+                "applicationCategory": "DeveloperApplication",
+                "operatingSystem": "Linux, macOS",
+                "softwareVersion": "0.2",
+                "downloadUrl": "https://github.com/raskell-io/sentinel/releases",
+                "installUrl": "https://sentinel.raskell.io/docs/getting-started/installation/",
+                "screenshot": "{{ get_url(path='img/og-image.png') | safe }}",
+                "author": {
+                    "@id": "{{ config.base_url | safe }}/#organization"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD"
+                },
+                "license": "https://opensource.org/licenses/Apache-2.0",
+                "programmingLanguage": "Rust",
+                "codeRepository": "https://github.com/raskell-io/sentinel",
+                "featureList": [
+                    "TLS termination with OCSP stapling",
+                    "14+ load balancing algorithms",
+                    "HTTP, TCP, gRPC health checks",
+                    "External agent extensibility",
+                    "Hot configuration reload",
+                    "Prometheus metrics",
+                    "OpenTelemetry tracing",
+                    "WebSocket support",
+                    "GeoIP filtering",
+                    "Response caching"
+                ]
             },
             {
                 "@type": "Organization",
