@@ -42,6 +42,44 @@ SentinelSec is a pure Rust ModSecurity-compatible WAF agent for Sentinel. It pro
 - **Block or Detect-Only Mode**: Monitor before blocking
 - **Zero Installation Hassle**: Just `cargo install`, no system dependencies
 
+## Performance: 10-30x Faster than C++
+
+SentinelSec uses the [sentinel-modsec](/docs/sentinel-modsec/) engine, a pure Rust implementation that **outperforms the C++ libmodsecurity by 10-30x**.
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">30x</div>
+        <div class="stat-label">Faster</div>
+        <div class="stat-detail">Clean requests</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">18x</div>
+        <div class="stat-label">Faster</div>
+        <div class="stat-detail">Attack detection</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">6.2M</div>
+        <div class="stat-label">Requests/sec</div>
+        <div class="stat-detail">vs 207K for libmodsec</div>
+    </div>
+</div>
+
+| Benchmark | SentinelSec (Rust) | libmodsecurity (C++) | Speedup |
+|-----------|--------------------|-----------------------|---------|
+| Clean request | 161 ns | 4,831 ns | **30x faster** |
+| SQLi detection | 295 ns | 5,545 ns | **19x faster** |
+| Body processing | 1.24 µs | 12.93 µs | **10x faster** |
+| Rule parsing | 2.75 µs | 10.07 µs | **3.6x faster** |
+
+**Why is Rust faster?**
+- Zero-copy parsing with `Cow<str>`
+- PHF (Perfect Hash Functions) for O(1) operator lookup
+- Lazy regex compilation - defer to first use
+- Aho-Corasick for multi-pattern matching
+- No FFI overhead or cross-language memory allocation
+
+See [full benchmarks](/benchmarks/#rust-vs-c-sentinel-modsec-vs-libmodsecurity) for details.
+
 ## Comparison
 
 | Feature | SentinelSec | ModSec | WAF |
@@ -50,6 +88,7 @@ SentinelSec is a pure Rust ModSecurity-compatible WAF agent for Sentinel. It pro
 | SecLang Support | Yes | Yes | No |
 | @detectSQLi/@detectXSS | Yes (pure Rust) | Yes (C lib) | No |
 | Dependencies | **Pure Rust** | libmodsecurity (C) | Pure Rust |
+| Performance | **6.2M req/s** | 207K req/s | ~8M req/s |
 | Binary Size | ~10MB | ~50MB | ~5MB |
 | Installation | `cargo install` | Requires libmodsecurity | `cargo install` |
 
