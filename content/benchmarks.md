@@ -201,13 +201,17 @@ Pure Rust ModSecurity implementation with full OWASP CRS compatibility. Benchmar
 
 ### Rule Parsing
 
+Optimized with lazy regex compilation for fast rule loading.
+
 | Rule Type | Parse Time |
 |-----------|------------|
-| Simple rule | 1.29 µs |
-| SQLi detection rule | 1.77 µs |
-| XSS detection rule | 1.49 µs |
-| Chain rule | 3.88 µs |
-| Complex rule (transforms) | 117 µs |
+| Simple rule | 1.21 µs |
+| SQLi detection rule | 1.73 µs |
+| XSS detection rule | 1.46 µs |
+| Chain rule | 2.45 µs |
+| Complex rule (transforms) | **2.75 µs** |
+
+Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
 
 ### Transformations
 
@@ -305,6 +309,15 @@ Direct benchmark comparison against libmodsecurity 3.0.14 (the reference C++ imp
 |--------|-----------------|----------------|
 | **Clean request throughput** | 6.2M req/s | 207K req/s |
 | **Attack detection throughput** | 3.2M req/s | 176K req/s |
+
+#### Rule Parsing Comparison
+
+| Rule Type | sentinel-modsec | libmodsecurity | Speedup |
+|-----------|-----------------|----------------|---------|
+| **Simple rule** | 1.21 µs | 3.28 µs | **2.7x faster** |
+| **Complex rule** | 2.75 µs | 10.07 µs | **3.6x faster** |
+
+PHF (perfect hash functions) for O(1) operator/variable lookup and lazy regex compilation make sentinel-modsec faster at parsing ModSecurity rules.
 
 **Why is sentinel-modsec faster?**
 - Pure Rust with zero-copy parsing where possible
