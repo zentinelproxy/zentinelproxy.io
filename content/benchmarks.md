@@ -237,6 +237,82 @@ Pure Rust ModSecurity implementation with full OWASP CRS compatibility. Benchmar
 - **Body processing** scales linearly at ~40 MB/s throughput
 - **Pure Rust** - zero C/C++ dependencies, full OWASP CRS compatibility
 
+### Comparison vs libmodsecurity (C++)
+
+Direct benchmark comparison against libmodsecurity 3.0.14 (the reference C++ implementation).
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">30x</div>
+        <div class="stat-label">Faster</div>
+        <div class="stat-detail">Clean requests</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">18x</div>
+        <div class="stat-label">Faster</div>
+        <div class="stat-detail">Attack detection</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value stat-value--success">10x</div>
+        <div class="stat-label">Faster</div>
+        <div class="stat-detail">Body processing</div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <div class="chart-title">Transaction Processing Latency (Lower is Better)</div>
+    <div class="bar-chart">
+        <div class="bar-item">
+            <span class="bar-label">sentinel (clean)</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--success" style="width: 3.3%;"></div>
+            </div>
+            <span class="bar-value">161 ns</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">libmodsec (clean)</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--secondary" style="width: 100%;"></div>
+            </div>
+            <span class="bar-value">4,831 ns</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">sentinel (SQLi)</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--success" style="width: 5.3%;"></div>
+            </div>
+            <span class="bar-value">295 ns</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">libmodsec (SQLi)</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--secondary" style="width: 100%;"></div>
+            </div>
+            <span class="bar-value">5,545 ns</span>
+        </div>
+    </div>
+</div>
+
+| Benchmark | sentinel-modsec | libmodsecurity | Speedup |
+|-----------|-----------------|----------------|---------|
+| **Clean request** | 161 ns | 4,831 ns | **30x faster** |
+| **SQLi attack request** | 295 ns | 5,545 ns | **18.8x faster** |
+| **POST body with SQLi** | 1.24 µs | 12.93 µs | **10.4x faster** |
+| **Clean traffic throughput** | 203 ns | 4,937 ns | **24.3x faster** |
+| **Attack traffic throughput** | 316 ns | 5,678 ns | **18x faster** |
+
+| Metric | sentinel-modsec | libmodsecurity |
+|--------|-----------------|----------------|
+| **Clean request throughput** | 6.2M req/s | 207K req/s |
+| **Attack detection throughput** | 3.2M req/s | 176K req/s |
+
+**Why is sentinel-modsec faster?**
+- Pure Rust with zero-copy parsing where possible
+- Aho-Corasick for O(n) multi-pattern matching
+- RegexSet for single-pass multi-regex evaluation
+- No C FFI overhead or memory allocation crossing language boundaries
+- Optimized data structures (no std::string copies)
+
 ---
 
 ## Soak Test Results
