@@ -490,10 +490,16 @@ async function copyToClipboard(text, button) {
 window.copyCLICommand = async function(button, command) {
     try {
         await navigator.clipboard.writeText(command);
-        button.classList.add('copied');
-        setTimeout(() => {
-            button.classList.remove('copied');
-        }, 2000);
+        const span = button.querySelector('span');
+        if (span) {
+            const originalText = span.textContent;
+            span.textContent = 'Copied!';
+            button.classList.add('copied');
+            setTimeout(() => {
+                span.textContent = originalText;
+                button.classList.remove('copied');
+            }, 2000);
+        }
     } catch (e) {
         console.error('Failed to copy:', e);
     }
