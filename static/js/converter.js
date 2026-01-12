@@ -266,15 +266,12 @@ api.example.com {
 // Initialize WASM
 async function initWasm() {
     setStatus('loading', 'Loading...');
-    console.log('Initializing WASM...');
     try {
         await init();
-        console.log('WASM module loaded');
         init_panic_hook();
         wasmReady = true;
 
         const version = get_version();
-        console.log('WASM version:', version);
         wasmVersion.textContent = `v${version}`;
 
         setStatus('ready', 'Ready');
@@ -282,7 +279,6 @@ async function initWasm() {
 
         // Auto-convert on load if there's content
         if (sourceEditor.value.trim()) {
-            console.log('Auto-converting initial content...');
             convertConfig();
         }
     } catch (e) {
@@ -317,7 +313,6 @@ function convertConfig() {
     try {
         const result = convert(source, format);
         lastConversion = result;
-        console.log('Conversion result:', result);
 
         if (result.success) {
             outputEditor.value = result.kdl;
