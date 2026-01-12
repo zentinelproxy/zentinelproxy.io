@@ -65,6 +65,9 @@ url = "/customize/"
 [[extra.nav_links.children]]
 name = "Playground"
 url = "/playground/"
+[[extra.nav_links.children]]
+name = "Converter"
+url = "/converter/"
 
 [[extra.nav_links]]
 name = "Explore"
