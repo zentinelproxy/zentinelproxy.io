@@ -11,7 +11,7 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.5.0"
+version = "0.6.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-waf"
 homepage = "https://sentinel.raskell.io/agents/waf/"
@@ -67,6 +67,7 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 - **Metrics**: Prometheus, OpenTelemetry, JSON export
 
 ### Operational
+- **WebSocket Inspection**: Text/binary frame inspection with fragment accumulation
 - **Streaming Inspection**: Sliding window for constant memory usage
 - **Plugin Architecture**: Extensible detection and scoring
 - **Health Checks**: Readiness/liveness probes for Kubernetes
@@ -87,6 +88,7 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 |-------|-------|--------|
 | Unit tests | 208 | Pass |
 | Integration tests | 29 | Pass |
+| WebSocket tests | 27 | Pass |
 | CRS compatibility | 15 | Pass |
 
 ## Installation
@@ -132,6 +134,10 @@ sentinel-waf-agent \
 | `--body-inspection` | `WAF_BODY_INSPECTION` | Request body inspection | `true` |
 | `--max-body-size` | `WAF_MAX_BODY_SIZE` | Max body size (bytes) | `1048576` |
 | `--response-inspection` | `WAF_RESPONSE_INSPECTION` | Response body inspection | `false` |
+| `--websocket-inspection` | `WAF_WEBSOCKET_INSPECTION` | WebSocket frame inspection | `false` |
+| `--websocket-text-frames` | `WAF_WEBSOCKET_TEXT_FRAMES` | Inspect text frames | `true` |
+| `--websocket-binary-frames` | `WAF_WEBSOCKET_BINARY_FRAMES` | Inspect binary frames | `false` |
+| `--websocket-max-frame-size` | `WAF_WEBSOCKET_MAX_FRAME_SIZE` | Max frame size (bytes) | `65536` |
 | `--verbose`, `-v` | `WAF_VERBOSE` | Debug logging | `false` |
 
 ### Sentinel Configuration
@@ -202,6 +208,15 @@ Full configuration via the agent protocol:
   "metrics": {
     "enabled": true,
     "per-rule-metrics": true
+  },
+  "websocket": {
+    "enabled": true,
+    "inspect-text-frames": true,
+    "inspect-binary-frames": false,
+    "max-frame-size": 65536,
+    "block-mode": true,
+    "accumulate-fragments": true,
+    "max-message-size": 1048576
   }
 }
 ```
@@ -346,6 +361,42 @@ Detects and optionally masks sensitive data in responses:
   }
 }
 ```
+
+## WebSocket Inspection
+
+Detect attacks in WebSocket traffic for real-time applications like chat, gaming, and streaming.
+
+**Features:**
+- Text and binary frame inspection
+- Fragmented message accumulation
+- Direction-aware detection (client→server, server→client)
+- Block or detect-only modes
+
+```json
+{
+  "websocket": {
+    "enabled": true,
+    "inspect-text-frames": true,
+    "inspect-binary-frames": false,
+    "max-frame-size": 65536,
+    "block-mode": true,
+    "accumulate-fragments": true,
+    "max-message-size": 1048576
+  }
+}
+```
+
+**Configuration Options:**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `enabled` | `false` | Enable WebSocket inspection |
+| `inspect-text-frames` | `true` | Inspect text frames |
+| `inspect-binary-frames` | `false` | Inspect binary frames |
+| `max-frame-size` | `65536` | Maximum frame size to inspect |
+| `block-mode` | `true` | Block attacks or detect-only |
+| `accumulate-fragments` | `true` | Reassemble fragmented messages |
+| `max-message-size` | `1048576` | Max accumulated message size |
 
 ## Metrics
 
