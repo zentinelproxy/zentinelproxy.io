@@ -1,6 +1,6 @@
 +++
 title = "WAF (Web Application Firewall)"
-description = "Next-generation WAAP with ML-powered detection, anomaly scoring, API security, bot protection, and 200+ rules."
+description = "Next-generation WAAP with ML-powered detection, anomaly scoring, API security, schema validation, bot protection, and 285 rules."
 template = "agent.html"
 
 [taxonomies]
@@ -11,7 +11,7 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.6.0"
+version = "0.9.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-waf"
 homepage = "https://sentinel.raskell.io/agents/waf/"
@@ -31,7 +31,7 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 
 ## Key Features
 
-### Core Detection (200+ Rules)
+### Core Detection (285 Rules)
 - **SQL Injection**: UNION, blind, time-based, stacked queries, NoSQL
 - **Cross-Site Scripting**: Reflected, stored, DOM-based, polyglot
 - **Command Injection**: Unix, Windows, PowerShell, expression languages
@@ -50,6 +50,7 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 - **GraphQL Protection**: Introspection blocking, depth/complexity limits
 - **JWT Validation**: "none" algorithm, weak algorithms, expiry detection
 - **JSON Security**: Depth limits, NoSQL injection patterns
+- **Schema Validation**: OpenAPI 3.0/3.1 and GraphQL SDL validation (optional feature)
 
 ### Bot Detection
 - **Scanner Fingerprints**: SQLMap, Nikto, Nmap, Burp Suite, etc.
@@ -105,6 +106,14 @@ cargo install sentinel-agent-waf
 git clone https://github.com/raskell-io/sentinel-agent-waf
 cd sentinel-agent-waf
 cargo build --release
+```
+
+### With Schema Validation
+
+Enable OpenAPI/GraphQL schema validation:
+
+```bash
+cargo build --release --features schema-validation
 ```
 
 ## Configuration
@@ -398,6 +407,88 @@ Detect attacks in WebSocket traffic for real-time applications like chat, gaming
 | `accumulate-fragments` | `true` | Reassemble fragmented messages |
 | `max-message-size` | `1048576` | Max accumulated message size |
 
+## Schema Validation
+
+Validate API requests against OpenAPI or GraphQL schemas to enforce API contracts and detect unknown endpoints.
+
+> **Note:** Requires the `schema-validation` feature flag when building from source.
+
+**Features:**
+- OpenAPI 3.0/3.1 specification validation
+- GraphQL SDL schema validation
+- Path, method, and parameter validation
+- Request body schema validation
+- Deprecated field detection (GraphQL)
+- Configurable enforcement (block, warn, ignore)
+
+```json
+{
+  "schema-validation": {
+    "enabled": true,
+    "reload-interval-secs": 300,
+    "openapi": {
+      "enabled": true,
+      "schema-source": "/etc/sentinel/openapi.yaml",
+      "validate-paths": true,
+      "validate-parameters": true,
+      "validate-request-body": true,
+      "enforcement": {
+        "default-mode": "warn",
+        "overrides": {
+          "unknown-path": "block",
+          "invalid-request-body": "block"
+        }
+      }
+    },
+    "graphql": {
+      "enabled": true,
+      "schema-source": "https://api.example.com/schema.graphql",
+      "validate-fields": true,
+      "validate-arguments": true,
+      "block-deprecated": false,
+      "enforcement": {
+        "default-mode": "warn",
+        "overrides": {
+          "unauthorized-field-access": "block"
+        }
+      }
+    }
+  }
+}
+```
+
+**Schema Sources:**
+- File path: `/etc/sentinel/openapi.yaml`
+- URL: `https://api.example.com/schema.yaml` (fetched at startup)
+
+**Enforcement Modes:**
+
+| Mode | Description |
+|------|-------------|
+| `block` | Block request on violation (403) |
+| `warn` | Log warning but allow request |
+| `ignore` | Ignore this violation type |
+
+**OpenAPI Violation Types (98300-98349):**
+
+| Rule ID | Type | Description |
+|---------|------|-------------|
+| 98300 | `unknown-path` | Path not in OpenAPI spec |
+| 98301 | `unknown-method` | HTTP method not allowed for path |
+| 98302 | `missing-required-parameter` | Required parameter missing |
+| 98303 | `invalid-parameter-type` | Parameter type mismatch |
+| 98305 | `invalid-request-body` | Request body schema violation |
+
+**GraphQL Violation Types (98350-98399):**
+
+| Rule ID | Type | Description |
+|---------|------|-------------|
+| 98350 | `unknown-type` | Unknown GraphQL type |
+| 98351 | `unknown-field` | Field not in schema |
+| 98352 | `invalid-argument` | Unknown argument |
+| 98353 | `missing-required-argument` | Required argument missing |
+| 98354 | `deprecated-field-usage` | Using deprecated field |
+
 ## Metrics
 
 ### Prometheus Format
@@ -501,10 +592,10 @@ GET /health
 
 | Feature | WAF | ModSecurity |
 |---------|-----|-------------|
-| Detection Rules | 200+ | 800+ CRS |
+| Detection Rules | 285 | 800+ CRS |
 | ML Detection | Yes | No |
 | Anomaly Scoring | Yes | Yes |
-| API Security | GraphQL, JWT | Basic |
+| API Security | GraphQL, JWT, Schema | Basic |
 | Bot Detection | Behavioral | UA only |
 | Threat Intel | Yes | No |
 | SecLang Support | No | Yes |
@@ -514,7 +605,7 @@ GET /health
 
 **Use WAF when:**
 - You want ML-powered detection with low false positives
-- You need API security (GraphQL, JWT)
+- You need API security (GraphQL, JWT, schema validation)
 - You want zero-dependency deployment
 - You need bot detection and threat intelligence
 
