@@ -228,6 +228,12 @@
     }
 }
 
+.panel-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
 .panel-header-actions {
     display: flex;
     align-items: center;
@@ -308,6 +314,7 @@
     flex: 1;
     display: flex;
     overflow: hidden;
+    position: relative;
 }
 
 .editor-container {
@@ -442,58 +449,60 @@ $editor-padding: var(--space-md);
     color: var(--ctp-sky, #89dceb);
 }
 
-// Validation Status
+// Validation Status (badge style)
 .validation-status {
-    display: flex;
+    display: none;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 4px;
     padding: var(--space-xs) var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
     background: var(--color-bg-elevated);
-    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    transition: all var(--transition-fast);
+
+    &.visible {
+        display: inline-flex;
+    }
 }
 
 .status-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-
-    svg {
-        width: 16px;
-        height: 16px;
-    }
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+    flex-shrink: 0;
 
     &.status-valid {
-        color: var(--color-success);
+        background: var(--ctp-green);
     }
 
-    &.status-invalid {
-        color: var(--color-error);
+    &.status-error {
+        background: var(--color-error);
     }
 
     &.status-warning {
-        color: var(--color-warning);
+        background: var(--color-warning);
     }
 
     &.status-loading {
-        color: var(--color-text-muted);
-
-        svg {
-            animation: spin 1s linear infinite;
-        }
+        background: var(--color-text-muted);
+        animation: pulse 1.5s ease-in-out infinite;
     }
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
 }
 
 .status-text {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-text-muted);
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
 }
 
 // Error Display
@@ -1935,12 +1944,105 @@ $editor-padding: var(--space-md);
 // Converter grid layout
 .converter-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
     margin-bottom: var(--space-lg);
 
     @media (max-width: 1024px) {
         grid-template-columns: 1fr;
+    }
+
+    // Normal mode: hide separator and add gap
+    &:not(.fullscreen) {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-lg);
+
+        .converter-separator {
+            display: none;
+        }
+    }
+
+    // Fullscreen split-pane mode
+    &.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        margin: 0;
+        background: var(--color-bg);
+        grid-template-columns: 1fr auto 1fr;
+
+        .playground-panel {
+            border-radius: 0;
+            border: none;
+            min-height: 100%;
+        }
+
+        .config-panel {
+            border-right: none;
+        }
+
+        .output-panel {
+            border-left: none;
+        }
+
+        .converter-separator {
+            display: flex;
+        }
+
+        .icon-expand {
+            display: none;
+        }
+
+        .icon-collapse {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr auto 1fr;
+
+            .converter-separator {
+                width: 100%;
+                height: 8px;
+
+                .separator-line {
+                    width: 60px;
+                    height: 4px;
+                }
+            }
+        }
+    }
+}
+
+// Separator between panels (visible in fullscreen)
+.converter-separator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 8px;
+    background: var(--color-bg);
+    cursor: col-resize;
+    transition: background var(--transition-fast);
+
+    &:hover {
+        background: var(--color-bg-elevated);
+
+        .separator-line {
+            background: var(--ctp-mauve);
+        }
+    }
+
+    .separator-line {
+        width: 4px;
+        height: 60px;
+        background: var(--color-border);
+        border-radius: 2px;
+        transition: background var(--transition-fast);
     }
 }
 
@@ -2062,21 +2164,104 @@ $editor-padding: var(--space-md);
     }
 }
 
-// Detected format badge
-.detected-format {
+// Detected format button (clickable to lock format)
+.detected-format-btn {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-xs) var(--space-sm);
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 500;
-    padding: var(--space-xs) var(--space-sm);
-    background: var(--color-bg);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
 
-    &.format-nginx { color: var(--ctp-green); }
-    &.format-haproxy { color: var(--ctp-blue); }
-    &.format-traefik { color: var(--ctp-mauve); }
-    &.format-caddy { color: var(--ctp-peach); }
-    &.format-envoy { color: var(--ctp-pink); }
+    &.visible {
+        display: inline-flex;
+    }
+
+    &:hover {
+        border-color: var(--color-text-muted);
+    }
+
+    .format-text {
+        &::before {
+            content: 'Detected: ';
+            opacity: 0.7;
+        }
+    }
+
+    .format-lock-icon {
+        display: none;
+    }
+
+    .format-unlock-icon {
+        display: block;
+        opacity: 0.5;
+    }
+
+    // Locked state
+    &.locked {
+        background: rgba(166, 227, 161, 0.15);
+        border-color: var(--color-success);
+        color: var(--color-success);
+
+        .format-text::before {
+            content: 'Locked: ';
+        }
+
+        .format-lock-icon {
+            display: block;
+        }
+
+        .format-unlock-icon {
+            display: none;
+        }
+    }
+
+    // Format-specific colors
+    &.format-nginx { color: var(--ctp-green); border-color: var(--ctp-green); }
+    &.format-haproxy { color: var(--ctp-blue); border-color: var(--ctp-blue); }
+    &.format-traefik { color: var(--ctp-mauve); border-color: var(--ctp-mauve); }
+    &.format-caddy { color: var(--ctp-peach); border-color: var(--ctp-peach); }
+    &.format-envoy { color: var(--ctp-pink); border-color: var(--ctp-pink); }
+}
+
+// Editor overlay controls (sample selector inside code block)
+.editor-overlay-controls {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 10;
+}
+
+.editor-sample-select {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.6875rem;
+    font-family: var(--font-mono);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    opacity: 0.7;
+
+    &:hover {
+        opacity: 1;
+        border-color: var(--color-text-muted);
+        background: var(--color-bg-elevated);
+    }
+
+    &:focus {
+        outline: none;
+        opacity: 1;
+        border-color: var(--ctp-mauve);
+    }
 }
 
 // Converter status indicator
@@ -2311,36 +2496,22 @@ $editor-padding: var(--space-md);
 // CLI Install Section
 // =============================================================================
 
-.cli-install-section {
+.cli-install-panel {
     margin-top: var(--space-xl);
-    padding: var(--space-xl);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
 
-    // Copy button feedback for this section
-    .copy-btn.copied {
-        border-color: var(--color-success);
-        color: var(--color-success);
+    .panel-header h2 {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+
+        svg {
+            color: var(--ctp-mauve);
+        }
     }
 }
 
-.cli-install-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
-
-    svg {
-        color: var(--ctp-mauve);
-    }
-
-    h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin: 0;
-        color: var(--color-text);
-    }
+.cli-install-content {
+    padding: var(--space-lg);
 }
 
 .cli-install-description {
@@ -2363,8 +2534,129 @@ $editor-padding: var(--space-md);
     margin-bottom: var(--space-lg);
 }
 
+.cli-code-block {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+
+    pre {
+        margin: 0;
+        padding: var(--space-md);
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        overflow-x: auto;
+    }
+
+    code {
+        background: none;
+        padding: 0;
+        font-family: inherit;
+        font-size: inherit;
+        color: var(--color-text);
+    }
+}
+
+.cli-code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.cli-code-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.cli-usage-block {
+    margin-top: 0;
+}
+
 .cli-prompt {
     color: var(--ctp-green);
     user-select: none;
     margin-right: var(--space-sm);
+}
+
+// CLI Install Widget (tabbed interface)
+.cli-install-widget {
+    margin-bottom: var(--space-lg);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.cli-install-tabs {
+    display: flex;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.cli-install-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    svg {
+        width: 16px;
+        height: 16px;
+        opacity: 0.7;
+    }
+
+    &:hover {
+        color: var(--color-text);
+        background: var(--color-bg-elevated);
+
+        svg {
+            opacity: 1;
+        }
+    }
+
+    &.active {
+        color: var(--ctp-mauve);
+        border-bottom-color: var(--ctp-mauve);
+        background: var(--color-bg-elevated);
+
+        svg {
+            opacity: 1;
+            color: var(--ctp-mauve);
+        }
+    }
+}
+
+.cli-install-cmd-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+}
+
+.cli-install-cmd {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    white-space: nowrap;
 }
