@@ -26,9 +26,12 @@ const sampleSelect = document.getElementById('sample-select');
 const convertBtn = document.getElementById('convert-btn');
 const copySourceBtn = document.getElementById('copy-source-btn');
 const copyOutputBtn = document.getElementById('copy-output-btn');
+const fullscreenSourceBtn = document.getElementById('fullscreen-source-btn');
+const fullscreenOutputBtn = document.getElementById('fullscreen-output-btn');
+const converterGrid = document.getElementById('converter-grid');
+const validationStatus = document.getElementById('validation-status');
 const statusIcon = document.getElementById('status-icon');
 const statusText = document.getElementById('status-text');
-const detectedFormat = document.getElementById('detected-format');
 const errorDisplay = document.getElementById('error-display');
 const agentsPanel = document.getElementById('agents-panel');
 const agentsContent = document.getElementById('agents-content');
@@ -37,6 +40,15 @@ const warningsPanel = document.getElementById('warnings-panel');
 const warningsContent = document.getElementById('warnings-content');
 const warningsCount = document.getElementById('warnings-count');
 const wasmVersion = document.getElementById('wasm-version');
+const cliInstallCmd = document.getElementById('cli-install-cmd');
+const cliCopyBtn = document.getElementById('cli-copy-btn');
+const cliInstallTabs = document.querySelectorAll('.cli-install-tab');
+
+// Install commands for each method
+const INSTALL_COMMANDS = {
+    cargo: 'cargo install sentinel-convert',
+    source: 'git clone https://github.com/raskell-io/sentinel && cd sentinel && cargo install --path crates/sentinel-convert'
+};
 
 // Sample configurations
 const SAMPLES = {
@@ -265,7 +277,6 @@ api.example.com {
 
 // Initialize WASM
 async function initWasm() {
-    setStatus('loading', 'Loading...');
     try {
         await init();
         init_panic_hook();
@@ -274,7 +285,6 @@ async function initWasm() {
         const version = get_version();
         wasmVersion.textContent = `v${version}`;
 
-        setStatus('ready', 'Ready');
         convertBtn.disabled = false;
 
         // Auto-convert on load if there's content
@@ -283,15 +293,16 @@ async function initWasm() {
         }
     } catch (e) {
         console.error('Failed to load WASM:', e);
-        setStatus('error', 'Failed to load');
         convertBtn.disabled = true;
     }
 }
 
 // Set status indicator
 function setStatus(status, text) {
+    if (!validationStatus) return;
     statusIcon.className = 'status-icon status-' + status;
     statusText.textContent = text;
+    validationStatus.classList.toggle('visible', status !== 'hidden');
 }
 
 // Convert configuration
@@ -302,7 +313,7 @@ function convertConfig() {
     if (!source.trim()) {
         outputEditor.value = '';
         outputCode.textContent = '';
-        detectedFormat.textContent = '';
+        setStatus('hidden', '');
         hideAgentsPanel();
         hideWarningsPanel();
         return;
@@ -318,9 +329,6 @@ function convertConfig() {
             outputEditor.value = result.kdl;
             outputCode.textContent = result.kdl;
             highlightKdl();
-
-            detectedFormat.textContent = `Detected: ${result.format}`;
-            detectedFormat.className = 'detected-format format-' + result.format;
 
             setStatus('valid', 'Converted');
             hideError();
@@ -474,36 +482,35 @@ function loadSample(sampleId) {
 async function copyToClipboard(text, button) {
     try {
         await navigator.clipboard.writeText(text);
-        const originalTitle = button.title;
-        button.title = 'Copied!';
-        button.classList.add('copied');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        button.style.color = 'var(--color-success)';
         setTimeout(() => {
-            button.title = originalTitle;
-            button.classList.remove('copied');
+            button.innerHTML = originalHTML;
+            button.style.color = '';
         }, 2000);
     } catch (e) {
         console.error('Failed to copy:', e);
     }
 }
 
-// Copy CLI command (exposed globally for onclick handlers)
-window.copyCLICommand = async function(button, command) {
-    try {
-        await navigator.clipboard.writeText(command);
-        const span = button.querySelector('span');
-        if (span) {
-            const originalText = span.textContent;
-            span.textContent = 'Copied!';
-            button.classList.add('copied');
-            setTimeout(() => {
-                span.textContent = originalText;
-                button.classList.remove('copied');
-            }, 2000);
-        }
-    } catch (e) {
-        console.error('Failed to copy:', e);
+// Toggle fullscreen split-pane view
+function toggleFullscreen() {
+    converterGrid.classList.toggle('fullscreen');
+    document.body.style.overflow = converterGrid.classList.contains('fullscreen') ? 'hidden' : '';
+
+    // Handle escape key to exit fullscreen
+    if (converterGrid.classList.contains('fullscreen')) {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                converterGrid.classList.remove('fullscreen');
+                document.body.style.overflow = '';
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
     }
-};
+}
 
 // Escape HTML
 function escapeHtml(text) {
@@ -549,6 +556,32 @@ document.addEventListener('DOMContentLoaded', () => {
     copyOutputBtn.addEventListener('click', () => {
         copyToClipboard(outputEditor.value, copyOutputBtn);
     });
+
+    // Fullscreen buttons (both toggle the split-pane view)
+    fullscreenSourceBtn.addEventListener('click', toggleFullscreen);
+    fullscreenOutputBtn.addEventListener('click', toggleFullscreen);
+
+    // CLI install tabs
+    cliInstallTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active tab
+            cliInstallTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Update command
+            const method = tab.dataset.method;
+            if (INSTALL_COMMANDS[method]) {
+                cliInstallCmd.textContent = INSTALL_COMMANDS[method];
+            }
+        });
+    });
+
+    // CLI copy button
+    if (cliCopyBtn && cliInstallCmd) {
+        cliCopyBtn.addEventListener('click', () => {
+            copyToClipboard(cliInstallCmd.textContent, cliCopyBtn);
+        });
+    }
 
     // Keyboard shortcut: Ctrl/Cmd + Enter to convert
     sourceEditor.addEventListener('keydown', (e) => {
