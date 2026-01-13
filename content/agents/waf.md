@@ -129,6 +129,28 @@ Enable OpenAPI/GraphQL schema validation:
 cargo build --release --features schema-validation
 ```
 
+### Kubernetes (Kustomize)
+
+```bash
+kubectl apply -k https://github.com/raskell-io/sentinel-agent-waf/deploy/kubernetes
+```
+
+### Helm Chart
+
+```bash
+# Install from local chart
+helm install sentinel-waf ./deploy/helm/sentinel-waf \
+  --namespace sentinel \
+  --create-namespace
+
+# With custom values
+helm install sentinel-waf ./deploy/helm/sentinel-waf \
+  --namespace sentinel \
+  --create-namespace \
+  --set waf.paranoiaLevel=2 \
+  --set replicaCount=3
+```
+
 ## Configuration
 
 ### Command Line
