@@ -76,12 +76,25 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 
 ## Performance
 
+Validated via Criterion benchmarks (v1.0.0):
+
 | Metric | Target | Actual |
 |--------|--------|--------|
-| Rule matching (1KB input) | <5ms | ~2ms |
-| Memory per request | <1KB | ~500B |
-| Throughput | >50K req/s | 65K req/s |
+| Single value check (1KB) | <5ms | **2.17µs** |
+| Full request check | <5ms | **3.56µs** |
+| Paranoia Level 4 check | <5ms | **2.34µs** |
+| Throughput | >50K req/s | **1.6M req/s** |
+| Memory (PL4 all features) | <50MB | **47.58MB** |
 | Binary size | <10MB | ~6MB |
+
+### Memory by Paranoia Level
+
+| Paranoia Level | Steady State |
+|----------------|--------------|
+| Level 1 | 13.06 MB |
+| Level 2 | 23.16 MB |
+| Level 3 | 34.27 MB |
+| Level 4 | 47.58 MB |
 
 ## Test Coverage
 
@@ -601,7 +614,7 @@ GET /health
 | SecLang Support | No | Yes |
 | Dependencies | Pure Rust | libmodsecurity |
 | Binary Size | ~6MB | ~50MB |
-| Latency p99 | <5ms | ~15ms |
+| Latency p99 | <5µs | ~15ms |
 
 **Use WAF when:**
 - You want ML-powered detection with low false positives
