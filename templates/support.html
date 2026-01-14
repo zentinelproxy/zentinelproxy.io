@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Support | {{ config.title }}{% endblock %}
+{% block description %}Support Sentinel's mission to guard the free web. Sponsor tiers, commercial support plans, and enterprise builds.{% endblock %}
+
+{% block content %}
+<div class="support-page">
+    <!-- Hero Section -->
+    <section class="support-hero">
+        <div class="container">
+            <h1 class="support-title">
+                <span class="gradient-text">Support Sentinel</span>
+            </h1>
+            <p class="support-subtitle">
+                Sentinel stays open source. You pay for <strong>assurance</strong> and <strong>operational deliverables</strong>.
+            </p>
+        </div>
+    </section>
+
+    <!-- Intro Section -->
+    <section class="support-intro">
+        <div class="container">
+            <div class="intro-content">
+                <p>
+                    Sentinel exists to keep critical web infrastructure <strong>boring, inspectable, and shared</strong>. We believe security-focused edge infrastructure should be transparent, forkable, and free from vendor lock-in.
+                </p>
+                <p>
+                    Your support funds CI/CD infrastructure, security audits, documentation, and the maintainers who keep Sentinel production-ready. Whether you're a solo developer or an enterprise team, there's a way to contribute.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sponsors Section -->
+    <section class="support-section sponsors-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                Sponsors
+            </h2>
+            <p class="section-description">
+                Sponsorships support ongoing development and help keep Sentinel free for everyone.
+            </p>
+
+            <div class="sponsor-tiers">
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <span class="tier-price">$10</span>
+                        <span class="tier-period">/month</span>
+                    </div>
+                    <h3 class="tier-name">Community Champion</h3>
+                    <ul class="tier-perks">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Name in SPONSORS.md
+                        </li>
+                    </ul>
+                    <a href="https://github.com/sponsors/raskell-io" class="tier-btn" target="_blank" rel="noopener">
+                        Sponsor
+                    </a>
+                </div>
+
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <span class="tier-price">$50</span>
+                        <span class="tier-period">/month</span>
+                    </div>
+                    <h3 class="tier-name">Backer</h3>
+                    <ul class="tier-perks">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Name in SPONSORS.md
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Logo on website
+                        </li>
+                    </ul>
+                    <a href="https://github.com/sponsors/raskell-io" class="tier-btn" target="_blank" rel="noopener">
+                        Sponsor
+                    </a>
+                </div>
+
+                <div class="sponsor-tier featured">
+                    <div class="tier-badge">Popular</div>
+                    <div class="tier-header">
+                        <span class="tier-price">$250</span>
+                        <span class="tier-period">/month</span>
+                    </div>
+                    <h3 class="tier-name">Patron</h3>
+                    <ul class="tier-perks">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Everything in Backer
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Priority issue triage
+                        </li>
+                    </ul>
+                    <a href="https://github.com/sponsors/raskell-io" class="tier-btn tier-btn--primary" target="_blank" rel="noopener">
+                        Sponsor
+                    </a>
+                </div>
+
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <span class="tier-price">$1,000</span>
+                        <span class="tier-period">/month</span>
+                    </div>
+                    <h3 class="tier-name">Guardian</h3>
+                    <ul class="tier-perks">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Everything in Patron
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Logo in README and docs
+                        </li>
+                    </ul>
+                    <a href="https://github.com/sponsors/raskell-io" class="tier-btn" target="_blank" rel="noopener">
+                        Sponsor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Commercial Support Section - Commented out for now
+    <!-- Support Plans Section -->
+    <section class="support-section plans-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                Commercial Support
+            </h2>
+            <p class="section-description">
+                SLA-backed support for teams running Sentinel in production. Get guaranteed response times, incident assistance, and direct access to maintainers.
+            </p>
+
+            <div class="support-plans">
+                <div class="support-plan">
+                    <h3 class="plan-name">Business</h3>
+                    <p class="plan-description">For teams getting started with Sentinel in production</p>
+                    <div class="plan-price">
+                        <span class="price-amount">$2,000</span>
+                        <span class="price-period">/year</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>48h response SLA</strong> (business hours)
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Email support
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Configuration review (1x/year)
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Access to private support channel
+                        </li>
+                    </ul>
+                    <a href="mailto:support@raskell.io?subject=Sentinel Business Support" class="plan-btn">
+                        Contact Sales
+                    </a>
+                </div>
+
+                <div class="support-plan featured">
+                    <div class="plan-badge">Recommended</div>
+                    <h3 class="plan-name">Production</h3>
+                    <p class="plan-description">For teams with mission-critical deployments</p>
+                    <div class="plan-price">
+                        <span class="price-amount">$8,000</span>
+                        <span class="price-period">/year</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>4h response SLA</strong> (business hours)
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>24h response</strong> (critical issues, 24/7)
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Slack/Teams integration
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Quarterly architecture reviews
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Incident post-mortem assistance
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Up to 5 named contacts
+                        </li>
+                    </ul>
+                    <a href="mailto:support@raskell.io?subject=Sentinel Production Support" class="plan-btn plan-btn--primary">
+                        Contact Sales
+                    </a>
+                </div>
+
+                <div class="support-plan">
+                    <h3 class="plan-name">Enterprise</h3>
+                    <p class="plan-description">For organizations with complex requirements</p>
+                    <div class="plan-price">
+                        <span class="price-amount">Custom</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <strong>1h response SLA</strong> (critical issues, 24/7)
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Dedicated support engineer
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Custom SLA terms
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            On-site training available
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Roadmap input
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Unlimited named contacts
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Includes Enterprise Builds
+                        </li>
+                    </ul>
+                    <a href="mailto:support@raskell.io?subject=Sentinel Enterprise Support" class="plan-btn">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    #}
+
+    {# Enterprise Builds Section - Commented out for now
+    <!-- Enterprise Builds Section -->
+    <section class="support-section builds-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                Enterprise Builds
+            </h2>
+            <p class="section-description">
+                Production-ready artifacts for teams that need supply chain security, compliance documentation, and long-term stability.
+            </p>
+
+            <div class="builds-grid">
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    </div>
+                    <h3>Signed Artifacts</h3>
+                    <p>Binaries signed with Sigstore/cosign with full provenance attestation. Verify authenticity before deployment.</p>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
+                    <h3>SBOM & Vulnerability Reports</h3>
+                    <p>SPDX and CycloneDX software bill of materials. Automated vulnerability scanning with each release.</p>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>LTS Releases</h3>
+                    <p>Long-term support branches with 12-month backport windows. Security patches without feature churn.</p>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    </div>
+                    <h3>Config Stability</h3>
+                    <p>Guaranteed configuration compatibility within LTS windows. No surprise breaking changes.</p>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                    </div>
+                    <h3>Security Advisories</h3>
+                    <p>Early notification of security issues with patch timelines. Private disclosure before public announcement.</p>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    </div>
+                    <h3>Update Channel</h3>
+                    <p>Automated update notifications with checksums. Integrate with your deployment pipeline.</p>
+                </div>
+            </div>
+
+            <div class="builds-pricing">
+                <div class="builds-card">
+                    <h3>Enterprise Builds</h3>
+                    <div class="builds-price">
+                        <span class="price-amount">$5,000</span>
+                        <span class="price-period">/year</span>
+                    </div>
+                    <p>Everything your procurement team needs to approve Sentinel for production.</p>
+                    <a href="mailto:support@raskell.io?subject=Sentinel Enterprise Builds" class="builds-btn">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    #}
+
+    {# Cloud Marketplace Section - Commented out for now
+    <!-- AWS Marketplace Section -->
+    <section class="support-section marketplace-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Cloud Marketplace
+            </h2>
+            <p class="section-description">
+                Deploy Sentinel directly from AWS Marketplace. Billing through your existing cloud account.
+            </p>
+
+            <div class="marketplace-cards">
+                <div class="marketplace-card">
+                    <div class="marketplace-badge">Free</div>
+                    <h3>Community AMI</h3>
+                    <p>Standard Sentinel build for evaluation, demos, and development. Same features as the open source release.</p>
+                    <span class="marketplace-status">Coming Soon</span>
+                </div>
+
+                <div class="marketplace-card">
+                    <div class="marketplace-card">
+                    <div class="marketplace-badge">Paid</div>
+                    <h3>Hardened AMI</h3>
+                    <p>CIS-hardened base image with security defaults, logging enabled, and production-ready TLS configuration.</p>
+                    <span class="marketplace-status">Coming Soon</span>
+                </div>
+
+                <div class="marketplace-card featured">
+                    <div class="marketplace-badge">Paid + Support</div>
+                    <h3>Enterprise AMI</h3>
+                    <p>Includes hardened image, signed updates, LTS track, and support entitlements. Full enterprise package.</p>
+                    <span class="marketplace-status">Coming Soon</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    #}
+
+    <!-- CTA Section -->
+    <section class="support-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Questions? Let's talk.</h2>
+                <p>Not sure which option is right for you? We're happy to help you figure out the best path forward.</p>
+                <div class="cta-actions">
+                    <a href="mailto:support@raskell.io" class="cta-btn cta-btn--primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        support@raskell.io
+                    </a>
+                    <a href="https://github.com/raskell-io/sentinel/discussions" class="cta-btn" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        GitHub Discussions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
