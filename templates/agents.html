@@ -1026,6 +1026,7 @@
                         <button class="code-tab" data-lang="python">Python</button>
                         <button class="code-tab" data-lang="typescript">TypeScript</button>
                         <button class="code-tab" data-lang="elixir">Elixir</button>
+                        <button class="code-tab" data-lang="haskell">Haskell</button>
                     </div>
                     <div class="code-panels">
                         <pre class="code-panel active language-rust" data-lang="rust"><code class="language-rust">use sentinel_agent_sdk::{Agent, Decision, Request};
@@ -1114,6 +1115,20 @@ class MyAgent extends Agent {
     end
   end
 end</code></pre>
+                        <pre class="code-panel language-haskell" data-lang="haskell"><code class="language-haskell">import Sentinel.Agent.Protocol
+import Data.Text qualified as T
+
+instance AgentHandler IO where
+  capabilities = pure $ defaultCapabilities "my-agent"
+
+  onRequestHeaders event =
+    if "/admin" `T.isPrefixOf` reqHdrUri event
+      then pure $ block 403 "Access denied"
+             `withAudit` AuditMetadata ["blocked"] [] Nothing [] mempty
+      else pure allow
+
+main :: IO ()
+main = runAgent defaultConfig id</code></pre>
                     </div>
                 </div>
 
