@@ -10,7 +10,7 @@ tags = ["security", "waf", "modsecurity", "owasp", "crs", "pure-rust"]
 official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
-status = "Alpha"
+status = "Stable"
 version = "0.1.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-sentinelsec"
@@ -22,14 +22,14 @@ crate_name = "sentinel-agent-sentinelsec"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_sentinel_version = "26.01.0"
 +++
 
 ## Overview
 
 SentinelSec is a pure Rust ModSecurity-compatible WAF agent for Sentinel. It provides full OWASP Core Rule Set (CRS) support with **zero C dependencies** - no libmodsecurity installation required.
 
-> **Alpha Release:** This agent is in early development. Core functionality works but expect API changes.
+> **Beta Release:** This agent is feature-complete and undergoing final testing. API is stable but may have minor adjustments before 1.0.
 
 ## Features
 

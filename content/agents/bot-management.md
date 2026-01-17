@@ -10,7 +10,7 @@ tags = ["security", "bot-detection", "core"]
 official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
-status = "Beta"
+status = "Stable"
 version = "0.1.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-bot-management"
@@ -22,7 +22,7 @@ crate_name = "sentinel-agent-bot-management"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_sentinel_version = "26.01.0"
 +++
 
 ## Overview

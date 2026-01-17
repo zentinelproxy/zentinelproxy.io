@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Deprecated"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-ratelimit"
 homepage = "https://sentinel.raskell.io/agents/ratelimit/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-ratelimit"
@@ -160,6 +160,17 @@ For complete documentation on built-in rate limiting, see:
 
 The following documentation is preserved for users still migrating from the agent.
 
+### Protocol v2 Features
+
+As of v0.2.0, the rate limiter agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with load metrics
+- **Metrics export**: Counter and gauge metrics for monitoring
+- **gRPC transport**: Optional high-performance gRPC transport
+- **Lifecycle hooks**: Graceful shutdown and drain handling
+- **Flow control**: Backpressure-aware request handling
+
 ### Overview
 
 The Rate Limiter agent provides flexible traffic control using the token bucket algorithm. Protect your upstream services from traffic spikes and abuse.
@@ -185,6 +196,15 @@ cargo install sentinel-agent-ratelimit
 docker pull ghcr.io/raskell-io/sentinel-agent-ratelimit:latest
 ```
 
+### CLI Options
+
+| Option | Env Var | Default | Description |
+|--------|---------|---------|-------------|
+| `--socket` | `RATELIMIT_AGENT_SOCKET` | `/var/run/sentinel/ratelimit.sock` | UDS socket path |
+| `--grpc-address` | `RATELIMIT_AGENT_GRPC_ADDRESS` | - | gRPC listen address (e.g., `0.0.0.0:50051`) |
+| `--log-level` | `RUST_LOG` | `info` | Log level (trace, debug, info, warn, error) |
+| `--json-logs` | - | `false` | Output logs in JSON format |
+
 ### Configuration
 
 Add the agent to your Sentinel configuration:
@@ -194,6 +214,26 @@ agent "ratelimit" {
     socket "/var/run/sentinel/ratelimit.sock"
     timeout 100ms
     fail-open false
+
+    config {
+        default-limit 100
+        window-seconds 60
+        burst-size 20
+        key-type "ip"
+    }
+}
+```
+
+#### gRPC Transport (v2)
+
+For higher throughput, use gRPC transport:
+
+```kdl
+agent "ratelimit" {
+    grpc "localhost:50051"
+    timeout 100ms
+    fail-open false
+    protocol "v2"
 
     config {
         default-limit 100

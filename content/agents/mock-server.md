@@ -10,7 +10,7 @@ tags = ["mock", "testing", "development", "stubs", "api"]
 official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
-status = "Beta"
+status = "Stable"
 version = "0.1.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-mock-server"
@@ -22,7 +22,7 @@ crate_name = "sentinel-agent-mock-server"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_sentinel_version = "26.01.0"
 +++
 
 ## Overview
