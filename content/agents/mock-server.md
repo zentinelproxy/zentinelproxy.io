@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-mock-server"
 homepage = "https://sentinel.raskell.io/agents/mock-server/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-mock-server"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the Mock Server agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with draining awareness
+- **Metrics export**: Counter metrics for requests matched/unmatched
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -462,6 +472,7 @@ sentinel-agent-mock-server [OPTIONS]
 Options:
   -c, --config <PATH>        Configuration file [default: mock-server.yaml]
   -s, --socket <PATH>        Unix socket path [default: /tmp/sentinel-mock-server.sock]
+      --grpc-address <ADDR>  gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>    Log level [default: info]
       --print-config         Print example configuration
       --validate             Validate configuration and exit

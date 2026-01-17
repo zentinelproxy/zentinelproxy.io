@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "MIT"
 repo = "https://github.com/raskell-io/sentinel-agent-grpc-inspector"
 homepage = "https://sentinel.raskell.io/agents/grpc-inspector/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-grpc-inspector"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the gRPC Inspector agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for requests processed/blocked/allowed
+- **gRPC transport**: High-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -195,9 +205,10 @@ cargo build --release
 sentinel-agent-grpc-inspector [OPTIONS]
 
 Options:
-  -c, --config <FILE>     Path to configuration file [default: grpc-inspector.yaml]
-  -s, --socket <PATH>     Unix socket path [default: /tmp/sentinel-grpc-inspector.sock]
-  -L, --log-level <LEVEL> Log level [default: info]
+  -c, --config <FILE>       Path to configuration file [default: grpc-inspector.yaml]
+  -s, --socket <PATH>       Unix socket path
+  -g, --grpc-address <ADDR> gRPC listen address (e.g., 0.0.0.0:50051)
+  -L, --log-level <LEVEL>   Log level [default: info]
       --print-config      Print example configuration and exit
       --validate          Validate configuration and exit
   -h, --help              Print help
