@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "MIT"
 repo = "https://github.com/raskell-io/sentinel-agent-ip-reputation"
 homepage = "https://sentinel.raskell.io/agents/ip-reputation/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-ip-reputation"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the IP Reputation agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with draining awareness
+- **Metrics export**: Counter metrics for lookups, blocks, allowlist matches, failures
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -165,9 +175,10 @@ cargo build --release
 sentinel-agent-ip-reputation [OPTIONS]
 
 Options:
-  -c, --config <FILE>     Path to configuration file [default: ip-reputation.yaml]
-  -s, --socket <PATH>     Unix socket path [default: /tmp/sentinel-ip-reputation.sock]
-  -L, --log-level <LEVEL> Log level [default: info]
+  -c, --config <FILE>       Path to configuration file [default: ip-reputation.yaml]
+  -s, --socket <PATH>       Unix socket path [default: /tmp/sentinel-ip-reputation.sock]
+      --grpc-address <ADDR> gRPC listen address (e.g., 0.0.0.0:50051)
+  -L, --log-level <LEVEL>   Log level [default: info]
       --print-config      Print example configuration and exit
       --validate          Validate configuration and exit
   -h, --help              Print help
