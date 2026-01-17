@@ -11,18 +11,18 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.9.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-waf"
 homepage = "https://sentinel.raskell.io/agents/waf/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-waf"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_sentinel_version = "26.01.0"
 +++
 
 ## Overview
@@ -73,6 +73,13 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 - **Plugin Architecture**: Extensible detection and scoring
 - **Health Checks**: Readiness/liveness probes for Kubernetes
 - **Graceful Shutdown**: SIGINT/SIGTERM handling
+
+### Protocol v2
+- **gRPC Transport**: High-performance gRPC transport for production deployments
+- **Health Reporting**: Automatic health status reporting to proxy
+- **Metrics Export**: Built-in metrics (requests, blocks, detections by attack type)
+- **Capability Negotiation**: Dynamic feature discovery during handshake
+- **Graceful Lifecycle**: Proper drain and shutdown handling
 
 ## Performance
 
@@ -156,8 +163,15 @@ helm install sentinel-waf ./deploy/helm/sentinel-waf \
 ### Command Line
 
 ```bash
+# UDS transport (default)
 sentinel-waf-agent \
   --socket /var/run/sentinel/waf.sock \
+  --paranoia-level 2 \
+  --block-mode true
+
+# gRPC transport (v2 protocol)
+sentinel-waf-agent \
+  --grpc-address "[::1]:50051" \
   --paranoia-level 2 \
   --block-mode true
 ```
@@ -167,6 +181,7 @@ sentinel-waf-agent \
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-waf.sock` |
+| `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (v2 protocol) | - |
 | `--paranoia-level` | `WAF_PARANOIA_LEVEL` | Sensitivity (1-4) | `1` |
 | `--sqli` | `WAF_SQLI` | SQL injection detection | `true` |
 | `--xss` | `WAF_XSS` | XSS detection | `true` |
@@ -188,14 +203,16 @@ sentinel-waf-agent \
 
 ```kdl
 agents {
+    // UDS transport
     agent "waf" {
         type "custom"
         transport "unix_socket" {
             path "/var/run/sentinel/waf.sock"
         }
-        events ["request_headers", "request_body_chunk", "response_body_chunk"]
+        events ["request_headers", "request_body_chunk", "response_body_chunk", "websocket_frame"]
         timeout-ms 50
         failure-mode "open"
+        protocol-version 2
     }
 }
 
@@ -204,6 +221,23 @@ routes {
         matches { path-prefix "/api" }
         upstream "backend"
         agents ["waf"]
+    }
+}
+```
+
+#### gRPC Transport (v2)
+
+```kdl
+agents {
+    agent "waf" {
+        type "custom"
+        transport "grpc" {
+            address "127.0.0.1:50051"
+        }
+        events ["request_headers", "request_body_chunk", "response_body_chunk", "websocket_frame"]
+        timeout-ms 50
+        failure-mode "open"
+        protocol-version 2
     }
 }
 ```
