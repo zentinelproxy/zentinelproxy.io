@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-audit-logger"
 homepage = "https://sentinel.raskell.io/agents/audit-logger/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-audit-logger"
@@ -30,6 +30,16 @@ min_sentinel_version = "25.12.0"
 A comprehensive audit logging agent for Sentinel that captures detailed API traffic logs with built-in PII redaction and compliance support. Designed for organizations that need structured, security-focused logging for regulatory compliance.
 
 The agent supports multiple output formats for SIEM integration, automatic detection and masking of sensitive data, and pre-configured templates for common compliance standards.
+
+## Protocol v2 Features
+
+As of v0.2.0, the Audit Logger agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with error rate monitoring
+- **Metrics export**: Counter metrics for requests, events logged/filtered, output errors
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Features
 
@@ -279,9 +289,10 @@ filters:
 sentinel-agent-audit-logger [OPTIONS]
 
 Options:
-  -c, --config <PATH>      Configuration file [default: audit-logger.yaml]
-  -s, --socket <PATH>      Unix socket path [default: /tmp/sentinel-audit-logger.sock]
-  -L, --log-level <LEVEL>  Log level [default: info]
+  -c, --config <PATH>        Configuration file [default: audit-logger.yaml]
+  -s, --socket <PATH>        Unix socket path [default: /tmp/sentinel-audit-logger.sock]
+      --grpc-address <ADDR>  gRPC listen address (e.g., 0.0.0.0:50051)
+  -L, --log-level <LEVEL>    Log level [default: info]
       --print-config       Print default configuration
       --validate           Validate configuration and exit
   -h, --help              Print help

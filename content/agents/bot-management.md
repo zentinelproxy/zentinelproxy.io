@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-bot-management"
 homepage = "https://sentinel.raskell.io/agents/bot-management/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-bot-management"
@@ -28,6 +28,16 @@ min_sentinel_version = "26.01.0"
 ## Overview
 
 A comprehensive bot detection and management agent for Sentinel. Analyzes multiple signals to classify traffic as human, good bot (search engines, monitors), or bad bot (scrapers, attackers), returning a bot score with configurable ALLOW/BLOCK/CHALLENGE decisions.
+
+## Protocol v2 Features
+
+As of v0.2.0, the Bot Management agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for bot detections (allowed, blocked, challenged)
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Features
 
@@ -62,6 +72,7 @@ cargo build --release
 ```bash
 sentinel-agent-bot-management \
     --socket /var/run/sentinel/bot-management.sock \
+    --grpc-address 0.0.0.0:50051 \
     --config /etc/sentinel/bot-management.yaml
 ```
 

@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-ai-gateway"
 homepage = "https://sentinel.raskell.io/agents/ai-gateway/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-ai-gateway"
@@ -54,6 +54,16 @@ Sentinel v26.01 includes [built-in inference support](/configuration/inference/)
 **Recommended setup:** Use Sentinel's built-in inference features for rate limiting and cost control, and add this agent for semantic security.
 
 </div>
+
+## Protocol v2 Features
+
+As of v0.2.0, the AI Gateway agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with detection metrics
+- **Metrics export**: Counter metrics for detections (prompt injection, jailbreak, PII)
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Features
 
@@ -123,6 +133,7 @@ sentinel-ai-gateway-agent \
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-ai-gateway.sock` |
+| `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--allowed-models` | `ALLOWED_MODELS` | Comma-separated model allowlist | (all) |
 | `--block-mode` | `BLOCK_MODE` | Block or detect-only | `true` |
 | `--fail-open` | `FAIL_OPEN` | Allow requests on processing errors | `false` |

@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-api-deprecation"
 homepage = "https://sentinel.raskell.io/agents/api-deprecation/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-api-deprecation"
@@ -30,6 +30,16 @@ min_sentinel_version = "26.01.0"
 An API lifecycle management agent for Sentinel that helps you gracefully deprecate and sunset API endpoints. The agent adds standard RFC-compliant deprecation headers, tracks usage metrics, and supports flexible actions from warnings to redirects to blocking.
 
 Perfect for managing API versioning, communicating breaking changes to clients, and monitoring migration progress.
+
+## Protocol v2 Features
+
+As of v0.2.0, the API Deprecation agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with draining awareness
+- **Metrics export**: Gauge metrics for endpoint counts and days until sunset
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Features
 
@@ -276,6 +286,7 @@ sentinel-agent-api-deprecation [OPTIONS]
 Options:
   -c, --config <PATH>        Configuration file [default: api-deprecation.yaml]
   -s, --socket <PATH>        Unix socket path [default: /tmp/sentinel-api-deprecation.sock]
+      --grpc-address <ADDR>  gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>    Log level [default: info]
       --print-config         Print default configuration
       --validate             Validate configuration and exit
