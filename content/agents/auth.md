@@ -11,18 +11,18 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-auth"
 homepage = "https://sentinel.raskell.io/agents/auth/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-auth"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_sentinel_version = "26.01.0"
 +++
 
 ## Overview
@@ -50,6 +50,13 @@ The Auth agent provides comprehensive authentication and authorization for your 
 - **Claims Forwarding**: Pass validated claims/attributes to upstream services
 - **Fail-Open Mode**: Graceful degradation for non-critical paths
 
+### Protocol v2
+- **gRPC Transport**: High-performance gRPC transport for production deployments
+- **Health Reporting**: Automatic health status reporting to proxy
+- **Metrics Export**: Built-in metrics (auth success/failure rates, request counts)
+- **Capability Negotiation**: Dynamic feature discovery during handshake
+- **Graceful Lifecycle**: Proper drain and shutdown handling
+
 ## Installation
 
 ### Using Cargo
@@ -71,9 +78,14 @@ cargo build --release
 ### Command Line
 
 ```bash
-# JWT authentication
+# UDS transport (default)
 sentinel-auth-agent \
   --socket /var/run/sentinel/auth.sock \
+  --jwt-secret "your-secret-key-at-least-32-characters"
+
+# gRPC transport (v2 protocol)
+sentinel-auth-agent \
+  --grpc-address "[::1]:50051" \
   --jwt-secret "your-secret-key-at-least-32-characters"
 
 # With API keys
@@ -103,6 +115,7 @@ export API_KEYS="sk_live_abc123:production"
 
 ```kdl
 agents {
+    // UDS transport
     agent "auth" {
         type "custom"
         transport "unix_socket" {
@@ -111,6 +124,7 @@ agents {
         events ["request_headers" "request_body_chunk"]
         timeout-ms 100
         failure-mode "closed"
+        protocol-version 2
 
         config {
             // JWT configuration
@@ -145,11 +159,29 @@ routes {
 }
 ```
 
+#### gRPC Transport (v2)
+
+```kdl
+agents {
+    agent "auth" {
+        type "custom"
+        transport "grpc" {
+            address "127.0.0.1:50051"
+        }
+        events ["request_headers" "request_body_chunk"]
+        timeout-ms 100
+        failure-mode "closed"
+        protocol-version 2
+    }
+}
+```
+
 ### Command Line Options
 
 | Option | Environment | Description | Default |
 |--------|-------------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-auth.sock` |
+| `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (v2 protocol) | - |
 | `--jwt-secret` | `JWT_SECRET` | JWT secret key (HS256) | - |
 | `--jwt-public-key` | `JWT_PUBLIC_KEY` | JWT public key file (RS256/ES256) | - |
 | `--jwt-algorithm` | `JWT_ALGORITHM` | Algorithm: HS256, RS256, ES256 | `HS256` |
