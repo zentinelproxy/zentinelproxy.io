@@ -8,9 +8,29 @@ tags = ["content-scanner", "malware", "clamav", "security", "file-upload"]
 
 [extra]
 official = true
+author = "Sentinel Core Team"
+author_url = "https://github.com/raskell-io"
+status = "Stable"
+version = "0.2.0"
+license = "Apache-2.0"
+repo = "https://github.com/raskell-io/sentinel-agent-content-scanner"
+homepage = "https://sentinel.raskell.io/agents/content-scanner/"
+protocol_version = "v2"
 +++
 
 # Content Scanner Agent
+
+## Protocol v2 Features
+
+As of v0.2.0, the Content Scanner agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with draining awareness
+- **Metrics export**: Counter metrics for scans, blocks, errors, and bytes processed
+- **gRPC transport**: High-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
+
+## Overview
 
 The Content Scanner agent scans uploaded files and request bodies for malware using ClamAV daemon. It provides protection against malicious file uploads by integrating with the industry-standard ClamAV antivirus engine.
 
@@ -162,7 +182,7 @@ The agent supports flexible content-type patterns:
 | Option | Description |
 |--------|-------------|
 | `-c, --config` | Path to configuration file (default: `config.yaml`) |
-| `-s, --socket` | Unix socket path (default: `/tmp/sentinel-content-scanner.sock`) |
+| `--grpc-address` | gRPC listen address (e.g., `0.0.0.0:50051`) |
 | `--example-config` | Print example configuration and exit |
 | `--validate` | Validate configuration and exit |
 

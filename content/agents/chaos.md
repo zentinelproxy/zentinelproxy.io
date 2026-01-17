@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "MIT"
 repo = "https://github.com/raskell-io/sentinel-agent-chaos"
 homepage = "https://sentinel.raskell.io/agents/chaos/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-chaos"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the Chaos Engineering agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with draining awareness
+- **Metrics export**: Counter metrics for faults injected per experiment
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -244,9 +254,10 @@ cargo build --release
 sentinel-agent-chaos [OPTIONS]
 
 Options:
-  -c, --config <FILE>     Path to configuration file [default: chaos.yaml]
-  -s, --socket <PATH>     Unix socket path [default: /tmp/sentinel-chaos.sock]
-  -L, --log-level <LEVEL> Log level [default: info]
+  -c, --config <FILE>       Path to configuration file [default: chaos.yaml]
+  -s, --socket <PATH>       Unix socket path [default: /tmp/sentinel-chaos.sock]
+      --grpc-address <ADDR> gRPC listen address (e.g., 0.0.0.0:50051)
+  -L, --log-level <LEVEL>   Log level [default: info]
       --print-config      Print example configuration and exit
       --validate          Validate configuration and exit
       --dry-run           Run in dry-run mode
