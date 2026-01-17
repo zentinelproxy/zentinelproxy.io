@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-graphql-security"
 homepage = "https://sentinel.raskell.io/agents/graphql-security/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-graphql-security"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the GraphQL Security agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for requests and blocks
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -72,6 +82,7 @@ sentinel-agent-graphql-security --config config.yaml --socket /var/run/sentinel/
 |--------|-------------|---------|
 | `--config`, `-c` | Path to YAML configuration file | `config.yaml` |
 | `--socket`, `-s` | Unix socket path | `/tmp/sentinel-graphql-security.sock` |
+| `--grpc-address` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--log-level`, `-l` | Log level (trace, debug, info, warn, error) | `info` |
 
 ### Configuration File (YAML)
