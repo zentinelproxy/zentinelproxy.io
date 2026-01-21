@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-lua"
 homepage = "https://sentinel.raskell.io/agents/lua/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-lua"
@@ -24,6 +24,17 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the Lua agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with draining awareness
+- **Metrics export**: Counter metrics for requests processed/blocked and script errors
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
+- **Dual transport**: Supports both UDS and gRPC simultaneously
 
 ## Overview
 
@@ -39,6 +50,22 @@ The Lua Scripting agent enables custom request/response processing using embedde
 - **Fail-Open Mode**: Optionally allow requests when scripts error
 
 ## Installation
+
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install lua
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+
+### Using Cargo
 
 ```bash
 cargo install sentinel-agent-lua
@@ -78,6 +105,7 @@ sentinel-lua-agent --script policy.lua --socket /tmp/sentinel-lua.sock
 | Option | Env Var | Default | Description |
 |--------|---------|---------|-------------|
 | `--socket` | `AGENT_SOCKET` | `/tmp/sentinel-lua.sock` | Unix socket path |
+| `--grpc-address` | `GRPC_ADDRESS` | - | gRPC listen address (e.g., `0.0.0.0:50051`) |
 | `--script` | `LUA_SCRIPT` | (required) | Path to Lua script file |
 | `--verbose` | `LUA_VERBOSE` | `false` | Enable debug logging |
 | `--fail-open` | `FAIL_OPEN` | `false` | Allow requests on script errors |

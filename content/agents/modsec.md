@@ -67,6 +67,20 @@ apt install libmodsecurity-dev
 
 ## Installation
 
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install modsec
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+
 ### Using Cargo
 
 ```bash

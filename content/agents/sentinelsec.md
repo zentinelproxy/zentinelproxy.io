@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-sentinelsec"
 homepage = "https://sentinel.raskell.io/agents/sentinelsec/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-sentinelsec"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the SentinelSec agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for requests processed/blocked/allowed
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -94,6 +104,20 @@ See [full benchmarks](/benchmarks/#rust-vs-c-sentinel-modsec-vs-libmodsecurity) 
 
 ## Installation
 
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install sentinelsec
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+
 ### Using Cargo
 
 ```bash
@@ -116,6 +140,7 @@ sentinel-sentinelsec-agent \
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-sentinelsec.sock` |
+| `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--rules` | `SENTINELSEC_RULES` | Rule file paths (glob patterns) | - |
 | `--block-mode` | `SENTINELSEC_BLOCK_MODE` | Block (true) or detect-only | `true` |
 | `--exclude-paths` | `SENTINELSEC_EXCLUDE_PATHS` | Paths to exclude | - |

@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-spiffe"
 homepage = "https://sentinel.raskell.io/agents/spiffe/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-spiffe"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the SPIFFE agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with SPIRE connectivity awareness
+- **Metrics export**: Counter metrics for authentications succeeded/failed
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -52,6 +62,20 @@ The SPIFFE agent provides zero-trust workload identity authentication using SPIF
 - **Cache Mode**: Use cached trust bundles during SPIRE outages
 
 ## Installation
+
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install spiffe
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
 
 ### Using Cargo
 
@@ -188,6 +212,7 @@ routes {
 | Option | Environment | Description | Default |
 |--------|-------------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-spiffe.sock` |
+| `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--spire-socket` | `SPIRE_AGENT_SOCKET` | SPIRE agent socket | `/run/spire/sockets/agent.sock` |
 | `--verbose` | `SPIFFE_VERBOSE` | Enable debug logging | `false` |
 

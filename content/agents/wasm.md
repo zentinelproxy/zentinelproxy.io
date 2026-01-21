@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-wasm"
 homepage = "https://sentinel.raskell.io/agents/wasm/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-wasm"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the WebAssembly agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for requests processed/blocked and wasm errors
+- **gRPC transport**: High-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -40,6 +50,20 @@ WebAssembly agent for Sentinel reverse proxy. Execute custom Wasm modules for hi
 - **Fail-Open Mode**: Graceful error handling
 
 ## Installation
+
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install wasm
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
 
 ### Using Cargo
 
@@ -61,6 +85,7 @@ sentinel-wasm-agent --socket /var/run/sentinel/wasm.sock \
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-wasm.sock` |
+| `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--module` | `WASM_MODULE` | Wasm module file (.wasm) | (required) |
 | `--pool-size` | `WASM_POOL_SIZE` | Instance pool size | `4` |
 | `--verbose` | `WASM_VERBOSE` | Enable debug logging | `false` |

@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-transform"
 homepage = "https://sentinel.raskell.io/agents/transform/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-transform"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "25.12.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the Transform agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for requests processed/transformed
+- **gRPC transport**: High-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -40,6 +50,20 @@ A configuration-driven transformation agent for Sentinel that provides advanced 
 - **Debug Headers**: Optional `X-Transform-Rule` and `X-Transform-Time` response headers
 
 ## Installation
+
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install transform
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
 
 ### Using Cargo
 
@@ -62,8 +86,17 @@ cargo build --release
 ```bash
 sentinel-agent-transform \
     --socket /var/run/sentinel/transform.sock \
+    --grpc-address 0.0.0.0:50051 \
     --config /etc/sentinel/transform.yaml
 ```
+
+### CLI Options
+
+| Option | Env Var | Description | Default |
+|--------|---------|-------------|---------|
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-transform.sock` |
+| `--grpc-address` | `TRANSFORM_GRPC_ADDRESS` | gRPC listen address | `0.0.0.0:50051` |
+| `--config` | `TRANSFORM_CONFIG` | Configuration file path | (required) |
 
 ### Sentinel Configuration
 

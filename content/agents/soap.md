@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-soap"
 homepage = "https://sentinel.raskell.io/agents/soap/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-soap"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the SOAP Security agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status for monitoring
+- **Metrics export**: Counter metrics for requests validated/blocked per violation type
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -41,6 +51,20 @@ SOAP services remain critical in enterprise environments—banking, healthcare, 
 - **SOAP Fault Responses**: Proper SOAP 1.1/1.2 fault format with violation details
 
 ## Installation
+
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install soap
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
 
 ### Using Cargo
 
@@ -70,6 +94,7 @@ sentinel-agent-soap --config config.yaml --socket /var/run/sentinel/soap.sock
 |--------|-------------|---------|
 | `--config`, `-c` | Path to YAML configuration file | `config.yaml` |
 | `--socket`, `-s` | Unix socket path | `/tmp/sentinel-soap.sock` |
+| `--grpc-address` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--log-level`, `-l` | Log level (trace, debug, info, warn, error) | `info` |
 
 ### Configuration File (YAML)

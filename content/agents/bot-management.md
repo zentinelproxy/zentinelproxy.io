@@ -51,6 +51,20 @@ As of v0.2.0, the Bot Management agent supports protocol v2 with:
 
 ## Installation
 
+### Using Bundle (Recommended)
+
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install bot-management
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+
 ### Using Cargo
 
 ```bash

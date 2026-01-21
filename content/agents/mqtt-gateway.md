@@ -11,11 +11,11 @@ official = true
 author = "Sentinel Core Team"
 author_url = "https://github.com/raskell-io"
 status = "Stable"
-version = "0.1.0"
+version = "0.2.0"
 license = "Apache-2.0"
 repo = "https://github.com/raskell-io/sentinel-agent-mqtt-gateway"
 homepage = "https://sentinel.raskell.io/agents/mqtt-gateway/"
-protocol_version = "0.1"
+protocol_version = "v2"
 
 # Installation methods
 crate_name = "sentinel-agent-mqtt-gateway"
@@ -24,6 +24,16 @@ docker_image = ""
 # Compatibility
 min_sentinel_version = "26.01.0"
 +++
+
+## Protocol v2 Features
+
+As of v0.2.0, the MQTT Gateway agent supports protocol v2 with:
+
+- **Capability negotiation**: Reports supported features during handshake
+- **Health reporting**: Exposes health status with broker connectivity awareness
+- **Metrics export**: Counter metrics for packets processed/blocked/authenticated
+- **gRPC transport**: Optional high-performance gRPC transport via `--grpc-address`
+- **Lifecycle hooks**: Graceful shutdown and drain handling
 
 ## Overview
 
@@ -289,11 +299,29 @@ Control which topics can use retained messages:
 
 ## Installation
 
-```bash
-# Install from crates.io
-cargo install sentinel-agent-mqtt-gateway
+### Using Bundle (Recommended)
 
-# Or build from source
+The easiest way to install this agent is via the Sentinel bundle command:
+
+```bash
+# Install just this agent
+sentinel bundle install mqtt-gateway
+
+# Or install all available agents
+sentinel bundle install --all
+```
+
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+
+### Using Cargo
+
+```bash
+cargo install sentinel-agent-mqtt-gateway
+```
+
+### From Source
+
+```bash
 git clone https://github.com/raskell-io/sentinel-agent-mqtt-gateway
 cd sentinel-agent-mqtt-gateway
 cargo build --release
@@ -322,6 +350,7 @@ sentinel-mqtt-agent \
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
 | `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-mqtt-agent.sock` |
+| `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--config` | `MQTT_CONFIG` | Configuration file path | - |
 | `--log-level` | `MQTT_LOG_LEVEL` | Log level (trace, debug, info, warn, error) | `info` |
 | `--json-logs` | - | Enable JSON log format | `false` |
