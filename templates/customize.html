@@ -86,6 +86,21 @@
         margin-top: 2px;
         color: var(--color-primary);
     }
+
+    /* More agents CTA */
+    .more-agents-cta {
+        margin-top: var(--space-xl);
+        padding: var(--space-lg);
+        text-align: center;
+        background: var(--color-bg-elevated);
+        border: 1px dashed var(--color-border);
+        border-radius: var(--radius-lg);
+    }
+    .more-agents-cta p {
+        margin: 0 0 var(--space-md);
+        color: var(--color-text-muted);
+        font-size: 0.9375rem;
+    }
 </style>
 {% endblock %}
 
@@ -167,19 +182,18 @@
                 <p class="section-description">Select the agents you want to include. All agents are optional and can be added later.</p>
 
                 <div class="agents-grid">
-                    <!-- Stable Agents -->
-                    <label class="agent-card" data-agent="auth" data-crate="sentinel-agent-auth">
-                        <input type="checkbox" name="agents" value="auth">
+                    <label class="agent-card" data-agent="waf" data-crate="sentinel-agent-waf">
+                        <input type="checkbox" name="agents" value="waf">
                         <div class="agent-header">
                             <div class="agent-info">
-                                <h3>Auth</h3>
+                                <h3>WAF</h3>
                                 <span class="status-badge stable">Stable</span>
                             </div>
                             <div class="agent-check">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
-                        <p class="agent-description">Authentication and authorization with JWT, API keys, OAuth support</p>
+                        <p class="agent-description">OWASP CRS-compatible web application firewall</p>
                     </label>
 
                     <label class="agent-card" data-agent="ratelimit" data-crate="sentinel-agent-ratelimit">
@@ -196,6 +210,20 @@
                         <p class="agent-description">Token bucket rate limiting with configurable windows and limits</p>
                     </label>
 
+                    <label class="agent-card" data-agent="auth" data-crate="sentinel-agent-auth">
+                        <input type="checkbox" name="agents" value="auth">
+                        <div class="agent-header">
+                            <div class="agent-info">
+                                <h3>Auth</h3>
+                                <span class="status-badge stable">Stable</span>
+                            </div>
+                            <div class="agent-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="agent-description">Authentication and authorization with JWT, API keys, OAuth</p>
+                    </label>
+
                     <label class="agent-card" data-agent="denylist" data-crate="sentinel-agent-denylist">
                         <input type="checkbox" name="agents" value="denylist">
                         <div class="agent-header">
@@ -208,105 +236,6 @@
                             </div>
                         </div>
                         <p class="agent-description">Block requests based on IP addresses, CIDR ranges, or patterns</p>
-                    </label>
-
-                    <!-- Beta Agents -->
-                    <label class="agent-card" data-agent="waf" data-crate="sentinel-agent-waf">
-                        <input type="checkbox" name="agents" value="waf">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>WAF</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">OWASP CRS-compatible web application firewall</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="lua" data-crate="sentinel-agent-lua">
-                        <input type="checkbox" name="agents" value="lua">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>Lua Scripting</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">Embed custom Lua scripts for flexible request/response processing</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="js" data-crate="sentinel-agent-js">
-                        <input type="checkbox" name="agents" value="js">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>JavaScript</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">Custom JavaScript logic with QuickJS runtime</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="wasm" data-crate="sentinel-agent-wasm">
-                        <input type="checkbox" name="agents" value="wasm">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>WebAssembly</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">High-performance Wasm modules in any language</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="modsec" data-crate="sentinel-agent-modsec">
-                        <input type="checkbox" name="agents" value="modsec">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>ModSecurity</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">Full OWASP CRS with 800+ detection rules</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="ai-gateway" data-crate="sentinel-agent-ai-gateway">
-                        <input type="checkbox" name="agents" value="ai-gateway">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>AI Gateway</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">AI API security: prompt injection, PII, rate limits</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="websocket-inspector" data-crate="sentinel-agent-websocket-inspector">
-                        <input type="checkbox" name="agents" value="websocket-inspector">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>WebSocket Inspector</h3>
-                                <span class="status-badge beta">Beta</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">WebSocket frame inspection and security controls</p>
                     </label>
 
                     <label class="agent-card" data-agent="audit-logger" data-crate="sentinel-agent-audit-logger">
@@ -323,47 +252,24 @@
                         <p class="agent-description">Structured audit logging for compliance and debugging</p>
                     </label>
 
-                    <label class="agent-card" data-agent="chaos" data-crate="sentinel-agent-chaos">
-                        <input type="checkbox" name="agents" value="chaos">
+                    <label class="agent-card" data-agent="ai-gateway" data-crate="sentinel-agent-ai-gateway">
+                        <input type="checkbox" name="agents" value="ai-gateway">
                         <div class="agent-header">
                             <div class="agent-info">
-                                <h3>Chaos Engineering</h3>
+                                <h3>AI Gateway</h3>
                                 <span class="status-badge stable">Stable</span>
                             </div>
                             <div class="agent-check">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
-                        <p class="agent-description">Controlled fault injection for resilience testing</p>
+                        <p class="agent-description">LLM security: prompt injection detection, PII filtering, token limits</p>
                     </label>
+                </div>
 
-                    <label class="agent-card" data-agent="api-deprecation" data-crate="sentinel-agent-api-deprecation">
-                        <input type="checkbox" name="agents" value="api-deprecation">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>API Deprecation</h3>
-                                <span class="status-badge stable">Stable</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">Track and notify clients of deprecated API endpoints</p>
-                    </label>
-
-                    <label class="agent-card" data-agent="ip-reputation" data-crate="sentinel-agent-ip-reputation">
-                        <input type="checkbox" name="agents" value="ip-reputation">
-                        <div class="agent-header">
-                            <div class="agent-info">
-                                <h3>IP Reputation</h3>
-                                <span class="status-badge stable">Stable</span>
-                            </div>
-                            <div class="agent-check">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-                        <p class="agent-description">Block malicious IPs using threat intelligence feeds</p>
-                    </label>
+                <div class="more-agents-cta">
+                    <p>Looking for more? We have 20+ agents for security, observability, and traffic management.</p>
+                    <a href="/agents/" class="btn btn-secondary">Browse All Agents</a>
                 </div>
             </div>
 
