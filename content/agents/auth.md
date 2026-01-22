@@ -754,8 +754,9 @@ spec:
 
 | Agent | Integration |
 |-------|-------------|
-| **WAF** | Combine auth with attack detection |
-| **Denylist** | Block IPs before auth processing |
+| [Policy](/agents/policy/) | Advanced Cedar/Rego policy evaluation |
+| [WAF](/agents/waf/) | Combine auth with attack detection |
+| [Denylist](/agents/denylist/) | Block IPs before auth processing |
 
 ## Resources
 
