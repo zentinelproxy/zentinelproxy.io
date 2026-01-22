@@ -544,140 +544,117 @@ const agentConfigs = {
         bin: 'sentinel-agent-auth',
         socket: '/var/run/sentinel/auth.sock',
         config: `agent "auth" {
-        type "auth"
-        transport "unix_socket" {
-            path "/var/run/sentinel/auth.sock"
-        }
-        events ["request_headers"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/auth.sock"
+        events "request_headers"
         timeout-ms 100
         failure-mode "closed"
     }`
     },
     ratelimit: {
         crate: 'sentinel-agent-ratelimit',
-        bin: 'sentinel-agent-ratelimit',
+        bin: 'sentinel-ratelimit-agent',
         socket: '/var/run/sentinel/ratelimit.sock',
         config: `agent "ratelimit" {
-        type "rate_limit"
-        transport "unix_socket" {
-            path "/var/run/sentinel/ratelimit.sock"
-        }
-        events ["request_headers"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/ratelimit.sock"
+        events "request_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     denylist: {
         crate: 'sentinel-agent-denylist',
-        bin: 'sentinel-agent-denylist',
+        bin: 'sentinel-denylist-agent',
         socket: '/var/run/sentinel/denylist.sock',
         config: `agent "denylist" {
-        type "denylist"
-        transport "unix_socket" {
-            path "/var/run/sentinel/denylist.sock"
-        }
-        events ["request_headers"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/denylist.sock"
+        events "request_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     waf: {
         crate: 'sentinel-agent-waf',
-        bin: 'sentinel-agent-waf',
+        bin: 'sentinel-waf-agent',
         socket: '/var/run/sentinel/waf.sock',
         config: `agent "waf" {
-        type "waf"
-        transport "unix_socket" {
-            path "/var/run/sentinel/waf.sock"
-        }
-        events ["request_headers" "request_body"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/waf.sock"
+        events "request_headers" "request_body"
         timeout-ms 200
         failure-mode "closed"
-        max-request-body-bytes 1048576
     }`
     },
     lua: {
         crate: 'sentinel-agent-lua',
-        bin: 'sentinel-agent-lua',
+        bin: 'sentinel-lua-agent',
         socket: '/var/run/sentinel/lua.sock',
         config: `agent "lua" {
-        type "lua"
-        transport "unix_socket" {
-            path "/var/run/sentinel/lua.sock"
-        }
-        events ["request_headers" "response_headers"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/lua.sock"
+        events "request_headers" "response_headers"
         timeout-ms 100
         failure-mode "open"
     }`
     },
     js: {
         crate: 'sentinel-agent-js',
-        bin: 'sentinel-agent-js',
+        bin: 'sentinel-js-agent',
         socket: '/var/run/sentinel/js.sock',
         config: `agent "js" {
-        type "js"
-        transport "unix_socket" {
-            path "/var/run/sentinel/js.sock"
-        }
-        events ["request_headers" "response_headers"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/js.sock"
+        events "request_headers" "response_headers"
         timeout-ms 100
         failure-mode "open"
     }`
     },
     wasm: {
         crate: 'sentinel-agent-wasm',
-        bin: 'sentinel-agent-wasm',
+        bin: 'sentinel-wasm-agent',
         socket: '/var/run/sentinel/wasm.sock',
         config: `agent "wasm" {
-        type "wasm"
-        transport "unix_socket" {
-            path "/var/run/sentinel/wasm.sock"
-        }
-        events ["request_headers" "response_headers"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/wasm.sock"
+        events "request_headers" "response_headers"
         timeout-ms 50
         failure-mode "closed"
     }`
     },
     modsec: {
         crate: 'sentinel-agent-modsec',
-        bin: 'sentinel-agent-modsec',
+        bin: 'sentinel-modsec-agent',
         socket: '/var/run/sentinel/modsec.sock',
         config: `agent "modsec" {
-        type "modsec"
-        transport "unix_socket" {
-            path "/var/run/sentinel/modsec.sock"
-        }
-        events ["request_headers" "request_body" "response_body"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/modsec.sock"
+        events "request_headers" "request_body" "response_body"
         timeout-ms 200
         failure-mode "closed"
-        max-request-body-bytes 1048576
     }`
     },
     'ai-gateway': {
         crate: 'sentinel-agent-ai-gateway',
-        bin: 'sentinel-agent-ai-gateway',
+        bin: 'sentinel-ai-gateway-agent',
         socket: '/var/run/sentinel/ai-gateway.sock',
         config: `agent "ai-gateway" {
-        type "ai-gateway"
-        transport "unix_socket" {
-            path "/var/run/sentinel/ai-gateway.sock"
-        }
-        events ["request_headers" "request_body"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/ai-gateway.sock"
+        events "request_headers" "request_body"
         timeout-ms 100
         failure-mode "closed"
-        max-request-body-bytes 1048576
     }`
     },
     'websocket-inspector': {
         crate: 'sentinel-agent-websocket-inspector',
-        bin: 'sentinel-agent-websocket-inspector',
+        bin: 'sentinel-websocket-inspector-agent',
         socket: '/var/run/sentinel/ws-inspector.sock',
         config: `agent "websocket-inspector" {
-        type "websocket-inspector"
-        transport "unix_socket" {
-            path "/var/run/sentinel/ws-inspector.sock"
-        }
-        events ["websocket_frame"]
+        type "custom"
+        unix-socket path="/var/run/sentinel/ws-inspector.sock"
+        events "websocket_frame"
         timeout-ms 50
         failure-mode "open"
     }`
@@ -687,7 +664,7 @@ const agentConfigs = {
         bin: 'sentinel-audit-logger-agent',
         socket: '/var/run/sentinel/audit.sock',
         config: `agent "audit-logger" {
-        type "audit"
+        type "custom"
         unix-socket path="/var/run/sentinel/audit.sock"
         events "request_headers" "response_headers"
         timeout-ms 50
@@ -699,7 +676,7 @@ const agentConfigs = {
         bin: 'sentinel-chaos-agent',
         socket: '/var/run/sentinel/chaos.sock',
         config: `agent "chaos" {
-        type "chaos"
+        type "custom"
         unix-socket path="/var/run/sentinel/chaos.sock"
         events "request_headers"
         timeout-ms 50
@@ -711,7 +688,7 @@ const agentConfigs = {
         bin: 'sentinel-api-deprecation-agent',
         socket: '/var/run/sentinel/api-deprecation.sock',
         config: `agent "api-deprecation" {
-        type "api-deprecation"
+        type "custom"
         unix-socket path="/var/run/sentinel/api-deprecation.sock"
         events "request_headers"
         timeout-ms 50
@@ -723,7 +700,7 @@ const agentConfigs = {
         bin: 'sentinel-ip-reputation-agent',
         socket: '/var/run/sentinel/ip-reputation.sock',
         config: `agent "ip-reputation" {
-        type "ip-reputation"
+        type "custom"
         unix-socket path="/var/run/sentinel/ip-reputation.sock"
         events "request_headers"
         timeout-ms 100
