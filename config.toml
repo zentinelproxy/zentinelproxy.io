@@ -23,12 +23,13 @@ taxonomies = [
 ]
 
 [markdown]
-highlight_code = true
-highlight_theme = "base16-ocean-dark"
 smart_punctuation = true
 external_links_target_blank = true
 external_links_no_follow = true
 external_links_no_referrer = true
+
+[markdown.highlighting]
+theme = "github-dark"
 
 [slugify]
 paths = "on"
