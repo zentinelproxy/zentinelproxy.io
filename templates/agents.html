@@ -846,6 +846,89 @@
             </div>
         </details>
 
+        {# Quick Install - Most Popular Agents #}
+        <div class="quick-install-section">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Quick Install
+            </h2>
+            <p class="quick-install-subtitle">Get started with the most popular agents in one command</p>
+
+            <div class="quick-install-grid">
+                <div class="quick-install-card">
+                    <div class="qi-header">
+                        <h3>WAF</h3>
+                        <span class="qi-badge">Security</span>
+                    </div>
+                    <p>OWASP-compatible web application firewall with SQL injection, XSS, and path traversal protection.</p>
+                    <code class="qi-command">cargo install sentinel-agent-waf</code>
+                </div>
+
+                <div class="quick-install-card">
+                    <div class="qi-header">
+                        <h3>Rate Limiter</h3>
+                        <span class="qi-badge">Traffic</span>
+                    </div>
+                    <p>Token bucket rate limiting with configurable limits per IP, user, or custom key.</p>
+                    <code class="qi-command">cargo install sentinel-agent-ratelimit</code>
+                </div>
+
+                <div class="quick-install-card">
+                    <div class="qi-header">
+                        <h3>Denylist</h3>
+                        <span class="qi-badge">Security</span>
+                    </div>
+                    <p>Block requests by IP address, CIDR range, path pattern, or User-Agent.</p>
+                    <code class="qi-command">cargo install sentinel-agent-denylist</code>
+                </div>
+
+                <div class="quick-install-card">
+                    <div class="qi-header">
+                        <h3>Audit Logger</h3>
+                        <span class="qi-badge">Observability</span>
+                    </div>
+                    <p>Structured audit logging for compliance, debugging, and security analysis.</p>
+                    <code class="qi-command">cargo install sentinel-agent-audit-logger</code>
+                </div>
+
+                <div class="quick-install-card">
+                    <div class="qi-header">
+                        <h3>IP Reputation</h3>
+                        <span class="qi-badge">Security</span>
+                    </div>
+                    <p>Block malicious IPs using threat intelligence feeds and reputation scoring.</p>
+                    <code class="qi-command">cargo install sentinel-agent-ip-reputation</code>
+                </div>
+
+                <div class="quick-install-card">
+                    <div class="qi-header">
+                        <h3>Chaos Engineering</h3>
+                        <span class="qi-badge">Testing</span>
+                    </div>
+                    <p>Controlled fault injection for resilience testing in staging environments.</p>
+                    <code class="qi-command">cargo install sentinel-agent-chaos</code>
+                </div>
+            </div>
+        </div>
+
+        {# Missing Agent CTA #}
+        <div class="missing-agent-cta">
+            <div class="cta-content">
+                <h2>Missing an agent?</h2>
+                <p>Can't find the agent you need? You have options:</p>
+                <div class="cta-options">
+                    <a href="/customize/" class="cta-button primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Customize Installation
+                    </a>
+                    <a href="https://github.com/raskell-io/sentinel/discussions/new?category=ideas" target="_blank" rel="noopener" class="cta-button secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Request an Agent
+                    </a>
+                </div>
+            </div>
+        </div>
+
         {# Create Your Own Agent - Collapsible #}
         <details class="create-agent-details" open>
             <summary class="create-agent-summary">
