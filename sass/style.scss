@@ -1798,17 +1798,16 @@ body > .nav-dropdown__menu {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: var(--space-lg);
-    align-items: start;
 
-    @media (max-width: 1200px) {
+    @media (max-width: 900px) {
         grid-template-columns: repeat(3, 1fr);
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 600px) {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 400px) {
         grid-template-columns: 1fr;
     }
 }
@@ -2760,23 +2759,23 @@ body > .nav-dropdown__menu {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     text-align: center;
-}
 
-.cta-content {
-    max-width: 500px;
-    margin: 0 auto;
+    .cta-content {
+        max-width: 500px;
+        margin: 0 auto;
 
-    h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin: 0 0 var(--space-sm);
-        color: var(--color-text);
-    }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 var(--space-sm);
+            color: var(--color-text);
+        }
 
-    > p {
-        color: var(--color-text-muted);
-        font-size: 1rem;
-        margin: 0 0 var(--space-xl);
+        > p {
+            color: var(--color-text-muted);
+            font-size: 1rem;
+            margin: 0 0 var(--space-xl);
+        }
     }
 }
 
