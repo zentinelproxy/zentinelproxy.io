@@ -105,26 +105,8 @@
                     Installation Method
                 </h2>
                 <div class="option-cards">
-                    <label class="option-card selected" data-method="bundle">
-                        <input type="radio" name="install-method" value="bundle" checked>
-                        <div class="option-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m7.5 4.27 9 5.15"/>
-                                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-                                <path d="m3.3 7 8.7 5 8.7-5"/>
-                                <path d="M12 22V12"/>
-                            </svg>
-                        </div>
-                        <div class="option-content">
-                            <h3>Bundle</h3>
-                            <p>Proxy + agents in one command (Recommended)</p>
-                        </div>
-                        <div class="option-check">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                    </label>
-                    <label class="option-card" data-method="script">
-                        <input type="radio" name="install-method" value="script">
+                    <label class="option-card selected" data-method="script">
+                        <input type="radio" name="install-method" value="script" checked>
                         <div class="option-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="18" height="18" x="3" y="3" rx="2"/>
@@ -133,7 +115,7 @@
                         </div>
                         <div class="option-content">
                             <h3>Install Script</h3>
-                            <p>One-line installer for proxy only</p>
+                            <p>One-line installer for Linux and macOS (Recommended)</p>
                         </div>
                         <div class="option-check">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -399,10 +381,10 @@
                             <span>Copy</span>
                         </button>
                     </div>
-                    <pre id="install-code" class="language-bash"><code class="language-bash"># Install Sentinel bundle (proxy only, no agents)
-curl -fsSL https://get.sentinel.raskell.io/bundle | bash
+                    <pre id="install-code" class="language-bash"><code class="language-bash"># Install Sentinel proxy
+curl -fsSL https://get.sentinel.raskell.io | bash
 
-# Select agents above to include them in the bundle</code></pre>
+# Select agents above to include them in the installation</code></pre>
                 </div>
             </div>
 
@@ -481,12 +463,8 @@ upstreams {
                             <span>Copy</span>
                         </button>
                     </div>
-                    <pre id="startup-code" class="language-bash"><code class="language-bash"># Start all services (proxy + agents) via systemd
-sudo systemctl start sentinel.target
-
-# Or start individually:
-# sudo systemctl start sentinel          # proxy only
-# sudo systemctl start sentinel-waf      # individual agent</code></pre>
+                    <pre id="startup-code" class="language-bash"><code class="language-bash"># Start Sentinel
+sentinel-proxy --config sentinel.kdl</code></pre>
                 </div>
                 <p class="section-note" id="startup-note" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
@@ -763,64 +741,38 @@ function updateOutput() {
     // Update install commands based on selected method
     let installCode = '';
 
-    if (installMethod === 'bundle') {
+    if (installMethod === 'script') {
         if (selectedAgents.length > 0) {
             const agentList = selectedAgents.join(',');
-            installCode = `# Install Sentinel + selected agents as a bundle
-curl -fsSL https://get.sentinel.raskell.io/bundle | bash -s -- --agents ${agentList}`;
+            installCode = `# Install Sentinel proxy + selected agents
+curl -fsSL https://get.sentinel.raskell.io | bash -s -- --agents ${agentList}`;
         } else {
-            installCode = `# Install Sentinel bundle (proxy only, no agents)
-curl -fsSL https://get.sentinel.raskell.io/bundle | bash
-
-# Select agents above to include them in the bundle`;
-        }
-    } else if (installMethod === 'script') {
-        installCode = `# Install Sentinel proxy only
+            installCode = `# Install Sentinel proxy
 curl -fsSL https://get.sentinel.raskell.io | bash
-`;
-        if (selectedAgents.length > 0) {
-            installCode += `
-# Install selected agents separately (via cargo)
-`;
-            selectedAgents.forEach(agent => {
-                installCode += `cargo install ${agentConfigs[agent].crate}
-`;
-            });
-        } else {
-            installCode += `
-# No agents selected - select agents above to generate install commands`;
+
+# Select agents above to include them in the installation`;
         }
     } else if (installMethod === 'cargo') {
-        installCode = `# Install Sentinel proxy
-cargo install sentinel-proxy
-`;
         if (selectedAgents.length > 0) {
-            installCode += `
-# Install selected agents
-`;
-            selectedAgents.forEach(agent => {
-                installCode += `cargo install ${agentConfigs[agent].crate}
-`;
-            });
+            const crates = ['sentinel-proxy', ...selectedAgents.map(a => agentConfigs[a].crate)].join(' ');
+            installCode = `# Install Sentinel proxy + selected agents
+cargo install ${crates}`;
         } else {
-            installCode += `
-# No agents selected - select agents above to generate install commands`;
+            installCode = `# Install Sentinel proxy
+cargo install sentinel-proxy
+
+# Select agents above to include them in the installation`;
         }
     } else if (installMethod === 'oci') {
-        installCode = `# Pull Sentinel container image
-docker pull ghcr.io/raskell-io/sentinel:latest
-`;
         if (selectedAgents.length > 0) {
-            installCode += `
-# Pull selected agent images
-`;
-            selectedAgents.forEach(agent => {
-                installCode += `docker pull ghcr.io/raskell-io/${agentConfigs[agent].crate}:latest
-`;
-            });
+            const images = ['ghcr.io/raskell-io/sentinel:latest', ...selectedAgents.map(a => `ghcr.io/raskell-io/${agentConfigs[a].crate}:latest`)];
+            installCode = `# Pull Sentinel proxy + selected agent images
+docker pull ${images.join(' \\\n    ')}`;
         } else {
-            installCode += `
-# No agents selected - select agents above to generate install commands`;
+            installCode = `# Pull Sentinel proxy image
+docker pull ghcr.io/raskell-io/sentinel:latest
+
+# Select agents above to include them in the installation`;
         }
     }
 
@@ -894,16 +846,7 @@ agents {`;
     let startupCode = '';
     const startupNote = document.querySelector('#startup-note');
 
-    if (installMethod === 'bundle') {
-        // Bundle uses systemd services
-        startupCode = `# Start all services (proxy + agents) via systemd
-sudo systemctl start sentinel.target
-
-# Or start individually:
-# sudo systemctl start sentinel          # proxy only
-# sudo systemctl start sentinel-waf      # individual agent`;
-        startupNote.style.display = 'none';
-    } else if (installMethod === 'oci') {
+    if (installMethod === 'oci') {
         if (selectedAgents.length > 0) {
             startupCode = `# Start agents (each in a separate terminal)
 `;
