@@ -1407,7 +1407,7 @@ $editor-padding: var(--space-md);
     top: calc(100% + var(--space-sm));
     right: 0;
     width: 520px;
-    padding: var(--space-xl);
+    padding: var(--space-lg);
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -1429,9 +1429,9 @@ $editor-padding: var(--space-md);
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
     font-weight: 600;
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: var(--color-text);
 
     svg {
@@ -1440,36 +1440,34 @@ $editor-padding: var(--space-md);
 }
 
 .version-dropdown-desc {
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: var(--color-text-muted);
-    line-height: 1.6;
-    margin: 0 0 var(--space-lg);
+    line-height: 1.5;
+    margin: 0 0 var(--space-md);
 }
 
 .version-dropdown-actions {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 
     .btn {
         width: 100%;
         justify-content: center;
-        font-size: 1rem;
-        padding: var(--space-md) var(--space-lg);
     }
 
     .wasm-size {
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
         opacity: 0.7;
         margin-left: var(--space-xs);
     }
 }
 
 .version-dropdown-code {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 
     .code-label {
-        font-size: 0.9375rem;
+        font-size: 0.8125rem;
         color: var(--color-text-muted);
-        margin: 0 0 var(--space-sm);
+        margin: 0 0 var(--space-xs);
 
         a {
             color: var(--ctp-blue);
@@ -1488,8 +1486,8 @@ $editor-padding: var(--space-md);
         border: 1px solid var(--color-border-subtle);
         border-radius: var(--radius-md);
         overflow-x: auto;
-        font-size: 0.8125rem;
-        line-height: 1.7;
+        font-size: 0.75rem;
+        line-height: 1.6;
 
         code {
             font-family: var(--font-mono);
@@ -1503,10 +1501,10 @@ $editor-padding: var(--space-md);
 }
 
 .version-dropdown-runtimes {
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
     color: var(--color-text-muted);
     text-align: center;
-    padding-top: var(--space-md);
+    padding-top: var(--space-sm);
     border-top: 1px solid var(--color-border-subtle);
 
     .runtimes-label {
