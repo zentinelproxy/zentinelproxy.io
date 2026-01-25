@@ -199,8 +199,44 @@
                 <p>This converter uses the <strong>actual sentinel-convert parser</strong> compiled to <a href="https://webassembly.org/" target="_blank" rel="noopener">WebAssembly</a>, running directly in your browser. The same <a href="https://www.rust-lang.org/" target="_blank" rel="noopener">Rust</a> code that powers the CLI tool parses your configuration and converts it to Sentinel's KDL format.</p>
                 <p class="info-highlight">Supported formats: <strong>nginx</strong>, <strong>HAProxy</strong>, <strong>Traefik</strong>, <strong>Caddy</strong>, and <strong>Envoy</strong>. The converter automatically detects rate limiting, authentication, and WAF patterns to suggest Sentinel agents.</p>
             </div>
-            <div class="info-version-badge">
-                <span>Converter Version: <span id="wasm-version">Loading...</span></span>
+            <div class="info-version-badge" id="version-badge">
+                <button type="button" class="version-badge-btn" id="version-badge-btn" title="Click for local runtime options">
+                    <span>Converter Version: <span id="wasm-version">Loading...</span></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="version-dropdown" id="version-dropdown">
+                    <div class="version-dropdown-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <span>Run Locally</span>
+                    </div>
+                    <p class="version-dropdown-desc">Take the converter home. Run batch conversions locally with any WASI-compatible runtime.</p>
+                    <div class="version-dropdown-actions">
+                        <a href="/wasm/sentinel_convert_wasm_bg.wasm" download="sentinel_convert.wasm" class="btn btn-primary btn-small">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Download WASM
+                            <span class="wasm-size">(~3.2 MB)</span>
+                        </a>
+                    </div>
+                    <div class="version-dropdown-code">
+                        <p class="code-label">Run with <a href="https://wasmtime.dev/" target="_blank" rel="noopener">Wasmtime</a>:</p>
+                        <pre><code><span class="code-comment"># Install wasmtime</span>
+curl https://wasmtime.dev/install.sh -sSf | bash
+
+<span class="code-comment"># Convert nginx config</span>
+wasmtime sentinel_convert.wasm nginx.conf -o sentinel.kdl
+
+<span class="code-comment"># Convert with format hint</span>
+wasmtime sentinel_convert.wasm config.txt --format haproxy</code></pre>
+                    </div>
+                    <div class="version-dropdown-runtimes">
+                        <span class="runtimes-label">Also works with:</span>
+                        <a href="https://wasmer.io/" target="_blank" rel="noopener">Wasmer</a>
+                        <span class="separator">·</span>
+                        <a href="https://wazero.io/" target="_blank" rel="noopener">wazero</a>
+                        <span class="separator">·</span>
+                        <a href="https://github.com/aspect-build/rules_esbuild" target="_blank" rel="noopener">Node.js</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
