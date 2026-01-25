@@ -294,6 +294,22 @@ async function initWasm() {
     } catch (e) {
         console.error('Failed to load WASM:', e);
         convertBtn.disabled = true;
+
+        // Update version display with error
+        if (wasmVersion) {
+            wasmVersion.textContent = 'Load failed';
+        }
+
+        // Show helpful error message
+        let errorMsg = 'Failed to load WebAssembly module. ';
+        if (e.message?.includes('CompileError') || e.message?.includes('instantiate')) {
+            errorMsg += 'Your browser may not support WebAssembly, or it may be blocked by an extension.';
+        } else if (e.message?.includes('NetworkError') || e.message?.includes('fetch')) {
+            errorMsg += 'Could not download the module. Check your network connection.';
+        } else {
+            errorMsg += 'Please try refreshing the page or using a different browser.';
+        }
+        showError(errorMsg + ' Supported browsers: Chrome 57+, Firefox 52+, Safari 11+, Edge 16+');
     }
 }
 

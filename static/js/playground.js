@@ -1095,6 +1095,35 @@ async function initWasm() {
     } catch (e) {
         setStatus('error', 'Failed to load');
         console.error('WASM init error:', e);
+
+        // Update version display with error
+        const versionEl = document.getElementById('wasm-version');
+        if (versionEl) {
+            versionEl.textContent = 'Load failed';
+        }
+
+        // Show helpful error message in the config panel
+        const errorDisplay = document.getElementById('error-display');
+        if (errorDisplay) {
+            let errorMsg = 'Failed to load WebAssembly module. ';
+            if (e.message?.includes('CompileError') || e.message?.includes('instantiate')) {
+                errorMsg += 'Your browser may not support WebAssembly, or it may be blocked by an extension.';
+            } else if (e.message?.includes('NetworkError') || e.message?.includes('fetch')) {
+                errorMsg += 'Could not download the module. Check your network connection.';
+            } else {
+                errorMsg += 'Please try refreshing the page or using a different browser.';
+            }
+            errorDisplay.innerHTML = `
+                <div class="error-item error-error">
+                    <span class="error-icon">${icons.invalid}</span>
+                    <div class="error-content">
+                        <span class="error-message">${errorMsg}</span>
+                        <span class="error-hint">Supported browsers: Chrome 57+, Firefox 52+, Safari 11+, Edge 16+</span>
+                    </div>
+                </div>
+            `;
+            errorDisplay.classList.add('visible');
+        }
     }
 }
 

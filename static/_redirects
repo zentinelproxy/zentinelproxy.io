@@ -1,0 +1,8 @@
+# Redirect rules for Cloudflare Pages / Netlify
+# These will be ignored on GitHub Pages but work if hosting is migrated
+
+/install     /docs/getting-started/installation/  301
+/download    /docs/getting-started/installation/  301
+/quickstart  /docs/getting-started/quick-start/   301
+/config      /docs/configuration/                 301
+/examples    /docs/examples/                      301
