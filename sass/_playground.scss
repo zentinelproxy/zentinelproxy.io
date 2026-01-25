@@ -1255,6 +1255,7 @@ $editor-padding: var(--space-md);
     flex-direction: column;
     gap: var(--space-lg);
     padding: var(--space-xl);
+    padding-bottom: var(--space-3xl);
     margin-top: var(--space-xl);
     background: linear-gradient(135deg,
         rgba(203, 166, 247, 0.08) 0%,
@@ -1263,7 +1264,6 @@ $editor-padding: var(--space-md);
     );
     border: 1px solid transparent;
     border-radius: var(--radius-lg);
-    overflow: hidden;
 
     // Gradient border effect
     &::before {
