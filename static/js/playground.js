@@ -2343,6 +2343,34 @@ document.querySelectorAll('.template-card').forEach(card => {
     });
 });
 
+// Version badge dropdown toggle
+const versionBadgeBtn = document.getElementById('version-badge-btn');
+const versionDropdown = document.getElementById('version-dropdown');
+
+if (versionBadgeBtn && versionDropdown) {
+    versionBadgeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        versionBadgeBtn.classList.toggle('active');
+        versionDropdown.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!versionDropdown.contains(e.target) && !versionBadgeBtn.contains(e.target)) {
+            versionBadgeBtn.classList.remove('active');
+            versionDropdown.classList.remove('active');
+        }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && versionDropdown.classList.contains('active')) {
+            versionBadgeBtn.classList.remove('active');
+            versionDropdown.classList.remove('active');
+        }
+    });
+}
+
 // Initialize
 loadConfigFromHash();
 updateHighlight(); // Initial syntax highlighting
