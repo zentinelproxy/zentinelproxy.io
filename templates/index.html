@@ -709,6 +709,114 @@
     </div>
 </section>
 
+<section class="faq-preview" id="faq">
+    <div class="container">
+        <div class="section-header">
+            <h2>Frequently Asked Questions</h2>
+            <p>Quick answers to common questions about Sentinel</p>
+        </div>
+        <div class="faq-list">
+            <details class="faq-item">
+                <summary class="faq-question">
+                    <span>How does Sentinel compare to nginx or Envoy?</span>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Sentinel takes a fundamentally different approach to reverse proxying. Built in Rust on <a href="https://github.com/cloudflare/pingora" target="_blank" rel="noopener">Cloudflare's Pingora</a>, it prioritizes memory safety and explicit configuration over hidden defaults.</p>
+                    <ul>
+                        <li><strong>Security-first:</strong> Isolated <a href="/agents/">agent architecture</a> means a buggy plugin can't crash your proxy</li>
+                        <li><strong>No magic:</strong> Every behavior requires explicit configuration—no surprise defaults</li>
+                        <li><strong>Observable:</strong> Built-in <a href="/docs/configuration/observability/">OpenTelemetry support</a> for metrics, tracing, and logging</li>
+                    </ul>
+                    <p>See our <a href="/docs/concepts/comparison/">detailed comparison guide</a> for benchmarks and feature matrices.</p>
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-question">
+                    <span>Is Sentinel production-ready?</span>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Yes. Sentinel is built on Pingora, the same framework that powers a significant portion of Cloudflare's infrastructure serving millions of requests per second.</p>
+                    <p>Sentinel is designed for long-running production systems with:</p>
+                    <ul>
+                        <li><strong>Bounded resources:</strong> Predictable memory usage with configurable limits</li>
+                        <li><strong>Graceful reloads:</strong> Zero-downtime configuration updates via <code>SIGHUP</code></li>
+                        <li><strong>Health checks:</strong> Active and passive <a href="/docs/configuration/health-checks/">backend health monitoring</a></li>
+                    </ul>
+                    <p>Check our <a href="/docs/getting-started/quick-start/">quick start guide</a> to deploy your first instance.</p>
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-question">
+                    <span>What platforms are supported?</span>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Pre-built binaries are available for the most common platforms:</p>
+                    <ul>
+                        <li><strong>Linux x86_64:</strong> glibc 2.17+ (RHEL 7+, Ubuntu 18.04+, Debian 10+)</li>
+                        <li><strong>macOS:</strong> Intel (x86_64) and Apple Silicon (aarch64)</li>
+                        <li><strong>Containers:</strong> Official <a href="https://github.com/orgs/raskell-io/packages" target="_blank" rel="noopener">OCI images</a> for amd64 and arm64</li>
+                    </ul>
+                    <p>Linux ARM64 users can <a href="/docs/getting-started/installation/#building-from-source">build from source</a> or use our container images. See the <a href="/docs/getting-started/installation/">installation guide</a> for all options including Homebrew and cargo.</p>
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-question">
+                    <span>How do agents work?</span>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Agents are Sentinel's extension mechanism—isolated processes that hook into request/response phases without risking proxy stability.</p>
+                    <ul>
+                        <li><strong>Process isolation:</strong> Each agent runs in its own process; crashes don't affect the proxy</li>
+                        <li><strong>Language agnostic:</strong> Write agents in Rust, Go, Python, or any language with gRPC support</li>
+                        <li><strong>Phase hooks:</strong> Intercept requests at <code>on_request</code>, <code>on_response</code>, or <code>on_error</code> phases</li>
+                    </ul>
+                    <p>Browse our <a href="/agents/">agent registry</a> for ready-to-use agents like <a href="/agents/waf/">WAF</a>, <a href="/agents/auth/">Auth</a>, and <a href="/agents/ai-gateway/">AI Gateway</a>. Or learn to <a href="/docs/agents/custom-agents/">build your own</a>.</p>
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-question">
+                    <span>Can I migrate from nginx or HAProxy?</span>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Yes—we've built tools to make migration straightforward:</p>
+                    <ul>
+                        <li><strong><a href="/converter/">Config Converter:</a></strong> Paste your nginx, HAProxy, or Traefik config and get equivalent KDL</li>
+                        <li><strong><a href="/playground/">Playground:</a></strong> Test and validate your converted configuration before deploying</li>
+                        <li><strong><a href="/docs/migration/">Migration Guide:</a></strong> Step-by-step instructions for common setups</li>
+                    </ul>
+                    <p>The converter handles most directives automatically. For complex setups, check our <a href="/docs/migration/nginx/">nginx migration</a> or <a href="/docs/migration/haproxy/">HAProxy migration</a> docs.</p>
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-question">
+                    <span>Is Sentinel free to use?</span>
+                    <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Yes, completely. Sentinel is open source under the <a href="https://github.com/raskell-io/sentinel/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0 license</a>.</p>
+                    <ul>
+                        <li><strong>No usage limits:</strong> Run it anywhere, at any scale, forever</li>
+                        <li><strong>No phone-home:</strong> Sentinel never contacts external servers</li>
+                        <li><strong>Modify freely:</strong> Fork it, extend it, embed it in your products</li>
+                    </ul>
+                    <p>We believe critical infrastructure should be transparent and free from vendor lock-in. Read our <a href="/manifesto/">manifesto</a> to learn why. Contributions are welcome on <a href="https://github.com/raskell-io/sentinel" target="_blank" rel="noopener">GitHub</a>.</p>
+                </div>
+            </details>
+        </div>
+        <div class="faq-cta">
+            <a href="/docs/appendix/faq/" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                View All FAQs
+            </a>
+        </div>
+    </div>
+</section>
+
 <section class="manifesto-teaser">
     <div class="manifesto-teaser__bg" aria-hidden="true">
         <img src="{{ get_url(path='img/shisa-gate-landscape.avif') | safe }}" alt="" loading="lazy">
