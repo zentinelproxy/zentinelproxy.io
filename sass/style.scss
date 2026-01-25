@@ -1789,8 +1789,8 @@ body > .nav-dropdown__menu {
         color: var(--color-text-muted);
         margin-bottom: var(--space-2xl);
         max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
+        margin-inline: auto;
+        text-align: center;
     }
 }
 
