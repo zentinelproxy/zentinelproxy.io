@@ -1777,6 +1777,9 @@ body > .nav-dropdown__menu {
 }
 
 .cta-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
 
     h2 {
@@ -1789,8 +1792,6 @@ body > .nav-dropdown__menu {
         color: var(--color-text-muted);
         margin-bottom: var(--space-2xl);
         max-width: 800px;
-        margin-inline: auto;
-        text-align: center;
     }
 }
 
