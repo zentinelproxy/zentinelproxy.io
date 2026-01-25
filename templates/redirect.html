@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url={{ page.extra.redirect_to }}">
+    {%- set target_url = get_url(path=page.extra.redirect_to) -%}
+    <meta http-equiv="refresh" content="0; url={{ target_url | safe }}">
     <title>Redirecting...</title>
-    <link rel="canonical" href="{{ page.extra.redirect_to }}">
-    <script>window.location.replace("{{ page.extra.redirect_to }}");</script>
+    <link rel="canonical" href="{{ target_url | safe }}">
+    <script>window.location.replace("{{ target_url | safe }}");</script>
 </head>
 <body>
-    <p>Redirecting to <a href="{{ page.extra.redirect_to }}">{{ page.extra.redirect_to }}</a>...</p>
+    <p>Redirecting to <a href="{{ target_url | safe }}">{{ page.extra.redirect_to }}</a>...</p>
 </body>
 </html>
