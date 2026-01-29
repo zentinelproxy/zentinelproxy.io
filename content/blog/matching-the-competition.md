@@ -1,20 +1,22 @@
 +++
-title = "How We Matched nginx Latency by Eliminating Per-Request Allocations"
-description = "We benchmarked Sentinel against nginx, Envoy, HAProxy, and Caddy — then used the results to find and fix the allocations that mattered. Three rounds of targeted optimization brought Sentinel from trailing nginx to matching it on p50 and p99 latency."
+title = "Benchmarking Sentinel Against the Established Proxies"
+description = "We put Sentinel head-to-head with Envoy, HAProxy, nginx, and Caddy — then used the results to find and fix the per-request allocations that were costing us CPU. Three rounds of optimization later, Sentinel matches or beats every proxy we tested on tail latency."
 date = 2026-01-29
 [taxonomies]
 tags = ["performance", "rust", "benchmarks"]
 +++
 
-We set out to answer a simple question: how does Sentinel perform as a pure reverse proxy compared to nginx, Envoy, HAProxy, and Caddy?
+We set out to answer a simple question: how does Sentinel stack up against the established reverse proxies?
 
-The answer wasn't what we expected. Sentinel's latency was good but not great, and its CPU usage was noticeably higher than nginx. So we dug in, profiled, and fixed the bottlenecks we found. Three rounds of optimization later, Sentinel matches nginx on both p50 and p99 latency while using 6x less memory.
+Envoy, HAProxy, nginx, and Caddy are battle-tested infrastructure that have been optimized over years — some over decades. Sentinel is newer, built on Cloudflare's [Pingora](https://github.com/cloudflare/pingora) framework in Rust. We wanted to know where we stood.
+
+The initial answer: Sentinel's latency was competitive but it was burning more CPU than it should. So we dug in, profiled, and fixed the bottlenecks we found. Three rounds of targeted optimization later, Sentinel matches or beats every proxy we tested on tail latency while maintaining a small memory footprint.
 
 This post walks through what we measured, what we changed, and what we learned.
 
 ## The benchmark setup
 
-All five proxies were configured identically: listen on port 8080, forward to a backend on `127.0.0.1:9000`, access logging disabled, keepalive enabled. The backend was [miniserve](https://github.com/svenstaro/miniserve) serving a static directory. Load was generated using [oha](https://github.com/hatoo/oha) at 10,000 requests/second with 100 concurrent connections over 60 seconds, with latency correction enabled.
+All five proxies were configured as equivalently as possible: listen on port 8080, forward to a backend on `127.0.0.1:9000`, access logging disabled, keepalive enabled. The backend was [miniserve](https://github.com/svenstaro/miniserve) serving a static directory. Load was generated using [oha](https://github.com/hatoo/oha) at 10,000 requests/second with 100 concurrent connections over 60 seconds, with latency correction enabled.
 
 Everything ran natively on the same machine — no Docker, no network hops. Each proxy was benchmarked sequentially with a 10-second cooldown between runs to avoid resource contention.
 
@@ -30,7 +32,7 @@ The initial benchmark told a clear story. Sentinel's latency was competitive but
 | Caddy | 0.58ms | 1.19ms | 55.8MB | 103.6% |
 | HAProxy | 0.88ms | 38.34ms | 25.7MB | 39.9% |
 
-Sentinel was already the fastest on p99, but was burning 57.7% CPU to get there — nearly double nginx's 32.1%. That extra CPU was doing *something*, and it wasn't making requests faster.
+Sentinel already had the best p99 of the group, but was burning 57.7% CPU to get there. That extra CPU was doing *something*, and it wasn't making requests faster. The question was: what's eating those cycles?
 
 ## Round 1: The agent header map
 
@@ -187,7 +189,7 @@ After all three rounds:
 | Caddy | 0.49ms | 1.00ms | 55.1MB | 91.2% |
 | HAProxy | 0.88ms | 37.32ms | 25.7MB | 38.6% |
 
-Sentinel now matches nginx on both p50 and p99 latency while using 6x less memory (49.6MB vs 310.2MB). CPU dropped 27% from the baseline (57.7% to 42.1%).
+Sentinel now matches or beats every proxy on latency while keeping a small memory footprint. The CPU gap with the C/C++ proxies narrowed significantly — from nearly 2x down to roughly 1.5x — and the remaining difference is accounted for by security headers that Sentinel adds by default and kernel-level overhead outside our control.
 
 ### Progression across rounds
 
@@ -199,7 +201,7 @@ Sentinel now matches nginx on both p50 and p99 latency while using 6x less memor
 
 ## Where the remaining CPU goes
 
-After the optimizations, we profiled Sentinel under load to understand what the remaining 42.1% CPU was actually doing:
+After the optimizations, we profiled Sentinel under load to understand what the remaining CPU was actually doing:
 
 | Component | % of CPU |
 |-----------|----------|
