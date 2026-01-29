@@ -239,6 +239,21 @@ Not every suggestion panned out. A few things we investigated that turned out to
 
 **Know when to stop.** Once profiling shows CPU time dominated by kernel syscalls and framework internals, further optimization yields diminishing returns. The proxy is doing real work — the overhead is the work itself.
 
+## Try it yourself
+
+All the optimizations described in this post ship in Sentinel v0.4.5 (release [26.01_11](https://github.com/raskell-io/sentinel/releases/tag/26.01_11)). You can grab it and run your own benchmarks:
+
+```bash
+# From crates.io
+cargo install sentinel-proxy
+
+# Or download a prebuilt binary (Linux, macOS)
+curl -fsSL https://sentinel.raskell.io/install.sh | sh
+
+# Or pull the container image
+docker pull ghcr.io/raskell-io/sentinel:26.01_11
+```
+
 ---
 
 The full benchmark results are available on the [benchmarks page](/benchmarks/), including interactive charts for latency, throughput, memory, and CPU across all five proxies.
