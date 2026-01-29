@@ -1,0 +1,195 @@
++++
+title = "Sentinel 26.02: Every Binary Signed, Every Dependency Listed"
+description = "Release 26.02 adds supply chain security to every Sentinel release — cosign signatures, SLSA provenance, and SBOMs in CycloneDX and SPDX formats. Here's what we built, why it matters, and how to verify your deployment in 30 seconds."
+date = 2026-01-29
+[taxonomies]
+tags = ["release", "security", "supply-chain"]
++++
+
+Sentinel sits at the edge of your network. Every request passes through it. If someone tampers with the binary you deploy, your entire infrastructure is compromised — and you might never know.
+
+Release 26.02 closes that gap. Every Sentinel release now ships with cryptographic signatures, build provenance, and a complete dependency manifest. You can verify that the binary you downloaded was built by our CI pipeline, from our source code, on GitHub-hosted infrastructure — not by a third party, not from a fork, not from a compromised build environment.
+
+## What ships with every release
+
+Starting with 26.02, every GitHub release includes:
+
+| Artifact | Format | Purpose |
+|----------|--------|---------|
+| `.tar.gz` | Release archive | The binary |
+| `.sha256` | SHA-256 checksum | Integrity verification |
+| `.bundle` | Sigstore bundle | Cryptographic signature + certificate + transparency log proof |
+| `.cdx.json` | CycloneDX 1.5 | SBOM for vulnerability scanning |
+| `.spdx.json` | SPDX 2.3 | SBOM for license compliance |
+| `.intoto.jsonl` | SLSA v1.0 | Build provenance attestation |
+
+Container images (`ghcr.io/raskell-io/sentinel`) are signed with cosign and have an SBOM attached as a cosign attestation.
+
+## Verify a binary in 30 seconds
+
+```bash
+VERSION="26.02_0"
+
+# Download
+curl -LO "https://github.com/raskell-io/sentinel/releases/download/${VERSION}/sentinel-${VERSION}-linux-amd64.tar.gz"
+curl -LO "https://github.com/raskell-io/sentinel/releases/download/${VERSION}/sentinel-${VERSION}-linux-amd64.tar.gz.bundle"
+
+# Verify signature
+cosign verify-blob \
+  --bundle "sentinel-${VERSION}-linux-amd64.tar.gz.bundle" \
+  --certificate-identity-regexp "github.com/raskell-io/sentinel" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  "sentinel-${VERSION}-linux-amd64.tar.gz"
+```
+
+If you get `Verified OK`, you know:
+
+1. The binary was built by a GitHub Actions workflow in `raskell-io/sentinel`
+2. The signature is recorded in the [Sigstore transparency log](https://docs.sigstore.dev/logging/overview/) and is publicly auditable
+3. No private keys were involved — the signing identity is a GitHub Actions OIDC token, not a key that can be stolen
+
+## How the pipeline works
+
+The release workflow has two phases. Phase 1 builds everything — all four platform binaries, Docker images, SBOMs. Nothing is published. If any build fails, the process stops. Phase 2 only runs after every build succeeds: sign the binaries, push the container images, sign the images, generate SLSA provenance, create the GitHub release.
+
+```
+Phase 1: Build (all must pass)
+├── linux-amd64          ─┐
+├── linux-arm64           │ Build binaries
+├── darwin-amd64          │ + generate SBOM
+├── darwin-arm64         ─┘
+└── Docker multi-arch    ── Build image (don't push)
+
+Phase 2: Publish (only after Phase 1)
+├── Sign binaries        ── cosign sign-blob (keyless)
+├── Publish crates.io    ── cargo publish
+├── Push + sign images   ── docker push + cosign sign + SBOM attestation
+├── Create release       ── GitHub release with all artifacts
+└── SLSA provenance      ── slsa-github-generator (Build Level 3)
+```
+
+This two-phase structure means a build failure never results in a partially-signed or partially-published release.
+
+## Keyless signing with Sigstore
+
+Traditional code signing requires managing a private key. If the key is compromised, all signatures are suspect. If the key is lost, you can't sign new releases. Key rotation is operationally painful.
+
+Sigstore's keyless signing eliminates this entirely. Instead of a long-lived key, each signature uses an ephemeral key pair tied to an OIDC identity — in our case, the GitHub Actions workflow identity. The certificate and signature are recorded in the Rekor transparency log, providing a public, append-only audit trail.
+
+This means:
+
+- **No key management** — there is no private key to protect, rotate, or lose
+- **Identity-based trust** — you verify *who built it* (the GitHub Actions identity), not *which key signed it*
+- **Public auditability** — anyone can inspect the transparency log to verify signatures haven't been tampered with
+
+## SLSA provenance: proving *where* it was built
+
+Cosign signatures prove the binary was built by our GitHub Actions workflow. SLSA provenance goes further — it proves *how* it was built:
+
+- The build ran on GitHub-hosted infrastructure (not a developer laptop)
+- The build script is defined in the repository (not injected)
+- The provenance attestation is generated by the [SLSA GitHub Generator](https://github.com/slsa-framework/slsa-github-generator), not by the build itself — making it non-forgeable
+
+```bash
+slsa-verifier verify-artifact \
+  "sentinel-${VERSION}-linux-amd64.tar.gz" \
+  --provenance-path "sentinel-${VERSION}-linux-amd64.tar.gz.intoto.jsonl" \
+  --source-uri github.com/raskell-io/sentinel
+```
+
+This satisfies [SLSA Build Level 3](https://slsa.dev/spec/v1.0/levels), the highest level achievable with GitHub Actions.
+
+## SBOMs: what's inside the binary
+
+Every release includes a Software Bill of Materials in two formats: CycloneDX 1.5 (preferred for vulnerability scanning) and SPDX 2.3 (preferred for license compliance). These list every dependency, its version, and its license.
+
+You can feed these directly into standard vulnerability scanners:
+
+```bash
+# Anchore grype
+grype sbom:sentinel-26.02_0-sbom.cdx.json
+
+# Aqua trivy
+trivy sbom sentinel-26.02_0-sbom.cdx.json
+
+# Google osv-scanner
+osv-scanner --sbom sentinel-26.02_0-sbom.cdx.json
+```
+
+For container images, the SBOM is attached as a cosign attestation and can be extracted with:
+
+```bash
+cosign verify-attestation \
+  --type cyclonedx \
+  --certificate-identity-regexp "github.com/raskell-io/sentinel" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  ghcr.io/raskell-io/sentinel:26.02_0 | jq -r '.payload' | base64 -d | jq .
+```
+
+## Enforcing verification in CI/CD
+
+Verifying manually is fine for one-off deployments. For production pipelines, you want verification to be automatic and mandatory.
+
+### GitHub Actions
+
+```yaml
+- uses: sigstore/cosign-installer@v3
+- run: |
+    cosign verify \
+      ghcr.io/raskell-io/sentinel:26.02_0 \
+      --certificate-identity-regexp "github.com/raskell-io/sentinel" \
+      --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+```
+
+### Kubernetes (Kyverno)
+
+```yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-sentinel-images
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: verify-cosign-signature
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+      verifyImages:
+        - imageReferences: ["ghcr.io/raskell-io/sentinel*"]
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/raskell-io/sentinel/*"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: "https://rekor.sigstore.dev"
+```
+
+With this policy, Kubernetes will reject any Sentinel pod whose image can't be verified against Sigstore.
+
+## What this doesn't cover (yet)
+
+Reproducible builds. You can build Sentinel from source and compare checksums, but exact byte-for-byte reproducibility depends on matching the Rust compiler version, target triple, and build environment. We include the Rust version in release notes to make this feasible, but we haven't invested in deterministic builds yet.
+
+## What's next
+
+26.02 is a supply chain release — it doesn't change proxy behavior. The next feature release will focus on configuration improvements and observability enhancements. Watch the [changelog](/docs/appendix/changelog/) for updates.
+
+---
+
+Full verification documentation is in the [Supply Chain Security](/docs/operations/supply-chain/) operator guide. The [supply chain page](/supply-chain/) has a higher-level overview for evaluating Sentinel's security posture.
+
+Install 26.02:
+
+```bash
+# Binary
+curl -fsSL https://sentinel.raskell.io/install.sh | sh
+
+# Container
+docker pull ghcr.io/raskell-io/sentinel:26.02_0
+
+# From source
+cargo install sentinel-proxy
+```
