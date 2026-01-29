@@ -82,6 +82,9 @@ url = "/agents/"
 name = "Converter"
 url = "/converter/"
 [[extra.nav_links.children]]
+name = "Supply Chain"
+url = "/supply-chain/"
+[[extra.nav_links.children]]
 name = "Manifesto"
 url = "/manifesto/"
 

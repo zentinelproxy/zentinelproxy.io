@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}Supply Chain Security | {{ config.title }}{% endblock %}
+{% block description %}Every Sentinel release is signed, attested, and ships with a full software bill of materials.{% endblock %}
+
+{% block content %}
+<div class="supply-chain-page">
+    <!-- Hero Section -->
+    <section class="supply-chain-hero">
+        <div class="container">
+            <h1 class="supply-chain-title">
+                <span class="gradient-text">Supply Chain Security</span>
+            </h1>
+            <p class="supply-chain-subtitle">
+                Every Sentinel release is signed, attested, and ships with a full software bill of materials. Know exactly what you're deploying.
+            </p>
+        </div>
+    </section>
+
+    <!-- Principles -->
+    <section class="supply-chain-section">
+        <div class="container">
+            <div class="intro-content">
+                <p>
+                    Sentinel sits at the edge of your network. Every request flows through it. That position demands <strong>verifiable trust</strong> in the software you deploy. We provide cryptographic proof of provenance for every release artifact.
+                </p>
+                <p>
+                    Releases are identified by <a href="/docs/appendix/versioning/">CalVer</a> (<code>YY.MM_PATCH</code>, e.g., <code>26.01_0</code>). This is the version you'll see in download URLs, Docker tags, and verification commands below. Enterprise <a href="/support/">LTS branches</a> are designated by their CalVer series.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="supply-chain-section">
+        <div class="container">
+            <div class="builds-grid">
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <h3>Signed Releases</h3>
+                    <p>Every binary is signed with <a href="https://docs.sigstore.dev/" target="_blank" rel="noopener">Sigstore cosign</a> using keyless signing tied to our GitHub Actions OIDC identity. No private keys to rotate or leak.</p>
+                    <div class="verify-command">
+                        <pre><code>cosign verify-blob \
+  --bundle sentinel.tar.gz.bundle \
+  --certificate-identity-regexp \
+    "github.com/raskell-io/sentinel" \
+  --certificate-oidc-issuer \
+    "https://token.actions.githubusercontent.com" \
+  sentinel.tar.gz</code></pre>
+                    </div>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
+                    <h3>Software Bill of Materials</h3>
+                    <p>Every release includes machine-readable SBOMs in both <strong>CycloneDX 1.5</strong> and <strong>SPDX 2.3</strong> formats listing all dependencies, versions, and licenses. Scan them with your existing vulnerability tooling.</p>
+                    <div class="verify-command">
+                        <pre><code># Scan SBOM for vulnerabilities
+grype sbom:sentinel-sbom.cdx.json</code></pre>
+                    </div>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                    </div>
+                    <h3>Container Images</h3>
+                    <p>OCI images on GHCR are signed with cosign and include an SBOM attestation. Verify image authenticity before pulling into your cluster.</p>
+                    <div class="verify-command">
+                        <pre><code>cosign verify \
+  ghcr.io/raskell-io/sentinel:VERSION \
+  --certificate-identity-regexp \
+    "github.com/raskell-io/sentinel" \
+  --certificate-oidc-issuer \
+    "https://token.actions.githubusercontent.com"</code></pre>
+                    </div>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    </div>
+                    <h3>SLSA Provenance</h3>
+                    <p>All release artifacts include <a href="https://slsa.dev/" target="_blank" rel="noopener">SLSA v1.0</a> provenance attestations generated by the SLSA GitHub Generator, achieving <strong>SLSA Build Level 3</strong>.</p>
+                    <div class="verify-command">
+                        <pre><code>slsa-verifier verify-artifact \
+  sentinel.tar.gz \
+  --provenance-path sentinel.tar.gz.intoto.jsonl \
+  --source-uri github.com/raskell-io/sentinel</code></pre>
+                    </div>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <h3>Transparency Log</h3>
+                    <p>All signing events are recorded in the <a href="https://docs.sigstore.dev/logging/overview/" target="_blank" rel="noopener">Sigstore transparency log</a> (Rekor). Signing is publicly auditable and tamper-evident.</p>
+                </div>
+
+                <div class="build-feature">
+                    <div class="build-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/></svg>
+                    </div>
+                    <h3>Build from Source</h3>
+                    <p>Sentinel is fully open source. Build from source and compare checksums against published releases to independently verify reproducibility.</p>
+                    <div class="verify-command">
+                        <pre><code>git clone https://github.com/raskell-io/sentinel
+cd sentinel && cargo build --release
+sha256sum target/release/sentinel</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What ships with each release -->
+    <section class="supply-chain-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                What ships with each release
+            </h2>
+            <div class="release-artifacts-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Artifact</th>
+                            <th>Format</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>sentinel-VERSION-PLATFORM.tar.gz</code></td>
+                            <td>Binary archive</td>
+                            <td>Pre-built binary for each platform</td>
+                        </tr>
+                        <tr>
+                            <td><code>*.tar.gz.sha256</code></td>
+                            <td>SHA-256 checksum</td>
+                            <td>Integrity verification</td>
+                        </tr>
+                        <tr>
+                            <td><code>*.tar.gz.bundle</code></td>
+                            <td>Sigstore bundle</td>
+                            <td>Cosign signature + certificate + Rekor entry</td>
+                        </tr>
+                        <tr>
+                            <td><code>*-sbom.cdx.json</code></td>
+                            <td>CycloneDX 1.5</td>
+                            <td>Software bill of materials</td>
+                        </tr>
+                        <tr>
+                            <td><code>*-sbom.spdx.json</code></td>
+                            <td>SPDX 2.3</td>
+                            <td>Software bill of materials</td>
+                        </tr>
+                        <tr>
+                            <td><code>*.intoto.jsonl</code></td>
+                            <td>SLSA provenance</td>
+                            <td>Build provenance attestation (SLSA v1.0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="supply-chain-section supply-chain-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Detailed verification guide</h2>
+                <p>For step-by-step verification procedures, CI/CD integration examples, and compliance documentation, see the operator guide.</p>
+                <div class="cta-actions">
+                    <a href="/docs/operations/supply-chain/" class="cta-btn cta-btn--primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Operator Guide
+                    </a>
+                    <a href="https://github.com/raskell-io/sentinel/releases" class="cta-btn" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        View Releases
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.supply-chain-page {
+    padding-bottom: 4rem;
+}
+
+.supply-chain-hero {
+    padding: 6rem 0 3rem;
+    text-align: center;
+}
+
+.supply-chain-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.supply-chain-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    max-width: 680px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.supply-chain-section {
+    padding: 2rem 0;
+}
+
+.supply-chain-section .intro-content {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+}
+
+.supply-chain-section .intro-content strong {
+    color: var(--color-text-primary);
+}
+
+.supply-chain-section .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.builds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.build-feature {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: border-color 0.2s;
+}
+
+.build-feature:hover {
+    border-color: var(--color-border-hover, var(--color-border));
+}
+
+.build-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-elevated, var(--color-surface));
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    color: var(--color-accent, #60a5fa);
+}
+
+.build-feature h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.build-feature p {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.build-feature a {
+    color: var(--color-accent, #60a5fa);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.verify-command {
+    background: var(--color-code-bg, #1a1a2e);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin-top: 0.5rem;
+}
+
+.verify-command pre {
+    margin: 0;
+    white-space: pre;
+}
+
+.verify-command code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-code-text, #e0e0e0);
+}
+
+.release-artifacts-table {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.release-artifacts-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.release-artifacts-table th,
+.release-artifacts-table td {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.release-artifacts-table th {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.release-artifacts-table td code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.85rem;
+    background: var(--color-code-bg, #1a1a2e);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+}
+
+.supply-chain-cta {
+    padding: 3rem 0;
+}
+
+.supply-chain-cta .cta-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.supply-chain-cta .cta-content h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.supply-chain-cta .cta-content p {
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .builds-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
