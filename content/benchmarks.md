@@ -40,69 +40,105 @@ Sentinel includes a comprehensive testing framework validating performance, stab
 
 ---
 
-## Performance Benchmarks
+## Proxy Comparison Benchmarks
 
-### Native Performance (2025-12-31)
+Five reverse proxies benchmarked head-to-head on the same hardware, same backend, same load. Native binaries only — no Docker overhead.
 
-Tested on macOS ARM64, native binary (not containerized):
+### Test Environment
 
-<div class="chart-container">
-    <div class="chart-title">Requests per Second (Higher is Better)</div>
-    <div class="bar-chart">
-        <div class="bar-item">
-            <span class="bar-label">Sentinel</span>
-            <div class="bar-track">
-                <div class="bar-fill" style="width: 100%;"></div>
-            </div>
-            <span class="bar-value">23,098</span>
-        </div>
-        <div class="bar-item">
-            <span class="bar-label">Envoy</span>
-            <div class="bar-track">
-                <div class="bar-fill bar-fill--secondary" style="width: 97.6%;"></div>
-            </div>
-            <span class="bar-value">22,545</span>
-        </div>
+<div class="bench-meta-grid">
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">CPU</div>
+        <div class="bench-meta-value" id="bench-cpu">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">Cores</div>
+        <div class="bench-meta-value" id="bench-cores">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">RAM</div>
+        <div class="bench-meta-value" id="bench-ram">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">OS</div>
+        <div class="bench-meta-value" id="bench-os">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">Duration</div>
+        <div class="bench-meta-value" id="bench-duration">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">Connections</div>
+        <div class="bench-meta-value" id="bench-connections">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">Target RPS</div>
+        <div class="bench-meta-value" id="bench-rps">—</div>
+    </div>
+    <div class="bench-meta-item">
+        <div class="bench-meta-label">Tool</div>
+        <div class="bench-meta-value" id="bench-tool">—</div>
     </div>
 </div>
 
-| Proxy | Requests/sec | p50 Latency |
-|-------|--------------|-------------|
-| **Sentinel** | **23,098** | **3.5ms** |
-| Envoy | 22,545 | 3.6ms |
+**Methodology:** Each proxy is started as a native binary, warmed up, then benchmarked for 60 seconds with [oha](https://github.com/hatoo/oha). Resource usage (CPU, memory) is sampled every second via `ps`. Proxies are tested sequentially with 10-second cooldowns between runs to avoid contention.
 
-**Sentinel is 2.5% faster than Envoy** in native benchmarks.
+### Throughput
 
-### Load Test Results
-
-| Target | Result |
-|--------|--------|
-| 10K RPS with p99 < 10ms | **Achieved 23K RPS, p99 ~8ms** |
+<div class="benchmark-charts">
+<div class="chart-canvas-container">
+    <div class="chart-canvas-title">Requests per Second (Higher is Better)</div>
+    <canvas id="chart-rps"></canvas>
+</div>
+</div>
 
 ### Latency Distribution
 
-<div class="latency-chart">
-    <div class="latency-bar-group">
-        <div class="latency-bar latency-bar--p50" style="height: 15%;"></div>
-        <div class="latency-value">1.1ms</div>
-        <div class="latency-label">p50</div>
-    </div>
-    <div class="latency-bar-group">
-        <div class="latency-bar latency-bar--p95" style="height: 45%;"></div>
-        <div class="latency-value">32.3ms</div>
-        <div class="latency-label">p95</div>
-    </div>
-    <div class="latency-bar-group">
-        <div class="latency-bar latency-bar--p99" style="height: 85%;"></div>
-        <div class="latency-value">61.5ms</div>
-        <div class="latency-label">p99</div>
-    </div>
+<div class="chart-canvas-container">
+    <div class="chart-canvas-title">Latency Percentiles (Lower is Better)</div>
+    <canvas id="chart-latency"></canvas>
 </div>
 
-The latency distribution shows excellent tail latency characteristics:
-- **p50 (median)**: 1.1ms — half of all requests complete in just over 1 millisecond
-- **p95**: 32.3ms — 95% of requests complete within 32ms
-- **p99**: 61.5ms — only 1% of requests exceed 62ms
+### Resource Efficiency
+
+<div class="chart-canvas-container">
+    <div class="chart-canvas-title">Memory Usage Over Time</div>
+    <canvas id="chart-memory-timeline"></canvas>
+</div>
+
+<div class="chart-canvas-container">
+    <div class="chart-canvas-title">CPU Usage Over Time</div>
+    <canvas id="chart-cpu-timeline"></canvas>
+</div>
+
+<div class="chart-canvas-container">
+    <div class="chart-canvas-title">Memory Footprint (Initial / Peak / Final)</div>
+    <canvas id="chart-memory-footprint"></canvas>
+</div>
+
+### Summary
+
+<table class="bench-summary-table">
+    <thead>
+        <tr>
+            <th>Proxy</th>
+            <th>RPS</th>
+            <th>p50</th>
+            <th>p99</th>
+            <th>Peak Mem</th>
+            <th>Avg CPU</th>
+            <th>Success</th>
+        </tr>
+    </thead>
+    <tbody id="bench-summary-tbody">
+        <tr><td colspan="7" style="text-align: center; color: var(--color-text-muted);">Loading...</td></tr>
+    </tbody>
+</table>
+
+<div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: var(--space-sm);">
+    Date: <span id="bench-date">—</span> |
+    <a href="/data/benchmark-results.json" style="color: var(--color-primary);">Raw JSON data</a>
+</div>
 
 ### Component Latency
 
@@ -653,68 +689,6 @@ All OWASP Top 10 attack patterns are blocked with the CRS rule set.
 
 ---
 
-## Comparison with Envoy
-
-### Native vs Docker Performance
-
-<div class="chart-container">
-    <div class="chart-title">Native Linux/macOS (Recommended)</div>
-    <div class="bar-chart">
-        <div class="bar-item">
-            <span class="bar-label">Sentinel</span>
-            <div class="bar-track">
-                <div class="bar-fill" style="width: 100%;"></div>
-            </div>
-            <span class="bar-value">23,098 RPS</span>
-        </div>
-        <div class="bar-item">
-            <span class="bar-label">Envoy</span>
-            <div class="bar-track">
-                <div class="bar-fill bar-fill--secondary" style="width: 97.6%;"></div>
-            </div>
-            <span class="bar-value">22,545 RPS</span>
-        </div>
-    </div>
-</div>
-
-| Metric | Sentinel | Envoy | Difference |
-|--------|----------|-------|------------|
-| Requests/sec | 23,098 | 22,545 | **+2.5%** |
-| p50 Latency | 3.5ms | 3.6ms | **-2.8%** |
-
-<div class="chart-container">
-    <div class="chart-title">Docker for Mac (Virtualized)</div>
-    <div class="bar-chart">
-        <div class="bar-item">
-            <span class="bar-label">Envoy</span>
-            <div class="bar-track">
-                <div class="bar-fill bar-fill--secondary" style="width: 100%;"></div>
-            </div>
-            <span class="bar-value">20,868 RPS</span>
-        </div>
-        <div class="bar-item">
-            <span class="bar-label">Sentinel</span>
-            <div class="bar-track">
-                <div class="bar-fill" style="width: 32.8%;"></div>
-            </div>
-            <span class="bar-value">6,839 RPS</span>
-        </div>
-    </div>
-</div>
-
-| Environment | Sentinel | Envoy |
-|-------------|----------|-------|
-| Native Linux/macOS | 23,098 RPS | 22,545 RPS |
-| Docker for Mac | 6,839 RPS | 20,868 RPS |
-
-**Root Cause Analysis:**
-
-The performance difference in Docker for Mac is due to how Docker Desktop virtualizes the Linux kernel. Pingora's async I/O model (tokio/epoll) interacts poorly with the virtualized network stack, while Envoy's libevent+threads model is more resilient to this overhead.
-
-**Key Finding:** This is an environmental issue specific to Docker Desktop on macOS, not a code problem. **On native Linux or bare metal, Sentinel matches or exceeds Envoy performance.**
-
----
-
 ## Integration Test Environment
 
 Full integration tests run in Docker Compose with:
@@ -808,10 +782,10 @@ We're actively working on:
 | High-concurrency (10k+ conn) tests | Planned |
 | Property-based fuzzing | Planned |
 | HTTP request smuggling tests | Planned |
-| Comparison benchmarks vs nginx/HAProxy | Planned |
+| Comparison benchmarks vs nginx/HAProxy/Caddy | <span class="result-badge result-badge--pass">Complete</span> |
 
 ---
 
 <p style="text-align: center; color: var(--color-text-muted); margin-top: var(--space-2xl);">
-Last updated: January 2026 | Sentinel v0.2.3
+Last updated: January 2026 | Sentinel v0.4.2
 </p>
