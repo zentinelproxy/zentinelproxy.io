@@ -1,7 +1,7 @@
 +++
 title = "Benchmarking Sentinel Against the Established Proxies"
 description = "We put Sentinel head-to-head with Envoy, HAProxy, nginx, and Caddy — then used the results to find and fix the per-request allocations that were costing us CPU. Three rounds of optimization later, Sentinel matches or beats every proxy we tested on tail latency."
-date = 2026-01-29
+date = 2026-01-28
 [taxonomies]
 tags = ["performance", "rust", "benchmarks"]
 +++
