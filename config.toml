@@ -86,6 +86,10 @@ name = "Manifesto"
 url = "/manifesto/"
 
 [[extra.nav_links]]
+name = "Blog"
+url = "/blog/"
+
+[[extra.nav_links]]
 name = "Docs"
 url = "/docs/"
 

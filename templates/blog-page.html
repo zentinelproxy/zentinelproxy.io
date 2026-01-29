@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | Blog | {{ config.title }}{% endblock %}
+{% block description %}{{ page.description | default(value=config.description) }}{% endblock %}
+
+{% block head %}
+<style>
+.blog-post-header {
+    text-align: center;
+    padding: var(--space-3xl) 0 var(--space-xl);
+    background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
+}
+
+.blog-post-header .container {
+    max-width: 720px;
+}
+
+.blog-post-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.blog-post-meta time {
+    font-family: var(--font-mono);
+}
+
+.blog-post-meta__separator {
+    color: var(--color-border);
+}
+
+.blog-post-meta__reading-time {
+    font-family: var(--font-mono);
+}
+
+.blog-post-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
+}
+
+.blog-post-description {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.blog-post-tags {
+    display: flex;
+    gap: var(--space-xs);
+    justify-content: center;
+    margin-top: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.blog-post-tag {
+    font-size: 0.75rem;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    text-decoration: none;
+}
+
+.blog-post-nav {
+    max-width: 720px;
+    margin: var(--space-2xl) auto;
+    padding: var(--space-xl) var(--space-lg);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-lg);
+}
+
+.blog-post-nav a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.blog-post-nav a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="blog-post-header">
+    <div class="container">
+        <div class="blog-post-meta">
+            {% if page.date %}
+            <time datetime="{{ page.date | date(format='%Y-%m-%d') }}">
+                {{ page.date | date(format='%B %d, %Y') }}
+            </time>
+            {% endif %}
+            {% if page.reading_time %}
+            <span class="blog-post-meta__separator">&middot;</span>
+            <span class="blog-post-meta__reading-time">{{ page.reading_time }} min read</span>
+            {% endif %}
+        </div>
+        <h1 class="blog-post-title">{{ page.title }}</h1>
+        {% if page.description %}
+        <p class="blog-post-description">{{ page.description }}</p>
+        {% endif %}
+        {% if page.taxonomies.tags %}
+        <div class="blog-post-tags">
+            {% for tag in page.taxonomies.tags %}
+            <span class="blog-post-tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<article class="article">
+    <div class="container container-narrow">
+        <div class="article-content prose">
+            {{ page.content | safe }}
+        </div>
+    </div>
+</article>
+
+<nav class="blog-post-nav">
+    <div>
+        {% if page.earlier %}
+        <a href="{{ page.earlier.permalink | safe }}">&larr; {{ page.earlier.title }}</a>
+        {% endif %}
+    </div>
+    <div>
+        <a href="/blog/">All posts</a>
+    </div>
+    <div>
+        {% if page.later %}
+        <a href="{{ page.later.permalink | safe }}">{{ page.later.title }} &rarr;</a>
+        {% endif %}
+    </div>
+</nav>
+{% endblock %}
