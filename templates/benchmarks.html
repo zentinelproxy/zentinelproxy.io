@@ -399,6 +399,88 @@
     color: var(--color-warning);
 }
 
+/* Chart.js canvas containers */
+.chart-canvas-container {
+    position: relative;
+    height: 350px;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    padding: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+.chart-canvas-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-canvas-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    color: var(--color-text);
+}
+
+/* Benchmark metadata cards */
+.bench-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+}
+
+.bench-meta-item {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    text-align: center;
+}
+
+.bench-meta-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bench-meta-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: var(--space-xs);
+}
+
+/* Summary comparison table */
+.bench-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-lg) 0;
+    font-size: 0.875rem;
+}
+
+.bench-summary-table th {
+    text-align: left;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bench-summary-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.bench-summary-table tr:hover td {
+    background: var(--color-bg-subtle);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .bar-item {
@@ -416,6 +498,24 @@
 
     .gauge-container {
         gap: var(--space-lg);
+    }
+
+    .chart-canvas-container {
+        height: 280px;
+        padding: var(--space-md);
+    }
+
+    .bench-meta-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bench-summary-table {
+        font-size: 0.75rem;
+    }
+
+    .bench-summary-table th,
+    .bench-summary-table td {
+        padding: var(--space-xs) var(--space-sm);
     }
 }
 </style>
@@ -438,14 +538,14 @@
         <!-- Key Stats -->
         <div class="stats-grid">
             <div class="stat-card stat-card--highlight">
-                <div class="stat-value">23,098</div>
+                <div class="stat-value">10,000</div>
                 <div class="stat-label">Requests/sec</div>
-                <div class="stat-detail">Native performance</div>
+                <div class="stat-detail">Lowest p99 of all proxies</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">3.5ms</div>
-                <div class="stat-label">p50 Latency</div>
-                <div class="stat-detail">Median response time</div>
+                <div class="stat-value">5</div>
+                <div class="stat-label">Proxies Compared</div>
+                <div class="stat-detail">Sentinel, Envoy, HAProxy, Nginx, Caddy</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value stat-value--success">99.95%</div>
@@ -467,6 +567,8 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="/js/benchmarks.js"></script>
 <script>
 // Animate stats on scroll
 document.addEventListener('DOMContentLoaded', function() {
@@ -479,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.stat-card, .chart-container').forEach(el => {
+    document.querySelectorAll('.stat-card, .chart-container, .chart-canvas-container').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
         el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
