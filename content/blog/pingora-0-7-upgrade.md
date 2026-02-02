@@ -105,14 +105,14 @@ The full test suite passes. All 25 test crates, zero failures.
 
 ---
 
-Sentinel v0.4.6 ships with Pingora 0.7 and all the dependency updates described above. Grab it:
+Sentinel v0.4.7 ships with Pingora 0.7 and all the dependency updates described above. Grab it:
 
 ```bash
 # From source
 cargo install sentinel-proxy
 
 # Container
-docker pull ghcr.io/raskell-io/sentinel:26.02_0
+docker pull ghcr.io/raskell-io/sentinel:26.02_1
 
 # Binary
 curl -fsSL https://sentinel.raskell.io/install.sh | sh
