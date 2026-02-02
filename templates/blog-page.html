@@ -79,18 +79,72 @@
     border-top: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;
+    align-items: stretch;
     gap: var(--space-lg);
 }
 
-.blog-post-nav a {
+.blog-post-nav__item {
+    flex: 1;
+    min-width: 0;
+}
+
+.blog-post-nav__item--center {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.blog-post-nav__item--end {
+    text-align: right;
+}
+
+.blog-post-nav__link {
+    display: block;
+    padding: var(--space-md);
+    border-radius: var(--radius-md, 6px);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.blog-post-nav__link:hover {
+    border-color: var(--color-primary);
+    background: var(--color-bg-subtle);
+}
+
+.blog-post-nav__label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.blog-post-nav__title {
+    display: block;
     color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.blog-post-nav__all {
+    color: var(--color-text-muted);
     text-decoration: none;
     font-size: 0.875rem;
     font-weight: 500;
+    font-family: var(--font-mono);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md, 6px);
+    border: 1px solid var(--color-border);
+    transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.blog-post-nav a:hover {
-    text-decoration: underline;
+.blog-post-nav__all:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 </style>
 {% endblock %}
@@ -132,17 +186,23 @@
 </article>
 
 <nav class="blog-post-nav">
-    <div>
-        {% if page.earlier %}
-        <a href="{{ page.earlier.permalink | safe }}">&larr; {{ page.earlier.title }}</a>
+    <div class="blog-post-nav__item">
+        {% if page.lower %}
+        <a href="{{ page.lower.permalink | safe }}" class="blog-post-nav__link">
+            <span class="blog-post-nav__label">&larr; Newer</span>
+            <span class="blog-post-nav__title">{{ page.lower.title }}</span>
+        </a>
         {% endif %}
     </div>
-    <div>
-        <a href="/blog/">All posts</a>
+    <div class="blog-post-nav__item blog-post-nav__item--center">
+        <a href="/blog/" class="blog-post-nav__all">All posts</a>
     </div>
-    <div>
-        {% if page.later %}
-        <a href="{{ page.later.permalink | safe }}">{{ page.later.title }} &rarr;</a>
+    <div class="blog-post-nav__item blog-post-nav__item--end">
+        {% if page.higher %}
+        <a href="{{ page.higher.permalink | safe }}" class="blog-post-nav__link">
+            <span class="blog-post-nav__label">Older &rarr;</span>
+            <span class="blog-post-nav__title">{{ page.higher.title }}</span>
+        </a>
         {% endif %}
     </div>
 </nav>
