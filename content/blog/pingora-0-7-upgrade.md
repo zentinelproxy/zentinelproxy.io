@@ -115,5 +115,5 @@ cargo install sentinel-proxy
 docker pull ghcr.io/raskell-io/sentinel:26.02_1
 
 # Binary
-curl -fsSL https://sentinel.raskell.io/install.sh | sh
+curl -fsSL https://getsentinel.raskell.io | sh
 ```

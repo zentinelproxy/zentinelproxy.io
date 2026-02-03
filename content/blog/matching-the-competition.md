@@ -248,7 +248,7 @@ All the optimizations described in this post ship in Sentinel v0.4.5 (release [2
 cargo install sentinel-proxy
 
 # Or download a prebuilt binary (Linux, macOS)
-curl -fsSL https://sentinel.raskell.io/install.sh | sh
+curl -fsSL https://getsentinel.raskell.io | sh
 
 # Or pull the container image
 docker pull ghcr.io/raskell-io/sentinel:26.01_11

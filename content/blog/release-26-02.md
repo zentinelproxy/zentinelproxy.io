@@ -185,7 +185,7 @@ Install 26.02:
 
 ```bash
 # Binary
-curl -fsSL https://sentinel.raskell.io/install.sh | sh
+curl -fsSL https://getsentinel.raskell.io | sh
 
 # Container
 docker pull ghcr.io/raskell-io/sentinel:26.02_0
