@@ -268,7 +268,7 @@
                 </div>
 
                 <div class="more-agents-cta">
-                    <p>Looking for more? We have 20+ agents for security, observability, and traffic management.</p>
+                    <p>Looking for more? We have 25+ agents for security, observability, and traffic management.</p>
                     <a href="/agents/" class="btn btn-secondary">Browse All Agents</a>
                 </div>
             </div>
@@ -288,7 +288,7 @@
                         </button>
                     </div>
                     <pre id="install-code" class="language-bash"><code class="language-bash"># Install Sentinel proxy
-curl -fsSL https://get.sentinel.raskell.io | bash
+curl -fsSL https://getsentinel.raskell.io | sh
 
 # Select agents above to include them in the installation</code></pre>
                 </div>
@@ -370,7 +370,7 @@ upstreams {
                         </button>
                     </div>
                     <pre id="startup-code" class="language-bash"><code class="language-bash"># Start Sentinel
-sentinel-proxy --config sentinel.kdl</code></pre>
+sentinel --config sentinel.kdl</code></pre>
                 </div>
                 <p class="section-note" id="startup-note" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
@@ -628,10 +628,10 @@ function updateOutput() {
         if (selectedAgents.length > 0) {
             const agentList = selectedAgents.join(',');
             installCode = `# Install Sentinel proxy + selected agents
-curl -fsSL https://get.sentinel.raskell.io | bash -s -- --agents ${agentList}`;
+curl -fsSL https://getsentinel.raskell.io | sh -s -- --agents ${agentList}`;
         } else {
             installCode = `# Install Sentinel proxy
-curl -fsSL https://get.sentinel.raskell.io | bash
+curl -fsSL https://getsentinel.raskell.io | sh
 
 # Select agents above to include them in the installation`;
         }
@@ -767,11 +767,11 @@ docker run -d --name sentinel \\
             });
             startupCode += `
 # Start Sentinel
-sentinel-proxy --config sentinel.kdl`;
+sentinel --config sentinel.kdl`;
             startupNote.style.display = 'flex';
         } else {
             startupCode = `# Start Sentinel
-sentinel-proxy --config sentinel.kdl`;
+sentinel --config sentinel.kdl`;
             startupNote.style.display = 'none';
         }
     }
