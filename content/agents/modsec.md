@@ -1,5 +1,6 @@
 +++
 title = "ModSecurity"
+weight = 190
 description = "Full OWASP Core Rule Set (CRS) support via libmodsecurity with 800+ detection rules."
 template = "agent.html"
 

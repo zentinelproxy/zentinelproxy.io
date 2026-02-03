@@ -1,5 +1,6 @@
 +++
 title = "IP Reputation"
+weight = 150
 description = "IP threat intelligence with AbuseIPDB integration, file-based blocklists, and Tor exit node detection."
 template = "agent.html"
 

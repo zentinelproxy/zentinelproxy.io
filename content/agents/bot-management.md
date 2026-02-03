@@ -1,5 +1,6 @@
 +++
 title = "Bot Management"
+weight = 100
 description = "Comprehensive bot detection with multi-signal analysis, known bot verification, and behavioral tracking."
 template = "agent.html"
 

@@ -1,5 +1,6 @@
 +++
 title = "Policy"
+weight = 10
 description = "Multi-language policy evaluation agent supporting Cedar and Rego/OPA for fine-grained authorization decisions."
 template = "agent.html"
 

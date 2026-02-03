@@ -1,5 +1,6 @@
 +++
 title = "SOAP Security"
+weight = 170
 description = "SOAP-specific security controls including envelope validation, WS-Security verification, operation control, and XXE prevention."
 template = "agent.html"
 

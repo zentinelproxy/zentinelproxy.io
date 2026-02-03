@@ -1,5 +1,6 @@
 +++
 title = "Mock Server"
+weight = 220
 description = "A mock server agent that intercepts requests and returns configurable stub responses with support for templating, latency simulation, and fault injection."
 template = "agent.html"
 

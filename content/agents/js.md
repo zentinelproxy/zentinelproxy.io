@@ -1,5 +1,6 @@
 +++
 title = "JavaScript Scripting"
+weight = 230
 description = "Write custom request/response processing logic in JavaScript using the QuickJS engine."
 template = "agent.html"
 

@@ -1,5 +1,6 @@
 +++
 title = "Denylist"
+weight = 200
 description = "Block requests based on IP addresses, CIDR ranges, or custom patterns with real-time updates."
 template = "agent.html"
 

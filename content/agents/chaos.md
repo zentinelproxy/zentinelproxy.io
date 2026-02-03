@@ -1,5 +1,6 @@
 +++
 title = "Chaos Engineering"
+weight = 40
 description = "Controlled fault injection for resilience testing: latency, errors, timeouts, and more with flexible targeting and safety controls."
 template = "agent.html"
 

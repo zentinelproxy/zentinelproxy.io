@@ -1,5 +1,6 @@
 +++
 title = "WAF (Web Application Firewall)"
+weight = 10
 description = "Next-generation WAAP with ML-powered detection, anomaly scoring, API security, schema validation, bot protection, and 285 rules."
 template = "agent.html"
 
