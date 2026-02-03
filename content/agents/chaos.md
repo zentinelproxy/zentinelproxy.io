@@ -284,12 +284,18 @@ Options:
 
 Add the agent to your Sentinel proxy configuration:
 
-```yaml
-agents:
-  - name: chaos
-    socket: /tmp/sentinel-chaos.sock
-    on_request: true
-    on_response: false
+```kdl
+agents {
+    agent "chaos" {
+        type "custom"
+        transport "unix_socket" {
+            path "/tmp/sentinel-chaos.sock"
+        }
+        events ["request_headers"]
+        timeout-ms 100
+        failure-mode "open"
+    }
+}
 ```
 
 ### Full Configuration Example

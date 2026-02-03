@@ -40,7 +40,7 @@ As of v0.2.0, the SentinelSec agent supports protocol v2 with:
 
 SentinelSec is a pure Rust ModSecurity-compatible WAF agent for Sentinel. It provides full OWASP Core Rule Set (CRS) support with **zero C dependencies** - no libmodsecurity installation required.
 
-> **Beta Release:** This agent is feature-complete and undergoing final testing. API is stable but may have minor adjustments before 1.0.
+> **Note:** CRS compatibility depends on the [sentinel-modsec](https://github.com/raskell-io/sentinel-modsec) engine, a pure Rust reimplementation of libmodsecurity. If you encounter unsupported SecLang features, please [file an issue](https://github.com/raskell-io/sentinel-agent-sentinelsec/issues).
 
 ## Features
 
@@ -89,17 +89,19 @@ SentinelSec uses the [sentinel-modsec](/docs/sentinel-modsec/) engine, a pure Ru
 - Aho-Corasick for multi-pattern matching
 - No FFI overhead or cross-language memory allocation
 
+> Benchmarks measured with Criterion on the sentinel-modsec library. Measured on Apple M2 Pro, single core. Run `cargo bench` in the [sentinel-modsec repo](https://github.com/raskell-io/sentinel-modsec) to reproduce.
+
 See [full benchmarks](/benchmarks/#rust-vs-c-sentinel-modsec-vs-libmodsecurity) for details.
 
 ## Comparison
 
 | Feature | SentinelSec | ModSec | WAF |
 |---------|-------------|--------|-----|
-| Detection Rules | 800+ CRS rules | 800+ CRS rules | ~20 regex rules |
+| Detection Rules | 800+ CRS rules | 800+ CRS rules | 285 rules |
 | SecLang Support | Yes | Yes | No |
 | @detectSQLi/@detectXSS | Yes (pure Rust) | Yes (C lib) | No |
 | Dependencies | **Pure Rust** | libmodsecurity (C) | Pure Rust |
-| Performance | **6.2M req/s** | 207K req/s | ~8M req/s |
+| Performance | **6.2M req/s** | 207K req/s | (varies) |
 | Binary Size | ~10MB | ~50MB | ~5MB |
 | Installation | `cargo install` | Requires libmodsecurity | `cargo install` |
 
@@ -249,6 +251,6 @@ SecAction "id:900000,phase:1,pass,t:none,nolog,setvar:tx.blocking_paranoia_level
 | Agent | Integration |
 |-------|-------------|
 | **ModSec** | C-based libmodsecurity (maximum compatibility) |
-| **WAF** | Lightweight, pure Rust (~20 rules) |
+| **WAF** | Pure Rust, 285 native rules (no SecLang) |
 | **AI Gateway** | AI-specific security controls |
 | **Auth** | Combine with authentication |

@@ -44,6 +44,7 @@ The Lua Scripting agent enables custom request/response processing using embedde
 ## Features
 
 - **Embedded Lua Runtime**: Uses mlua (Lua 5.4) for script execution
+- **Sandboxed Execution**: No filesystem or network access by default
 - **Request/Response Hooks**: Inspect and modify at both request and response phases
 - **Header Manipulation**: Add, remove, or modify request and response headers
 - **Decision Control**: Allow, block, deny, or redirect requests

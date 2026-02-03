@@ -38,7 +38,7 @@ As of v0.2.0, the MQTT Gateway agent supports protocol v2 with:
 
 ## Overview
 
-MQTT Gateway provides **comprehensive security controls** for MQTT traffic in IoT environments. The agent processes MQTT packets transmitted over WebSocket, enabling topic-based access control, client authentication, payload inspection, and rate limiting.
+MQTT Gateway provides **comprehensive security controls** for MQTT traffic in IoT environments. The agent processes MQTT packets carried over WebSocket frames. Native MQTT (TCP port 1883) is not supported — MQTT clients must connect via WebSocket. The agent enables topic-based access control, client authentication, payload inspection, and rate limiting.
 
 <div class="info-notice">
 
@@ -107,6 +107,10 @@ Control publish and subscribe access with flexible topic patterns:
   }
 }
 ```
+
+#### ACL Precedence
+
+Rules are evaluated by `priority` (highest value first). The first matching rule wins. If no rule matches, `default-action` applies. This is a strict first-match model — rules do not accumulate.
 
 #### Topic Wildcards
 

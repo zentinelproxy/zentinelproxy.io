@@ -111,6 +111,11 @@ Prevent resource exhaustion:
 - Maximum binary frame size
 - Maximum total message size
 
+### Limitations
+
+- **Per-frame inspection**: Content filtering operates on individual frames. Continuation frames are inspected independently, not reassembled into complete messages. Payloads deliberately fragmented across frames could bypass detection.
+- **Text-only content filtering by default**: Binary frames are not inspected unless `--inspect-binary` is enabled.
+
 ## Use Cases
 
 - **Chat Moderation**: Filter XSS and injection attacks in real-time messaging

@@ -41,7 +41,7 @@ The Auth agent provides comprehensive authentication and authorization for your 
 - **mTLS Client Certificates**: X.509 certificate-based authentication
 
 ### Authorization (AuthZ)
-- **Cedar Policy Engine**: Fine-grained, policy-as-code authorization
+- **Cedar Policy Engine**: Policy-as-code authorization (principal, action, resource evaluation)
 
 ### Token Services
 - **Token Exchange (RFC 8693)**: Convert between token types (SAML→JWT, external→internal)
@@ -561,6 +561,8 @@ The agent builds Cedar requests with:
 | Action | HTTP method | `Action::"GET"` |
 | Resource | Request path | `Resource::"/api/users/123"` |
 | Context | Claims, roles | `{"roles": ["admin"], "claims": {...}}` |
+
+> **Note:** The current Cedar integration evaluates principal, action, and resource. Entity hierarchies and complex context attributes are not yet supported. For advanced Cedar policies with entity relationships, use the dedicated [Policy agent](/agents/policy/).
 
 ## Token Exchange (RFC 8693)
 

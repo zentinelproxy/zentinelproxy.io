@@ -1,7 +1,7 @@
 +++
 title = "AI Gateway"
 weight = 20
-description = "Semantic security for AI APIs: prompt injection detection, jailbreak prevention, and PII filtering for LLM traffic."
+description = "Pattern-based security for AI APIs: prompt injection detection, jailbreak prevention, PII detection, and schema validation for LLM traffic."
 template = "agent.html"
 
 [taxonomies]
@@ -28,13 +28,13 @@ min_sentinel_version = "26.01.0"
 
 ## Overview
 
-AI Gateway provides **semantic security controls** for AI API traffic (OpenAI, Anthropic, Azure OpenAI). This agent specializes in content-level analysis that requires understanding the meaning and intent of prompts — capabilities that complement Sentinel's built-in inference features.
+AI Gateway provides **pattern-based security controls** for AI API traffic (OpenAI, Anthropic, Azure OpenAI). This agent specializes in content-level pattern matching that detects known attack patterns in prompts — capabilities that complement Sentinel's built-in inference features.
 
 <div class="info-notice">
 
 ### Built-in vs Agent Features
 
-Sentinel v26.01 includes [built-in inference support](/configuration/inference/) for token-based rate limiting, cost tracking, and model routing. This agent focuses on **semantic guardrails** that analyze prompt content:
+Sentinel v26.01 includes [built-in inference support](/configuration/inference/) for token-based rate limiting, cost tracking, and model routing. This agent focuses on **pattern-based guardrails** that analyze prompt content:
 
 | Feature | Built-in | Agent |
 |---------|----------|-------|
@@ -47,8 +47,6 @@ Sentinel v26.01 includes [built-in inference support](/configuration/inference/)
 | **Jailbreak detection** | — | Yes |
 | **Input PII detection & redaction** | — | Yes |
 | **Output PII detection** | — | Yes |
-| **Toxicity detection** | — | Yes |
-| **Topic guardrails** | — | Yes |
 | **Schema validation** | — | Yes |
 | **Model allowlist** | — | Yes |
 
@@ -86,15 +84,6 @@ Analyze and filter LLM responses before they reach the client:
 - **Response PII Detection**: Detect PII leaked in LLM responses
   - Configurable actions: block, redact, or log
   - Prevents models from exposing training data or user information
-- **Toxicity Detection**: Block harmful, offensive, or inappropriate content
-  - Hate speech, harassment, violence, self-harm
-  - Configurable severity threshold
-- **Topic Guardrails**: Restrict responses to allowed topics
-  - Block off-topic responses
-  - Enforce domain-specific constraints (e.g., only discuss products, not competitors)
-- **Hallucination Markers**: Flag responses with low-confidence indicators
-  - Detect hedging language ("I think", "possibly", "might be")
-  - Add confidence headers for downstream processing
 - **Response Schema Validation**: Validate structured outputs (JSON mode)
   - Ensure responses match expected schema
   - Block malformed structured responses
@@ -123,7 +112,6 @@ sentinel-ai-gateway-agent \
   --allowed-models "gpt-4,gpt-3.5-turbo,claude-3" \
   --pii-action block \
   --output-pii-action redact \
-  --toxicity-detection \
   --schema-validation
 ```
 
@@ -156,13 +144,6 @@ sentinel-ai-gateway-agent \
 |--------|---------|-------------|---------|
 | `--output-pii-detection` | `OUTPUT_PII_DETECTION` | Enable response PII detection | `false` |
 | `--output-pii-action` | `OUTPUT_PII_ACTION` | Action on output PII: block/redact/log | `log` |
-| `--toxicity-detection` | `TOXICITY_DETECTION` | Enable toxicity detection | `false` |
-| `--toxicity-threshold` | `TOXICITY_THRESHOLD` | Toxicity score threshold (0.0-1.0) | `0.7` |
-| `--toxicity-categories` | `TOXICITY_CATEGORIES` | Categories to detect (comma-separated) | `hate,harassment,violence,self-harm` |
-| `--topic-guardrails` | `TOPIC_GUARDRAILS` | Enable topic restriction | `false` |
-| `--allowed-topics` | `ALLOWED_TOPICS` | Allowed topic keywords (comma-separated) | (all) |
-| `--blocked-topics` | `BLOCKED_TOPICS` | Blocked topic keywords (comma-separated) | (none) |
-| `--hallucination-detection` | `HALLUCINATION_DETECTION` | Enable hallucination markers | `false` |
 | `--output-schema` | `OUTPUT_SCHEMA` | Path to JSON Schema for response validation | - |
 
 ### Recommended Sentinel Configuration
@@ -215,10 +196,6 @@ route {
 |--------|-------------|
 | `X-AI-Gateway-Output-PII-Detected` | Comma-separated PII types found in response |
 | `X-AI-Gateway-Output-PII-Redacted` | `true` if response PII was redacted |
-| `X-AI-Gateway-Toxicity-Score` | Toxicity score (0.0-1.0) if detection enabled |
-| `X-AI-Gateway-Toxicity-Categories` | Detected toxicity categories |
-| `X-AI-Gateway-Topic-Violation` | `true` if topic guardrail triggered |
-| `X-AI-Gateway-Hallucination-Markers` | Count of hedging phrases detected |
 | `X-AI-Gateway-Output-Schema-Valid` | Response schema validation result |
 
 ## Detection Patterns
@@ -251,35 +228,6 @@ Detects in both prompts and responses:
 - Credit card numbers
 - Public IP addresses
 - API keys and secrets (common patterns)
-
-### Output Detection
-
-#### Toxicity Categories
-
-| Category | Examples |
-|----------|----------|
-| `hate` | Slurs, discriminatory language, dehumanization |
-| `harassment` | Threats, bullying, targeted attacks |
-| `violence` | Graphic violence, instructions for harm |
-| `self-harm` | Suicide, self-injury encouragement |
-| `sexual` | Explicit sexual content |
-| `dangerous` | Instructions for illegal activities |
-
-#### Hallucination Markers
-
-Detects hedging and uncertainty phrases:
-- "I think", "I believe", "probably"
-- "might be", "could be", "possibly"
-- "I'm not sure", "I don't know exactly"
-- "As far as I know", "To the best of my knowledge"
-
-#### Topic Detection
-
-Keyword and semantic matching for:
-- Allowed topics (whitelist mode)
-- Blocked topics (blacklist mode)
-- Competitor mentions
-- Off-brand content
 
 ### Schema Validation (Input & Output)
 
@@ -353,40 +301,6 @@ X-AI-Gateway-Output-PII-Detected: email,ssn
 X-AI-Gateway-Output-PII-Redacted: true
 ```
 
-### Block Toxic Response
-
-With `--toxicity-detection --toxicity-threshold 0.7`:
-
-```http
-HTTP/1.1 403 Forbidden
-X-AI-Gateway-Blocked: true
-X-AI-Gateway-Blocked-Reason: toxicity
-X-AI-Gateway-Toxicity-Score: 0.85
-X-AI-Gateway-Toxicity-Categories: harassment,hate
-```
-
-### Topic Guardrails
-
-Block responses mentioning competitors with `--blocked-topics "competitor-a,competitor-b"`:
-
-```http
-HTTP/1.1 403 Forbidden
-X-AI-Gateway-Blocked: true
-X-AI-Gateway-Blocked-Reason: topic-violation
-X-AI-Gateway-Topic-Violation: true
-```
-
-### Hallucination Detection
-
-With `--hallucination-detection`, responses are annotated with confidence markers:
-
-```http
-HTTP/1.1 200 OK
-X-AI-Gateway-Hallucination-Markers: 3
-```
-
-The response passes through but downstream systems can use the header to flag low-confidence responses for review.
-
 ### Full Protection Example
 
 Run with comprehensive input and output guardrails:
@@ -399,19 +313,13 @@ sentinel-ai-gateway-agent \
   --jailbreak-detection true \
   --pii-action redact \
   --output-pii-detection true \
-  --output-pii-action redact \
-  --toxicity-detection true \
-  --toxicity-threshold 0.7 \
-  --toxicity-categories "hate,harassment,violence,self-harm,dangerous" \
-  --topic-guardrails true \
-  --blocked-topics "competitor-x,competitor-y,internal-project-name" \
-  --hallucination-detection true
+  --output-pii-action redact
 ```
 
 ## Library Usage
 
 ```rust
-use sentinel_agent_ai_gateway::{AiGatewayAgent, AiGatewayConfig, PiiAction, ToxicityCategory};
+use sentinel_agent_ai_gateway::{AiGatewayAgent, AiGatewayConfig, PiiAction};
 use sentinel_agent_protocol::AgentServer;
 
 let config = AiGatewayConfig {
@@ -425,17 +333,6 @@ let config = AiGatewayConfig {
     // Output guardrails
     output_pii_detection_enabled: true,
     output_pii_action: PiiAction::Redact,
-    toxicity_detection_enabled: true,
-    toxicity_threshold: 0.7,
-    toxicity_categories: vec![
-        ToxicityCategory::Hate,
-        ToxicityCategory::Harassment,
-        ToxicityCategory::Violence,
-        ToxicityCategory::SelfHarm,
-    ],
-    topic_guardrails_enabled: true,
-    blocked_topics: vec!["competitor-x".to_string()],
-    hallucination_detection_enabled: true,
 
     ..Default::default()
 };

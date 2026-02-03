@@ -381,6 +381,8 @@ The agent caches policy decisions to improve performance for repeated requests:
 - **LRU Eviction**: Least-recently-used entries evicted when cache is full
 - **Invalidation**: Cache clears on policy reload
 
+Caching is important for performance since each uncached evaluation spawns a subprocess. The default TTL of 60 seconds and 10,000 max entries provide good coverage for most workloads.
+
 ```yaml
 cache:
   enabled: true

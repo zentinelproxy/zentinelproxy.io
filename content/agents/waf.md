@@ -1,11 +1,11 @@
 +++
 title = "WAF (Web Application Firewall)"
 weight = 10
-description = "Next-generation WAAP with ML-powered detection, anomaly scoring, API security, schema validation, bot protection, and 285 rules."
+description = "Pure Rust WAF with 285 detection rules, anomaly scoring, API security, schema validation, bot protection, and n-gram based payload analysis."
 template = "agent.html"
 
 [taxonomies]
-tags = ["security", "waf", "core", "ml", "api-security"]
+tags = ["security", "waf", "core", "api-security"]
 
 [extra]
 official = true
@@ -28,7 +28,7 @@ min_sentinel_version = "26.01.0"
 
 ## Overview
 
-A **next-generation Web Application and API Protection (WAAP)** agent for Sentinel featuring ML-powered detection, anomaly scoring, and enterprise-grade security. Built in pure Rust with zero C dependencies.
+A **next-generation Web Application and API Protection (WAAP)** agent for Sentinel featuring heuristic anomaly detection, n-gram analysis, and comprehensive security. Built in pure Rust with zero C dependencies.
 
 ## Key Features
 
@@ -43,7 +43,7 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 
 ### Intelligence Layer
 - **Anomaly Scoring**: Cumulative risk scores with configurable thresholds
-- **ML Classification**: Character n-gram based attack detection
+- **Statistical Classification**: Character n-gram based payload fingerprinting
 - **Request Fingerprinting**: Behavioral baseline learning
 - **Payload Similarity**: MinHash-based malicious pattern matching
 
@@ -64,14 +64,14 @@ A **next-generation Web Application and API Protection (WAAP)** agent for Sentin
 - **Sensitive Data Detection**: Credit cards, SSN, API keys, PII masking
 - **Supply Chain Protection**: SRI validation, crypto miner detection
 - **Virtual Patching**: Log4Shell, Spring4Shell, Shellshock signatures
-- **Threat Intelligence**: IP/domain reputation, Tor exit nodes, IoC feeds
-- **Federated Learning**: Privacy-preserving distributed model training
+- **Threat Intelligence**: IP/domain reputation framework, Tor exit nodes (requires feed configuration)
+- **Federated Learning**: Privacy-preserving distributed gradient averaging (experimental)
 - **Metrics**: Prometheus, OpenTelemetry, JSON export
 
 ### Operational
 - **WebSocket Inspection**: Text/binary frame inspection with fragment accumulation
 - **Streaming Inspection**: Sliding window for constant memory usage
-- **Plugin Architecture**: Extensible detection and scoring
+- **Plugin Traits**: Compile-time extensible detection and scoring
 - **Health Checks**: Readiness/liveness probes for Kubernetes
 - **Graceful Shutdown**: SIGINT/SIGTERM handling
 
@@ -677,7 +677,7 @@ GET /health
 | Feature | WAF | ModSecurity |
 |---------|-----|-------------|
 | Detection Rules | 285 | 800+ CRS |
-| ML Detection | Yes | No |
+| Statistical Detection | Yes | No |
 | Anomaly Scoring | Yes | Yes |
 | API Security | GraphQL, JWT, Schema | Basic |
 | Bot Detection | Behavioral | UA only |
@@ -688,7 +688,7 @@ GET /health
 | Latency p99 | <5µs | ~15ms |
 
 **Use WAF when:**
-- You want ML-powered detection with low false positives
+- You want statistical anomaly detection with low false positives
 - You need API security (GraphQL, JWT, schema validation)
 - You want zero-dependency deployment
 - You need bot detection and threat intelligence
@@ -701,7 +701,7 @@ GET /health
 ## False Positive Handling
 
 1. **Anomaly scoring** - Single low-confidence matches won't block
-2. **ML classification** - Context-aware detection reduces noise
+2. **Statistical classification** - N-gram analysis reduces noise
 3. **Lower paranoia level** - Start with level 1
 4. **Exclude paths** - Skip known-safe endpoints
 5. **Disable rules** - Turn off specific problematic rules
@@ -732,8 +732,8 @@ pub trait WafPlugin: Send + Sync {
 ┌─────────────────────────────────────────────────────────────┐
 │                  WAF Agent                                  │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │  Automata   │  │     ML      │  │    Threat Intel     │  │
-│  │   Engine    │  │  Classifier │  │      Engine         │  │
+│  │  Automata   │  │  Statistical │  │    Threat Intel     │  │
+│  │   Engine    │  │  Classifier  │  │      Engine         │  │
 │  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘  │
 │         │                │                     │            │
 │         └────────────────┼─────────────────────┘            │
