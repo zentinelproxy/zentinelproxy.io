@@ -772,6 +772,51 @@ python3 analyze-results.py results/<timestamp>/
 
 ---
 
+## How to Reproduce
+
+All benchmark scripts live in the main repository. To reproduce any result on your own hardware:
+
+### Proxy Comparison
+
+```bash
+git clone https://github.com/raskell-io/sentinel
+cd sentinel
+
+# Install proxies you want to compare (Sentinel, nginx, HAProxy, Caddy, Envoy)
+# Then run the benchmark suite:
+cd tests/bench
+./proxy-bench.sh                    # All proxies, default settings
+./proxy-bench.sh --proxy sentinel   # Single proxy
+./proxy-bench.sh --duration 120     # Custom duration (seconds)
+./proxy-bench.sh --connections 200  # Custom concurrency
+```
+
+The script uses [oha](https://github.com/hatoo/oha) as the load generator. Each proxy is started as a native binary (no Docker), warmed up for 5 seconds, then benchmarked for 60 seconds at the configured concurrency. CPU and memory are sampled every second via `ps`. Proxies are tested sequentially with 10-second cooldowns between runs.
+
+**Configuration:** All proxies use equivalent minimal configs — single upstream, no TLS, no caching, keepalive enabled. Configs are in `tests/bench/configs/`.
+
+### WAF Benchmarks
+
+```bash
+cd tests/bench
+./waf-bench.sh                      # sentinel-modsec vs libmodsecurity
+```
+
+### Soak & Chaos Tests
+
+```bash
+cd tests/soak
+./run-soak-test.sh --duration 1     # 1-hour quick test
+
+cd tests/chaos
+make quick                          # 4 core scenarios
+make test                           # All 10 scenarios
+```
+
+Results are written to `results/<timestamp>/` as JSON. The raw data behind the charts on this page is available at [benchmark-results.json](/data/benchmark-results.json).
+
+---
+
 ## Known Gaps
 
 We're actively working on:
