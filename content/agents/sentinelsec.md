@@ -1,5 +1,6 @@
 +++
 title = "SentinelSec"
+weight = 60
 description = "Pure Rust ModSecurity-compatible WAF with full OWASP CRS support - no C dependencies required."
 template = "agent.html"
 

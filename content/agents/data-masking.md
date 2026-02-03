@@ -1,5 +1,6 @@
 +++
 title = "Data Masking"
+weight = 20
 description = "PII protection agent with reversible tokenization, format-preserving encryption, and pattern-based masking for JSON, XML, and form data."
 template = "agent.html"
 

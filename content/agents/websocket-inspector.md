@@ -1,5 +1,6 @@
 +++
 title = "WebSocket Inspector"
+weight = 70
 description = "Security analysis for WebSocket frames: content filtering, schema validation, and attack detection for real-time connections."
 template = "agent.html"
 

@@ -1,5 +1,6 @@
 +++
 title = "Rate Limiter"
+weight = 10
 description = "Token bucket rate limiting with configurable windows and limits per route, IP, or custom keys."
 template = "agent.html"
 

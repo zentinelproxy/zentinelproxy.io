@@ -1,5 +1,6 @@
 +++
 title = "AI Gateway"
+weight = 20
 description = "Semantic security for AI APIs: prompt injection detection, jailbreak prevention, and PII filtering for LLM traffic."
 template = "agent.html"
 

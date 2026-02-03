@@ -1,5 +1,6 @@
 +++
 title = "Content Scanner"
+weight = 160
 description = "Malware scanning agent using ClamAV daemon for file upload protection"
 template = "agent.html"
 

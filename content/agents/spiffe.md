@@ -1,5 +1,6 @@
 +++
 title = "SPIFFE"
+weight = 180
 description = "SPIFFE/SPIRE workload identity authentication agent for zero-trust service-to-service communication."
 template = "agent.html"
 

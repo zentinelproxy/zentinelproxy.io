@@ -1,5 +1,6 @@
 +++
 title = "API Deprecation"
+weight = 210
 description = "API lifecycle management agent with RFC 8594 Sunset headers, usage tracking, automatic redirects, and migration support for graceful API deprecation."
 template = "agent.html"
 

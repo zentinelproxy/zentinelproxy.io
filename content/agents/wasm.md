@@ -1,5 +1,6 @@
 +++
 title = "WebAssembly"
+weight = 240
 description = "Execute custom Wasm modules for high-performance request/response processing in any language."
 template = "agent.html"
 

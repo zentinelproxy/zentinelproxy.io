@@ -1,5 +1,6 @@
 +++
 title = "MQTT Gateway"
+weight = 80
 description = "IoT protocol security for MQTT: topic-based ACLs, client authentication, payload inspection, rate limiting, and QoS enforcement."
 template = "agent.html"
 

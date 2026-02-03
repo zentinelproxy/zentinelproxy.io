@@ -1,5 +1,6 @@
 +++
 title = "GraphQL Security"
+weight = 140
 description = "GraphQL-specific security controls including query depth limiting, complexity analysis, introspection control, and field-level authorization."
 template = "agent.html"
 

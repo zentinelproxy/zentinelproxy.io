@@ -1,5 +1,6 @@
 +++
 title = "Lua Scripting"
+weight = 50
 description = "Embed custom Lua scripts for flexible request/response processing and header manipulation."
 template = "agent.html"
 

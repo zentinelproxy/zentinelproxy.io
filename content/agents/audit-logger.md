@@ -1,5 +1,6 @@
 +++
 title = "Audit Logger"
+weight = 120
 description = "Structured audit logging agent with PII redaction, multiple formats (JSON, CEF, LEEF), and compliance templates for SOC2, HIPAA, PCI, and GDPR."
 template = "agent.html"
 

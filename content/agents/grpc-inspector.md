@@ -1,5 +1,6 @@
 +++
 title = "gRPC Inspector"
+weight = 130
 description = "Comprehensive security controls for gRPC services: method authorization, rate limiting, metadata inspection, and reflection control."
 template = "agent.html"
 

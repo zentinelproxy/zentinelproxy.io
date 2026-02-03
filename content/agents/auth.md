@@ -1,5 +1,6 @@
 +++
 title = "Auth"
+weight = 30
 description = "Authentication and authorization agent supporting JWT, OIDC, API keys, Basic auth, SAML SSO, mTLS, Cedar policies, and token exchange."
 template = "agent.html"
 
