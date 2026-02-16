@@ -1,0 +1,786 @@
+{% extends "base.html" %}
+
+{% block title %}Control Plane | {{ config.title }}{% endblock %}
+{% block description %}Fleet management for Sentinel reverse proxies. Declarative configuration distribution with safe rollouts, real-time monitoring, and audit logging.{% endblock %}
+
+{% block content %}
+<div class="cp-page">
+    <!-- Hero Section -->
+    <section class="cp-hero">
+        <div class="container">
+            <h1 class="cp-title">
+                <span class="gradient-text">Control Plane</span>
+            </h1>
+            <p class="cp-subtitle">
+                Fleet management for Sentinel reverse proxies. Declarative configuration distribution with safe rollouts, real-time monitoring, and audit logging.
+            </p>
+        </div>
+    </section>
+
+    <!-- Intro -->
+    <section class="cp-section">
+        <div class="container">
+            <div class="cp-intro">
+                <p>
+                    The <a href="https://github.com/raskell-io/sentinel-control-plane">Sentinel Control Plane</a> is a fleet management system for Sentinel reverse proxies. It handles configuration distribution, rolling deployments, and real-time node monitoring &mdash; built with Elixir/Phoenix and LiveView.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                How It Works
+            </h2>
+            <div class="cp-flow">
+                <div class="cp-flow-diagram">
+                    <div class="cp-flow-step">
+                        <span class="cp-flow-label">KDL Config</span>
+                    </div>
+                    <span class="cp-flow-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <div class="cp-flow-step">
+                        <span class="cp-flow-label">Compile &amp; Sign</span>
+                    </div>
+                    <span class="cp-flow-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <div class="cp-flow-step">
+                        <span class="cp-flow-label">Immutable Bundle</span>
+                    </div>
+                    <span class="cp-flow-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <div class="cp-flow-step">
+                        <span class="cp-flow-label">Rollout</span>
+                    </div>
+                    <span class="cp-flow-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <div class="cp-flow-step">
+                        <span class="cp-flow-label">Nodes Pull &amp; Activate</span>
+                    </div>
+                </div>
+            </div>
+            <ol class="cp-steps">
+                <li><strong>Define</strong> services, upstreams, certificates, and middleware through the web UI or API</li>
+                <li><strong>Compile</strong> into an immutable, signed bundle (<code>.tar.zst</code> with manifest, checksums, and SBOM)</li>
+                <li><strong>Create a rollout</strong> targeting nodes by labels, groups, or environments</li>
+                <li><strong>Deploy</strong> with batched progression, health gates, and automatic pause on failure</li>
+                <li><strong>Nodes pull</strong> the bundle, verify the Ed25519 signature, and activate</li>
+            </ol>
+            <p class="cp-note">Every mutation is recorded in a tamper-evident audit log.</p>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                Architecture
+            </h2>
+            <div class="cp-architecture">
+                <pre><code>┌─────────────────────────────────────────────────┐
+│              Control Plane (Phoenix)             │
+│                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
+│  │ LiveView │  │ REST API │  │    GitOps     │  │
+│  │    UI    │  │ GraphQL  │  │   Webhooks    │  │
+│  └────┬─────┘  └─────┬────┘  └────────┬──────┘  │
+│       │              │                │          │
+│  ┌────┴──────────────┴────────────────┴───────┐  │
+│  │           Contexts (Business Logic)        │  │
+│  │  Bundles · Nodes · Rollouts · Audit · WAF  │  │
+│  └────┬──────────────┬────────────────────────┘  │
+│       │              │                           │
+│  ┌────┴─────┐  ┌─────┴──────┐                    │
+│  │ Postgres │  │  S3/MinIO  │                    │
+│  │  (state) │  │ (bundles)  │                    │
+│  └──────────┘  └────────────┘                    │
+└─────────────────────────────────────────────────┘
+         │                          ▲
+         │  Rollout assigns bundle  │  Heartbeat + status
+         ▼                          │
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│  Sentinel   │  │  Sentinel   │  │  Sentinel   │
+│   Node A    │  │   Node B    │  │   Node C    │
+└─────────────┘  └─────────────┘  └─────────────┘</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                Features
+            </h2>
+            <div class="cp-features-grid">
+                <!-- Configuration Management -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <h3>Configuration Management</h3>
+                    <ul>
+                        <li><strong>Services</strong> &mdash; Routes with upstream targets, load balancing, timeouts, retries, and caching</li>
+                        <li><strong>TLS Certificates</strong> &mdash; Upload or auto-provision via ACME/Let's Encrypt with expiry tracking</li>
+                        <li><strong>Middlewares</strong> &mdash; Rate limiting, CORS, caching, compression, request/response transforms</li>
+                        <li><strong>Auth Policies</strong> &mdash; JWT, API key, Basic, OAuth2, OIDC, and composite authentication</li>
+                        <li><strong>Secrets</strong> &mdash; AES-256-GCM encrypted at rest with rotation and per-environment scoping</li>
+                        <li><strong>Service Topology</strong> &mdash; Visual graph of services, upstreams, middlewares, and policies</li>
+                    </ul>
+                </div>
+
+                <!-- Bundle Pipeline -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    </div>
+                    <h3>Bundle Pipeline</h3>
+                    <ul>
+                        <li><strong>Immutable Bundles</strong> &mdash; Content-addressed <code>.tar.zst</code> archives with SHA256 hashing</li>
+                        <li><strong>Ed25519 Signing</strong> &mdash; Cryptographic bundle verification on every node</li>
+                        <li><strong>SBOM Generation</strong> &mdash; CycloneDX 1.5 for supply chain visibility</li>
+                        <li><strong>Risk Scoring</strong> &mdash; Automatic risk assessment comparing each bundle against its predecessor</li>
+                        <li><strong>Config Validation</strong> &mdash; Custom rules (required fields, forbidden patterns, size limits, JSON Schema)</li>
+                        <li><strong>Promotion Pipeline</strong> &mdash; Promote bundles through dev, staging, and production</li>
+                    </ul>
+                </div>
+
+                <!-- Deployment & Rollouts -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12"/><path d="M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M15 6a9 9 0 0 0-9 9"/><path d="M18 15v6"/><path d="M21 18h-6"/></svg>
+                    </div>
+                    <h3>Deployment &amp; Rollouts</h3>
+                    <ul>
+                        <li><strong>Rolling</strong> &mdash; Deploy in batches with health gates between steps</li>
+                        <li><strong>Canary</strong> &mdash; Gradually shift traffic to the new configuration</li>
+                        <li><strong>Blue-Green</strong> &mdash; Deploy to standby slot, shift traffic, then swap</li>
+                        <li><strong>All at Once</strong> &mdash; Deploy to every node simultaneously</li>
+                        <li><strong>Health Gates</strong> &mdash; Heartbeat checks, error rate thresholds, latency limits</li>
+                        <li><strong>Approval Workflows</strong> &mdash; Require sign-off before rollouts execute</li>
+                        <li><strong>Freeze Windows</strong> &mdash; Block deployments during sensitive periods</li>
+                        <li><strong>Drift Detection</strong> &mdash; Automatic detection and remediation when nodes diverge</li>
+                    </ul>
+                </div>
+
+                <!-- Node Management -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+                    </div>
+                    <h3>Node Management</h3>
+                    <ul>
+                        <li><strong>Registration</strong> &mdash; Nodes self-register and receive a unique key</li>
+                        <li><strong>JWT Authentication</strong> &mdash; Exchange static keys for short-lived Ed25519 JWT tokens</li>
+                        <li><strong>Heartbeat Monitoring</strong> &mdash; Real-time health tracking with automatic staleness detection</li>
+                        <li><strong>Labels &amp; Groups</strong> &mdash; Organize and target nodes by metadata</li>
+                        <li><strong>Version Pinning</strong> &mdash; Pin nodes to specific bundles to exclude from rollouts</li>
+                        <li><strong>Fleet Simulator</strong> &mdash; Built-in GenServer fleet for testing without real nodes</li>
+                    </ul>
+                </div>
+
+                <!-- Security -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <h3>Security</h3>
+                    <ul>
+                        <li><strong>WAF</strong> &mdash; ~60 OWASP CRS rules with policy system, anomaly detection, and analytics</li>
+                        <li><strong>SSO</strong> &mdash; OIDC (with PKCE) and SAML 2.0 with JIT provisioning and group-to-role mapping</li>
+                        <li><strong>TOTP MFA</strong> &mdash; Time-based one-time passwords with recovery codes</li>
+                        <li><strong>API Keys</strong> &mdash; Scoped keys with 9 permission categories</li>
+                        <li><strong>Audit Logging</strong> &mdash; Tamper-evident HMAC chain with cryptographic checkpoints</li>
+                    </ul>
+                </div>
+
+                <!-- Observability -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <h3>Observability</h3>
+                    <ul>
+                        <li><strong>SLO/SLI Monitoring</strong> &mdash; Define SLOs with error budget tracking and burn rate alerts</li>
+                        <li><strong>Alert Rules</strong> &mdash; Threshold, anomaly, and SLO burn rate conditions with silencing</li>
+                        <li><strong>Prometheus Metrics</strong> &mdash; Fleet gauges, counters, and standard BEAM/Phoenix/Ecto/Oban metrics</li>
+                        <li><strong>OpenTelemetry</strong> &mdash; Distributed tracing across API, database, and compilation operations</li>
+                        <li><strong>Service Analytics</strong> &mdash; Per-service request counts, error rates, latency percentiles</li>
+                    </ul>
+                </div>
+
+                <!-- Integrations -->
+                <div class="cp-feature-card">
+                    <div class="cp-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </div>
+                    <h3>Integrations</h3>
+                    <ul>
+                        <li><strong>GitOps</strong> &mdash; Auto-compile bundles on push from GitHub, GitLab, Bitbucket, or Gitea</li>
+                        <li><strong>Notifications</strong> &mdash; Route events to Slack, PagerDuty, Microsoft Teams, Email, or webhooks</li>
+                        <li><strong>GraphQL API</strong> &mdash; Absinthe-powered with real-time subscriptions</li>
+                        <li><strong>Developer Portal</strong> &mdash; Auto-generated API documentation from OpenAPI specs</li>
+                        <li><strong>REST API</strong> &mdash; Full CRUD for all resources with scoped authentication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Quick Start
+            </h2>
+            <div class="cp-quickstart">
+                <div class="cp-quickstart-block">
+                    <p>Docker Compose (recommended):</p>
+                    <div class="verify-command">
+                        <pre><code>git clone https://github.com/raskell-io/sentinel-control-plane.git
+cd sentinel-control-plane
+docker compose up</code></pre>
+                    </div>
+                    <p class="cp-quickstart-note">This starts the control plane, PostgreSQL, and MinIO. Migrations run automatically. Visit <a href="http://localhost:4000">localhost:4000</a>.</p>
+                </div>
+                <div class="cp-quickstart-block">
+                    <p>Local development with hot-reloading:</p>
+                    <div class="verify-command">
+                        <pre><code>mise install && mise run setup && mise run dev</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Multi-Tenancy -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Multi-Tenancy
+            </h2>
+            <p class="section-description">The control plane supports multiple organizations, each with their own projects, members, and signing keys.</p>
+            <div class="cp-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Permissions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Admin</strong></td>
+                            <td>Full org control, manage members, signing keys, SSO</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Operator</strong></td>
+                            <td>Create/manage projects, bundles, rollouts, services</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reader</strong></td>
+                            <td>Read-only access to all resources</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- API -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                API
+            </h2>
+            <p class="section-description">Nodes authenticate with registration keys or JWT tokens. Operators authenticate with scoped API keys.</p>
+            <div class="cp-api-grid">
+                <div class="cp-api-block">
+                    <h3>Node API</h3>
+                    <div class="verify-command">
+                        <pre><code>POST /api/v1/projects/:slug/nodes/register    # Register
+POST /api/v1/nodes/:id/heartbeat              # Heartbeat
+GET  /api/v1/nodes/:id/bundles/latest          # Poll for updates</code></pre>
+                    </div>
+                </div>
+                <div class="cp-api-block">
+                    <h3>Operator API</h3>
+                    <div class="verify-command">
+                        <pre><code>POST /api/v1/projects/:slug/bundles            # Create bundle
+POST /api/v1/projects/:slug/rollouts           # Create rollout
+GET  /api/v1/projects/:slug/nodes/stats        # Fleet statistics
+POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
+                    </div>
+                </div>
+            </div>
+            <p class="cp-api-note">Full API reference and documentation available in the <a href="https://github.com/raskell-io/sentinel-control-plane/tree/main/docs">docs</a>.</p>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="cp-section">
+        <div class="container">
+            <h2 class="section-heading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                Tech Stack
+            </h2>
+            <div class="cp-stack-grid">
+                <div class="cp-stack-item">
+                    <strong>Elixir / Phoenix 1.8</strong>
+                    <span>LiveView for real-time UI</span>
+                </div>
+                <div class="cp-stack-item">
+                    <strong>Oban</strong>
+                    <span>Reliable background job processing</span>
+                </div>
+                <div class="cp-stack-item">
+                    <strong>Absinthe</strong>
+                    <span>GraphQL with subscriptions</span>
+                </div>
+                <div class="cp-stack-item">
+                    <strong>PostgreSQL / SQLite</strong>
+                    <span>Production / development</span>
+                </div>
+                <div class="cp-stack-item">
+                    <strong>S3 / MinIO</strong>
+                    <span>Bundle storage</span>
+                </div>
+                <div class="cp-stack-item">
+                    <strong>Ed25519 / JOSE</strong>
+                    <span>Signing</span>
+                </div>
+                <div class="cp-stack-item">
+                    <strong>PromEx + OpenTelemetry</strong>
+                    <span>Observability</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cp-section cp-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Get Started</h2>
+                <p>Explore the source, read the docs, or join the discussion.</p>
+                <div class="cta-actions">
+                    <a href="https://github.com/raskell-io/sentinel-control-plane" class="cta-btn cta-btn--primary" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                        GitHub Repository
+                    </a>
+                    <a href="https://github.com/raskell-io/sentinel-control-plane/tree/main/docs" class="cta-btn" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Documentation
+                    </a>
+                    <a href="https://github.com/raskell-io/sentinel/discussions" class="cta-btn" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Discussions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.cp-page {
+    padding-bottom: 4rem;
+}
+
+.cp-hero {
+    padding: 6rem 0 3rem;
+    text-align: center;
+}
+
+.cp-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.cp-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    max-width: 680px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.cp-section {
+    padding: 2rem 0;
+}
+
+.cp-section .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.cp-section .section-heading svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.cp-section .section-description {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* Intro */
+.cp-intro {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+}
+
+.cp-intro a {
+    color: var(--color-accent, #60a5fa);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Flow diagram */
+.cp-flow {
+    margin-bottom: 2rem;
+}
+
+.cp-flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.cp-flow-step {
+    background: var(--color-surface, var(--color-bg-elevated));
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.cp-flow-arrow {
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+}
+
+.cp-steps {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.cp-steps code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.85rem;
+    background: var(--color-code-bg, #1a1a2e);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+}
+
+.cp-note {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+/* Architecture */
+.cp-architecture {
+    overflow-x: auto;
+    background: var(--color-code-bg, #1a1a2e);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.cp-architecture pre {
+    margin: 0;
+    white-space: pre;
+}
+
+.cp-architecture code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-code-text, #e0e0e0);
+}
+
+/* Features grid */
+.cp-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+.cp-feature-card {
+    background: var(--color-surface, var(--color-bg-elevated));
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: border-color 0.2s;
+}
+
+.cp-feature-card:hover {
+    border-color: var(--color-border-hover, var(--color-border));
+}
+
+.cp-feature-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-elevated, var(--color-bg-elevated));
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    color: var(--color-accent, #60a5fa);
+}
+
+.cp-feature-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.cp-feature-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.cp-feature-card li {
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    font-size: 0.95rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.cp-feature-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary);
+}
+
+.cp-feature-card li strong {
+    color: var(--color-text, var(--color-text-primary));
+}
+
+.cp-feature-card code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--color-code-bg, #1a1a2e);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+}
+
+/* Quick Start */
+.cp-quickstart {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 720px;
+}
+
+.cp-quickstart-block p {
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.cp-quickstart-note {
+    margin-top: 0.75rem !important;
+    font-size: 0.95rem !important;
+}
+
+.cp-quickstart-note a {
+    color: var(--color-accent, #60a5fa);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Table */
+.cp-table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.cp-table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.cp-table-wrapper th,
+.cp-table-wrapper td {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.cp-table-wrapper th {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cp-table-wrapper td {
+    color: var(--color-text-secondary);
+}
+
+/* API */
+.cp-api-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.cp-api-block h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.cp-api-note {
+    margin-top: 1.5rem;
+    color: var(--color-text-secondary);
+}
+
+.cp-api-note a {
+    color: var(--color-accent, #60a5fa);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Tech Stack */
+.cp-stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.cp-stack-item {
+    background: var(--color-surface, var(--color-bg-elevated));
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cp-stack-item strong {
+    font-size: 0.95rem;
+}
+
+.cp-stack-item span {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
+/* CTA */
+.cp-cta {
+    padding: 3rem 0;
+}
+
+.cp-cta .cta-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.cp-cta .cta-content h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.cp-cta .cta-content p {
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+/* Shared command blocks (reuse supply-chain pattern) */
+.cp-page .verify-command {
+    background: var(--color-code-bg, #1a1a2e);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.cp-page .verify-command pre {
+    margin: 0;
+    white-space: pre;
+}
+
+.cp-page .verify-command code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-code-text, #e0e0e0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cp-features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cp-api-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cp-stack-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cp-flow-diagram {
+        flex-direction: column;
+    }
+
+    .cp-flow-arrow {
+        transform: rotate(90deg);
+    }
+}
+</style>
+{% endblock %}
