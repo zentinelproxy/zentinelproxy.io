@@ -3541,17 +3541,22 @@ body > .nav-dropdown__menu {
     pre {
         margin: var(--space-lg) 0;
         padding: var(--space-lg);
-        background: var(--color-bg-subtle);
         border: 1px solid var(--color-border-subtle);
         border-radius: var(--radius-md);
         overflow-x: auto;
         font-size: 0.875rem;
         line-height: 1.6;
 
+        // Fallback for pre blocks without inline styles
+        &:not([style]) {
+            background: var(--color-bg-subtle);
+        }
+
         code {
             background: none;
             padding: 0;
             font-size: inherit;
+            color: inherit;
         }
     }
 
