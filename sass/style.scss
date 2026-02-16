@@ -3546,11 +3546,7 @@ body > .nav-dropdown__menu {
         overflow-x: auto;
         font-size: 0.875rem;
         line-height: 1.6;
-
-        // Fallback for pre blocks without inline styles
-        &:not([style]) {
-            background: var(--color-bg-subtle);
-        }
+        background: var(--color-bg-subtle);
 
         code {
             background: none;
@@ -4125,3 +4121,8 @@ body > .nav-dropdown__menu {
 // Search Component
 // =============================================================================
 @import 'search';
+
+// =============================================================================
+// Syntax Highlighting (github-dark / github-light via Zola giallo)
+// =============================================================================
+@import 'syntax';
