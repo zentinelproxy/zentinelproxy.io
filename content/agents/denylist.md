@@ -9,21 +9,21 @@ tags = ["security", "filtering", "core"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-denylist"
-homepage = "https://sentinel.raskell.io/agents/denylist/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-denylist"
+homepage = "https://zentinelproxy.io/agents/denylist/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-denylist"
+crate_name = "zentinel-agent-denylist"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_zentinel_version = "25.12.0"
 +++
 
 ## Protocol v2 Features
@@ -56,28 +56,28 @@ The Denylist agent provides real-time request blocking based on IP addresses, CI
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install denylist
+zentinel bundle install denylist
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-denylist
+cargo install zentinel-agent-denylist
 ```
 
 ### Using Docker
 
 ```bash
-docker pull ghcr.io/raskell-io/sentinel-agent-denylist:latest
+docker pull ghcr.io/zentinelproxy/zentinel-agent-denylist:latest
 ```
 
 ### Docker Compose
@@ -85,26 +85,26 @@ docker pull ghcr.io/raskell-io/sentinel-agent-denylist:latest
 ```yaml
 services:
   denylist-agent:
-    image: ghcr.io/raskell-io/sentinel-agent-denylist:latest
+    image: ghcr.io/zentinelproxy/zentinel-agent-denylist:latest
     volumes:
-      - /var/run/sentinel:/var/run/sentinel
-      - ./denylist.txt:/etc/sentinel/denylist.txt:ro
+      - /var/run/zentinel:/var/run/zentinel
+      - ./denylist.txt:/etc/zentinel/denylist.txt:ro
     environment:
-      - SOCKET_PATH=/var/run/sentinel/denylist.sock
+      - SOCKET_PATH=/var/run/zentinel/denylist.sock
 ```
 
 ## Configuration
 
-Add the agent to your Sentinel configuration:
+Add the agent to your Zentinel configuration:
 
 ```kdl
 agent "denylist" {
-    socket "/var/run/sentinel/denylist.sock"
+    socket "/var/run/zentinel/denylist.sock"
     timeout 50ms
     fail-open false
 
     config {
-        file "/etc/sentinel/denylist.txt"
+        file "/etc/zentinel/denylist.txt"
         reload-interval 60s
     }
 }
@@ -123,7 +123,7 @@ agent "denylist" {
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-denylist.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-denylist.sock` |
 | `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--file` | `DENYLIST_FILE` | Path to denylist file | (required) |
 | `--reload-interval` | `RELOAD_INTERVAL` | Check interval for file changes | `60s` |
@@ -284,7 +284,7 @@ X-Blocked-Pattern: 192.168.1.100
 
 ```bash
 # Add an IP to denylist
-echo "127.0.0.1" >> /etc/sentinel/denylist.txt
+echo "127.0.0.1" >> /etc/zentinel/denylist.txt
 
 # Test (should be blocked)
 curl -i http://localhost:8080/api/test
@@ -294,7 +294,7 @@ curl -i http://localhost:8080/api/test
 
 ```bash
 # Add user agent rule
-echo "ua:curl" >> /etc/sentinel/denylist.txt
+echo "ua:curl" >> /etc/zentinel/denylist.txt
 
 # Test (should be blocked)
 curl -i http://localhost:8080/api/test
@@ -314,7 +314,7 @@ X-Blocked-Pattern: curl
 
 ```bash
 # Add path rule
-echo "path:/.env" >> /etc/sentinel/denylist.txt
+echo "path:/.env" >> /etc/zentinel/denylist.txt
 
 # Test (should be blocked)
 curl -i http://localhost:8080/.env
@@ -336,10 +336,10 @@ X-Blocked-Pattern: /.env
 
 ```kdl
 agent "denylist" {
-    socket "/var/run/sentinel/denylist.sock"
+    socket "/var/run/zentinel/denylist.sock"
 
     config {
-        file "/etc/sentinel/blocked-ips.txt"
+        file "/etc/zentinel/blocked-ips.txt"
         block-response-code 403
     }
 }
@@ -499,10 +499,10 @@ header:X-Debug:* [tag:debug-header]
 
 ```kdl
 agent "denylist" {
-    socket "/var/run/sentinel/denylist.sock"
+    socket "/var/run/zentinel/denylist.sock"
 
     config {
-        file "/etc/sentinel/denylist.txt"
+        file "/etc/zentinel/denylist.txt"
         block-response-code 451
         block-message "Access restricted in your region"
     }
@@ -517,4 +517,4 @@ agent "denylist" {
 | **WAF** | Combine with attack detection |
 | **ModSecurity** | Full WAF with IP reputation |
 
-> **Note:** For country-level blocking, use [Sentinel's built-in GeoIP filtering](/configuration/geoip/) instead.
+> **Note:** For country-level blocking, use [Zentinel's built-in GeoIP filtering](/configuration/geoip/) instead.

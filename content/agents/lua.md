@@ -9,21 +9,21 @@ tags = ["scripting", "extensibility", "core"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-lua"
-homepage = "https://sentinel.raskell.io/agents/lua/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-lua"
+homepage = "https://zentinelproxy.io/agents/lua/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-lua"
+crate_name = "zentinel-agent-lua"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -55,22 +55,22 @@ The Lua Scripting agent enables custom request/response processing using embedde
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install lua
+zentinel bundle install lua
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-lua
+cargo install zentinel-agent-lua
 ```
 
 ## Quick Start
@@ -99,14 +99,14 @@ end
 EOF
 
 # Run the agent
-sentinel-lua-agent --script policy.lua --socket /tmp/sentinel-lua.sock
+zentinel-lua-agent --script policy.lua --socket /tmp/zentinel-lua.sock
 ```
 
 ## CLI Options
 
 | Option | Env Var | Default | Description |
 |--------|---------|---------|-------------|
-| `--socket` | `AGENT_SOCKET` | `/tmp/sentinel-lua.sock` | Unix socket path |
+| `--socket` | `AGENT_SOCKET` | `/tmp/zentinel-lua.sock` | Unix socket path |
 | `--grpc-address` | `GRPC_ADDRESS` | - | gRPC listen address (e.g., `0.0.0.0:50051`) |
 | `--script` | `LUA_SCRIPT` | (required) | Path to Lua script file |
 | `--verbose` | `LUA_VERBOSE` | `false` | Enable debug logging |
@@ -256,7 +256,7 @@ For body inspection, additional hooks are available:
 | `on_response_headers()` | Called when response headers are received |
 | `on_response_body()` | Called when response body is available |
 
-> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Sentinel configuration.
+> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Zentinel configuration.
 
 ### Body Mutation
 
@@ -498,11 +498,11 @@ When a script encounters an error:
 
 The error message is included in the `reason_codes` audit field.
 
-## Sentinel Integration
+## Zentinel Integration
 
 ```kdl
 agent "lua" {
-    socket "/tmp/sentinel-lua.sock"
+    socket "/tmp/zentinel-lua.sock"
     timeout 50ms
     events ["request_headers" "response_headers"]
     failure-mode open

@@ -9,26 +9,26 @@ tags = ["logging", "compliance", "security", "audit"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-audit-logger"
-homepage = "https://sentinel.raskell.io/agents/audit-logger/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-audit-logger"
+homepage = "https://zentinelproxy.io/agents/audit-logger/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-audit-logger"
+crate_name = "zentinel-agent-audit-logger"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_zentinel_version = "25.12.0"
 +++
 
 ## Overview
 
-A comprehensive audit logging agent for Sentinel that captures detailed API traffic logs with built-in PII redaction and compliance support. Designed for organizations that need structured, security-focused logging for regulatory compliance.
+A comprehensive audit logging agent for Zentinel that captures detailed API traffic logs with built-in PII redaction and compliance support. Designed for organizations that need structured, security-focused logging for regulatory compliance.
 
 The agent supports multiple output formats for SIEM integration, automatic detection and masking of sensitive data, and pre-configured templates for common compliance standards.
 
@@ -60,29 +60,29 @@ As of v0.2.0, the Audit Logger agent supports protocol v2 with:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install audit-logger
+zentinel bundle install audit-logger
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-audit-logger
+cargo install zentinel-agent-audit-logger
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-audit-logger
-cd sentinel-agent-audit-logger
+git clone https://github.com/zentinelproxy/zentinel-agent-audit-logger
+cd zentinel-agent-audit-logger
 cargo build --release
 ```
 
@@ -114,7 +114,7 @@ fields:
 outputs:
   - type: stdout
   - type: file
-    path: /var/log/sentinel/audit.log
+    path: /var/log/zentinel/audit.log
     max_size: 104857600  # 100MB
     max_files: 10
 
@@ -136,13 +136,13 @@ redaction:
 sample_rate: 1.0
 ```
 
-## Sentinel Configuration
+## Zentinel Configuration
 
-Add to your Sentinel proxy configuration:
+Add to your Zentinel proxy configuration:
 
 ```kdl
 agents {
-    audit-logger socket="/tmp/sentinel-audit-logger.sock"
+    audit-logger socket="/tmp/zentinel-audit-logger.sock"
 }
 ```
 
@@ -301,11 +301,11 @@ filters:
 ## CLI Options
 
 ```bash
-sentinel-agent-audit-logger [OPTIONS]
+zentinel-agent-audit-logger [OPTIONS]
 
 Options:
   -c, --config <PATH>        Configuration file [default: audit-logger.yaml]
-  -s, --socket <PATH>        Unix socket path [default: /tmp/sentinel-audit-logger.sock]
+  -s, --socket <PATH>        Unix socket path [default: /tmp/zentinel-audit-logger.sock]
       --grpc-address <ADDR>  gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>    Log level [default: info]
       --print-config       Print default configuration

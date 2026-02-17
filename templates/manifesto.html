@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Manifesto | {{ config.title }}{% endblock %}
-{% block description %}Why Sentinel exists: boring infrastructure, explicit security, and guarding the free web{% endblock %}
+{% block description %}Why Zentinel exists: boring infrastructure, explicit security, and guarding the free web{% endblock %}
 
 
 {% block content %}
@@ -39,7 +39,7 @@
                 <span class="gradient-text">Manifesto</span>
             </h1>
             <p class="manifesto-opening">
-                Sentinel exists because critical web infrastructure should be <strong>boring, inspectable, and shared</strong>.
+                Zentinel exists because critical web infrastructure should be <strong>boring, inspectable, and shared</strong>.
             </p>
         </div>
     </section>
@@ -51,7 +51,7 @@
                     The web runs on systems that sit quietly at the edge, making decisions millions of times per second. When those systems fail, people wake up at 03:00. When they fail in opaque ways, people lose trust in the web itself.
                 </p>
                 <p>
-                    Sentinel is an attempt to do this layer right.
+                    Zentinel is an attempt to do this layer right.
                 </p>
                 <p>
                     Not bigger. Not smarter. Just <strong>more honest</strong>.
@@ -60,7 +60,7 @@
                     We build on proven foundations. Cloudflare's Pingora has handled trillions of requests. We inherit that battle-tested core and focus on what matters above it: configuration that humans can reason about, extension points that don't destabilize the system, and operational behavior you can trust with your sleep.
                 </p>
                 <p>
-                    Sentinel aspires to be a <strong>reference implementation</strong>&mdash;not because we claim to be the best, but because we aim to demonstrate how this layer <em>should</em> be built: with explicit contracts, bounded resources, and a clear separation between what must be fast and what must be flexible.
+                    Zentinel aspires to be a <strong>reference implementation</strong>&mdash;not because we claim to be the best, but because we aim to demonstrate how this layer <em>should</em> be built: with explicit contracts, bounded resources, and a clear separation between what must be fast and what must be flexible.
                 </p>
             </div>
 
@@ -81,7 +81,7 @@
                             <li>and failure modes you can explain to another human.</li>
                         </ul>
                         <p>If a system requires heroics to operate, it is already broken.</p>
-                        <p><strong>Sentinel is built so operators can sleep.</strong></p>
+                        <p><strong>Zentinel is built so operators can sleep.</strong></p>
                     </div>
                 </div>
 
@@ -92,14 +92,14 @@
                     </div>
                     <div class="belief-content">
                         <p>Security that relies on hidden behavior is not security.</p>
-                        <p>Every limit, timeout, and decision in Sentinel is meant to be:</p>
+                        <p>Every limit, timeout, and decision in Zentinel is meant to be:</p>
                         <ul class="belief-list">
                             <li>visible in configuration,</li>
                             <li>observable in metrics and logs,</li>
                             <li>and explainable after the fact.</li>
                         </ul>
                         <p>There is no "magic". There is no implied policy.</p>
-                        <p>If Sentinel is protecting something, you should be able to point to <strong>where and why</strong>.</p>
+                        <p>If Zentinel is protecting something, you should be able to point to <strong>where and why</strong>.</p>
                     </div>
                 </div>
 
@@ -109,7 +109,7 @@
                         <h3 class="belief-title">The edge is a boundary, not a battleground</h3>
                     </div>
                     <div class="belief-content">
-                        <p>Sentinel does not treat the network as a war zone.</p>
+                        <p>Zentinel does not treat the network as a war zone.</p>
                         <p>It treats it as a <strong>boundary</strong>:</p>
                         <ul class="belief-list">
                             <li>where traffic enters,</li>
@@ -127,14 +127,14 @@
                     </div>
                     <div class="belief-content">
                         <p>Complex systems fail in complex ways.</p>
-                        <p>Sentinel keeps the core dataplane intentionally small and predictable. Anything that is:</p>
+                        <p>Zentinel keeps the core dataplane intentionally small and predictable. Anything that is:</p>
                         <ul class="belief-list">
                             <li>parsing-heavy,</li>
                             <li>policy-rich,</li>
                             <li>or operationally risky</li>
                         </ul>
                         <p>belongs <strong>outside</strong> the core, behind explicit contracts.</p>
-                        <p>This is why Sentinel favors <strong>external agents</strong> over embedded logic.</p>
+                        <p>This is why Zentinel favors <strong>external agents</strong> over embedded logic.</p>
                         <p>The agent architecture is not a workaround or a plugin system bolted on as an afterthought. It is a fundamental design choice: the dataplane does one thing well (moving bytes with bounded resources), while agents handle everything else (WAF inspection, authentication, rate limiting, custom business logic).</p>
                         <p>A broken extension must never take the whole system down with it. Agents can crash, restart, be upgraded, or be disabled&mdash;independently of the proxy. The blast radius of complexity is contained by process boundaries, not just code boundaries.</p>
                     </div>
@@ -146,7 +146,7 @@
                         <h3 class="belief-title">The web is a commons</h3>
                     </div>
                     <div class="belief-content">
-                        <p>Sentinel is built for the free and open web.</p>
+                        <p>Zentinel is built for the free and open web.</p>
                         <p>That means:</p>
                         <ul class="belief-list">
                             <li>no hidden control planes,</li>
@@ -160,7 +160,7 @@
                             <li>modify it,</li>
                             <li>and run it independently.</li>
                         </ul>
-                        <p>Sentinel exists to keep this layer <strong>shared</strong>, not owned.</p>
+                        <p>Zentinel exists to keep this layer <strong>shared</strong>, not owned.</p>
                     </div>
                 </div>
 
@@ -170,7 +170,7 @@
                         <h3 class="belief-title">Production correctness beats feature breadth</h3>
                     </div>
                     <div class="belief-content">
-                        <p>Sentinel will always choose:</p>
+                        <p>Zentinel will always choose:</p>
                         <ul class="belief-list">
                             <li>correctness over cleverness,</li>
                             <li>boring reliability over shiny features,</li>
@@ -211,16 +211,16 @@
             <div class="future-section">
                 <h2>Guarding Tomorrow's Web</h2>
                 <p>The web is changing. New challenges are emerging that reverse proxies must address:</p>
-                <p><strong>Inference traffic is different.</strong> AI workloads don't fit the request-response model we've optimized for decades. Token streams, long-running connections, and cost-per-token economics require new primitives. Sentinel will treat inference as a first-class traffic type&mdash;with token-aware rate limiting, model routing, and semantic guardrails&mdash;without compromising the simplicity of HTTP routing.</p>
-                <p><strong>Identity is becoming workload-native.</strong> The future of security is not firewalls at the perimeter but cryptographic identity at every hop. Sentinel will embrace workload identity (SPIFFE, mTLS, continuous verification) so that every request can answer: <em>who is asking, and should they be allowed?</em></p>
-                <p><strong>Explainability is mandatory.</strong> As edge decisions grow more complex&mdash;WAF rules, rate limits, routing policies, agent verdicts&mdash;operators need to understand <em>why</em> a request was blocked or allowed. Sentinel will make every decision traceable: not just what happened, but which rule, which agent, which configuration line.</p>
-                <p><strong>The attack surface is expanding.</strong> Prompt injection, model jailbreaking, PII leakage through AI APIs&mdash;these are new categories of harm that the edge must help prevent. Sentinel's agent architecture is designed precisely for this: specialized agents can inspect, classify, and guard against threats we haven't fully imagined yet, without requiring changes to the core.</p>
-                <p>We do not know exactly what the web will look like in ten years. But we know that the layer sitting at the boundary&mdash;accepting connections, making decisions, routing traffic&mdash;will still matter. Sentinel is built to evolve with that future, not to predict it.</p>
+                <p><strong>Inference traffic is different.</strong> AI workloads don't fit the request-response model we've optimized for decades. Token streams, long-running connections, and cost-per-token economics require new primitives. Zentinel will treat inference as a first-class traffic type&mdash;with token-aware rate limiting, model routing, and semantic guardrails&mdash;without compromising the simplicity of HTTP routing.</p>
+                <p><strong>Identity is becoming workload-native.</strong> The future of security is not firewalls at the perimeter but cryptographic identity at every hop. Zentinel will embrace workload identity (SPIFFE, mTLS, continuous verification) so that every request can answer: <em>who is asking, and should they be allowed?</em></p>
+                <p><strong>Explainability is mandatory.</strong> As edge decisions grow more complex&mdash;WAF rules, rate limits, routing policies, agent verdicts&mdash;operators need to understand <em>why</em> a request was blocked or allowed. Zentinel will make every decision traceable: not just what happened, but which rule, which agent, which configuration line.</p>
+                <p><strong>The attack surface is expanding.</strong> Prompt injection, model jailbreaking, PII leakage through AI APIs&mdash;these are new categories of harm that the edge must help prevent. Zentinel's agent architecture is designed precisely for this: specialized agents can inspect, classify, and guard against threats we haven't fully imagined yet, without requiring changes to the core.</p>
+                <p>We do not know exactly what the web will look like in ten years. But we know that the layer sitting at the boundary&mdash;accepting connections, making decisions, routing traffic&mdash;will still matter. Zentinel is built to evolve with that future, not to predict it.</p>
             </div>
 
             <div class="not-section">
-                <h2>What Sentinel Is Not</h2>
-                <p>Sentinel is not:</p>
+                <h2>What Zentinel Is Not</h2>
+                <p>Zentinel is not:</p>
                 <ul class="not-list">
                     <li>a platform that needs a sales call,</li>
                     <li>a framework that reinvents everything below it,</li>
@@ -232,7 +232,7 @@
 
             <div class="contributors-section">
                 <h2>A Note to Contributors</h2>
-                <p>If you contribute to Sentinel, you are helping guard a shared layer of the web.</p>
+                <p>If you contribute to Zentinel, you are helping guard a shared layer of the web.</p>
                 <p>That comes with responsibility.</p>
                 <p>Before adding anything, ask:</p>
                 <ul class="contributors-questions">
@@ -241,7 +241,7 @@
                     <li>Will this make someone's on-call worse?</li>
                 </ul>
                 <p>If the answer is unclear, slow down.</p>
-                <p>Sentinel will still be here tomorrow.</p>
+                <p>Zentinel will still be here tomorrow.</p>
             </div>
 
             <div class="summary-section">

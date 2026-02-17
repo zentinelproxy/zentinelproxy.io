@@ -1,12 +1,12 @@
-// Sentinel Benchmark Charts
+// Zentinel Benchmark Charts
 // Renders interactive Chart.js charts from benchmark-results.json
 
 (function () {
   'use strict';
 
-  // Color palette - Sentinel uses primary/mauve, others muted
+  // Color palette - Zentinel uses primary/mauve, others muted
   const PROXY_COLORS = {
-    sentinel: { bg: 'rgba(203, 166, 247, 0.8)', border: 'rgb(203, 166, 247)' },
+    zentinel: { bg: 'rgba(203, 166, 247, 0.8)', border: 'rgb(203, 166, 247)' },
     envoy:    { bg: 'rgba(137, 180, 250, 0.6)', border: 'rgb(137, 180, 250)' },
     haproxy:  { bg: 'rgba(166, 227, 161, 0.6)', border: 'rgb(166, 227, 161)' },
     nginx:    { bg: 'rgba(249, 226, 175, 0.6)', border: 'rgb(249, 226, 175)' },
@@ -14,7 +14,7 @@
   };
 
   const PROXY_LABELS = {
-    sentinel: 'Sentinel',
+    zentinel: 'Zentinel',
     envoy: 'Envoy',
     haproxy: 'HAProxy',
     nginx: 'Nginx',
@@ -79,8 +79,8 @@
     var proxies = Object.keys(data.proxies);
     var labels = proxies.map(function (p) { return PROXY_LABELS[p] || p; });
     var values = proxies.map(function (p) { return data.proxies[p].rps; });
-    var bgColors = proxies.map(function (p) { return (PROXY_COLORS[p] || PROXY_COLORS.sentinel).bg; });
-    var borderColors = proxies.map(function (p) { return (PROXY_COLORS[p] || PROXY_COLORS.sentinel).border; });
+    var bgColors = proxies.map(function (p) { return (PROXY_COLORS[p] || PROXY_COLORS.zentinel).bg; });
+    var borderColors = proxies.map(function (p) { return (PROXY_COLORS[p] || PROXY_COLORS.zentinel).border; });
 
     // Sort by RPS descending
     var indices = proxies.map(function (_, i) { return i; });
@@ -127,7 +127,7 @@
     var proxies = Object.keys(data.proxies);
 
     var datasets = proxies.map(function (p) {
-      var color = PROXY_COLORS[p] || PROXY_COLORS.sentinel;
+      var color = PROXY_COLORS[p] || PROXY_COLORS.zentinel;
       return {
         label: PROXY_LABELS[p] || p,
         data: percentiles.map(function (pct) { return data.proxies[p].latency[pct]; }),
@@ -161,7 +161,7 @@
     var proxies = Object.keys(data.proxies);
 
     var datasets = proxies.map(function (p) {
-      var color = PROXY_COLORS[p] || PROXY_COLORS.sentinel;
+      var color = PROXY_COLORS[p] || PROXY_COLORS.zentinel;
       var ts = data.proxies[p].memory.timeseries || [];
       return {
         label: PROXY_LABELS[p] || p,
@@ -201,7 +201,7 @@
     var proxies = Object.keys(data.proxies);
 
     var datasets = proxies.map(function (p) {
-      var color = PROXY_COLORS[p] || PROXY_COLORS.sentinel;
+      var color = PROXY_COLORS[p] || PROXY_COLORS.zentinel;
       var ts = data.proxies[p].cpu.timeseries || [];
       return {
         label: PROXY_LABELS[p] || p,
@@ -320,10 +320,10 @@
     proxies.forEach(function (p) {
       var d = data.proxies[p];
       var row = document.createElement('tr');
-      var isSentinel = p === 'sentinel';
+      var isZentinel = p === 'zentinel';
       row.innerHTML =
-        '<td>' + (isSentinel ? '<strong>' : '') + (PROXY_LABELS[p] || p) + ' ' + d.version + (isSentinel ? '</strong>' : '') + '</td>' +
-        '<td>' + (isSentinel ? '<strong>' : '') + Math.round(d.rps).toLocaleString() + (isSentinel ? '</strong>' : '') + '</td>' +
+        '<td>' + (isZentinel ? '<strong>' : '') + (PROXY_LABELS[p] || p) + ' ' + d.version + (isZentinel ? '</strong>' : '') + '</td>' +
+        '<td>' + (isZentinel ? '<strong>' : '') + Math.round(d.rps).toLocaleString() + (isZentinel ? '</strong>' : '') + '</td>' +
         '<td>' + d.latency.p50_ms.toFixed(1) + ' ms</td>' +
         '<td>' + d.latency.p99_ms.toFixed(1) + ' ms</td>' +
         '<td>' + d.memory.peak_mb.toFixed(1) + ' MB</td>' +

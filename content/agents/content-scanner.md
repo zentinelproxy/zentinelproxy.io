@@ -9,13 +9,13 @@ tags = ["content-scanner", "malware", "clamav", "security", "file-upload"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-content-scanner"
-homepage = "https://sentinel.raskell.io/agents/content-scanner/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-content-scanner"
+homepage = "https://zentinelproxy.io/agents/content-scanner/"
 protocol_version = "v2"
 +++
 
@@ -51,23 +51,23 @@ The Content Scanner agent scans uploaded files and request bodies for malware us
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install content-scanner
+zentinel bundle install content-scanner
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-content-scanner
-cd sentinel-agent-content-scanner
+git clone https://github.com/zentinelproxy/zentinel-agent-content-scanner
+cd zentinel-agent-content-scanner
 cargo build --release
 ```
 
@@ -189,7 +189,7 @@ The agent supports flexible content-type patterns:
 ### Start the Agent
 
 ```bash
-./sentinel-agent-content-scanner -c config.yaml -s /tmp/content-scanner.sock
+./zentinel-agent-content-scanner -c config.yaml -s /tmp/content-scanner.sock
 ```
 
 ### CLI Options
@@ -201,9 +201,9 @@ The agent supports flexible content-type patterns:
 | `--example-config` | Print example configuration and exit |
 | `--validate` | Validate configuration and exit |
 
-## Sentinel Configuration
+## Zentinel Configuration
 
-Add the agent to your Sentinel route:
+Add the agent to your Zentinel route:
 
 ```kdl
 route "/api/upload" {
@@ -288,4 +288,4 @@ body:
 
 ## Source Code
 
-[GitHub Repository](https://github.com/raskell-io/sentinel-agent-content-scanner)
+[GitHub Repository](https://github.com/zentinelproxy/zentinel-agent-content-scanner)

@@ -182,7 +182,7 @@
                 <p class="section-description">Select the agents you want to include. All agents are optional and can be added later.</p>
 
                 <div class="agents-grid">
-                    <label class="agent-card" data-agent="waf" data-crate="sentinel-agent-waf">
+                    <label class="agent-card" data-agent="waf" data-crate="zentinel-agent-waf">
                         <input type="checkbox" name="agents" value="waf">
                         <div class="agent-header">
                             <div class="agent-info">
@@ -196,7 +196,7 @@
                         <p class="agent-description">OWASP CRS-compatible web application firewall</p>
                     </label>
 
-                    <label class="agent-card" data-agent="ratelimit" data-crate="sentinel-agent-ratelimit">
+                    <label class="agent-card" data-agent="ratelimit" data-crate="zentinel-agent-ratelimit">
                         <input type="checkbox" name="agents" value="ratelimit">
                         <div class="agent-header">
                             <div class="agent-info">
@@ -210,7 +210,7 @@
                         <p class="agent-description">Token bucket rate limiting with configurable windows and limits</p>
                     </label>
 
-                    <label class="agent-card" data-agent="auth" data-crate="sentinel-agent-auth">
+                    <label class="agent-card" data-agent="auth" data-crate="zentinel-agent-auth">
                         <input type="checkbox" name="agents" value="auth">
                         <div class="agent-header">
                             <div class="agent-info">
@@ -224,7 +224,7 @@
                         <p class="agent-description">Authentication and authorization with JWT, API keys, OAuth</p>
                     </label>
 
-                    <label class="agent-card" data-agent="denylist" data-crate="sentinel-agent-denylist">
+                    <label class="agent-card" data-agent="denylist" data-crate="zentinel-agent-denylist">
                         <input type="checkbox" name="agents" value="denylist">
                         <div class="agent-header">
                             <div class="agent-info">
@@ -238,7 +238,7 @@
                         <p class="agent-description">Block requests based on IP addresses, CIDR ranges, or patterns</p>
                     </label>
 
-                    <label class="agent-card" data-agent="audit-logger" data-crate="sentinel-agent-audit-logger">
+                    <label class="agent-card" data-agent="audit-logger" data-crate="zentinel-agent-audit-logger">
                         <input type="checkbox" name="agents" value="audit-logger">
                         <div class="agent-header">
                             <div class="agent-info">
@@ -252,7 +252,7 @@
                         <p class="agent-description">Structured audit logging for compliance and debugging</p>
                     </label>
 
-                    <label class="agent-card" data-agent="ai-gateway" data-crate="sentinel-agent-ai-gateway">
+                    <label class="agent-card" data-agent="ai-gateway" data-crate="zentinel-agent-ai-gateway">
                         <input type="checkbox" name="agents" value="ai-gateway">
                         <div class="agent-header">
                             <div class="agent-info">
@@ -287,8 +287,8 @@
                             <span>Copy</span>
                         </button>
                     </div>
-                    <pre id="install-code" class="language-bash"><code class="language-bash"># Install Sentinel proxy
-curl -fsSL https://getsentinel.raskell.io | sh
+                    <pre id="install-code" class="language-bash"><code class="language-bash"># Install Zentinel proxy
+curl -fsSL https://getzentinelproxy.io | sh
 
 # Select agents above to include them in the installation</code></pre>
                 </div>
@@ -300,10 +300,10 @@ curl -fsSL https://getsentinel.raskell.io | sh
                     <span class="section-number">4</span>
                     Example Configuration
                 </h2>
-                <p class="section-description">A starter configuration with your selected agents. Save as <code>sentinel.kdl</code></p>
+                <p class="section-description">A starter configuration with your selected agents. Save as <code>zentinel.kdl</code></p>
                 <div class="code-output">
                     <div class="code-header">
-                        <span class="code-label">sentinel.kdl</span>
+                        <span class="code-label">zentinel.kdl</span>
                         <div class="code-header-actions">
                             <a href="https://kdl.dev/" target="_blank" rel="noopener" class="code-link">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -315,8 +315,8 @@ curl -fsSL https://getsentinel.raskell.io | sh
                             </button>
                         </div>
                     </div>
-                    <pre id="config-code" class="language-kdl"><code class="language-kdl">// Sentinel Configuration
-// https://sentinel.raskell.io
+                    <pre id="config-code" class="language-kdl"><code class="language-kdl">// Zentinel Configuration
+// https://zentinelproxy.io
 
 system {
     worker-threads 0  // 0 = number of CPU cores
@@ -358,9 +358,9 @@ upstreams {
             <div class="customize-section">
                 <h2>
                     <span class="section-number">5</span>
-                    Run Sentinel
+                    Run Zentinel
                 </h2>
-                <p class="section-description">Start Sentinel with your configuration file.</p>
+                <p class="section-description">Start Zentinel with your configuration file.</p>
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
@@ -369,12 +369,12 @@ upstreams {
                             <span>Copy</span>
                         </button>
                     </div>
-                    <pre id="startup-code" class="language-bash"><code class="language-bash"># Start Sentinel
-sentinel --config sentinel.kdl</code></pre>
+                    <pre id="startup-code" class="language-bash"><code class="language-bash"># Start Zentinel
+zentinel --config zentinel.kdl</code></pre>
                 </div>
                 <p class="section-note" id="startup-note" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                    <span>Start agents before running Sentinel. Each agent runs as a separate process and communicates via Unix socket.</span>
+                    <span>Start agents before running Zentinel. Each agent runs as a separate process and communicates via Unix socket.</span>
                 </p>
             </div>
 
@@ -446,168 +446,168 @@ Prism.languages.kdl = {
 // Agent configuration data
 const agentConfigs = {
     auth: {
-        crate: 'sentinel-agent-auth',
-        bin: 'sentinel-agent-auth',
-        socket: '/var/run/sentinel/auth.sock',
+        crate: 'zentinel-agent-auth',
+        bin: 'zentinel-agent-auth',
+        socket: '/var/run/zentinel/auth.sock',
         config: `agent "auth" {
         type "custom"
-        unix-socket path="/var/run/sentinel/auth.sock"
+        unix-socket path="/var/run/zentinel/auth.sock"
         events "request_headers"
         timeout-ms 100
         failure-mode "closed"
     }`
     },
     ratelimit: {
-        crate: 'sentinel-agent-ratelimit',
-        bin: 'sentinel-ratelimit-agent',
-        socket: '/var/run/sentinel/ratelimit.sock',
+        crate: 'zentinel-agent-ratelimit',
+        bin: 'zentinel-ratelimit-agent',
+        socket: '/var/run/zentinel/ratelimit.sock',
         config: `agent "ratelimit" {
         type "custom"
-        unix-socket path="/var/run/sentinel/ratelimit.sock"
+        unix-socket path="/var/run/zentinel/ratelimit.sock"
         events "request_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     denylist: {
-        crate: 'sentinel-agent-denylist',
-        bin: 'sentinel-denylist-agent',
-        socket: '/var/run/sentinel/denylist.sock',
+        crate: 'zentinel-agent-denylist',
+        bin: 'zentinel-denylist-agent',
+        socket: '/var/run/zentinel/denylist.sock',
         config: `agent "denylist" {
         type "custom"
-        unix-socket path="/var/run/sentinel/denylist.sock"
+        unix-socket path="/var/run/zentinel/denylist.sock"
         events "request_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     waf: {
-        crate: 'sentinel-agent-waf',
-        bin: 'sentinel-waf-agent',
-        socket: '/var/run/sentinel/waf.sock',
+        crate: 'zentinel-agent-waf',
+        bin: 'zentinel-waf-agent',
+        socket: '/var/run/zentinel/waf.sock',
         config: `agent "waf" {
         type "custom"
-        unix-socket path="/var/run/sentinel/waf.sock"
+        unix-socket path="/var/run/zentinel/waf.sock"
         events "request_headers" "request_body"
         timeout-ms 200
         failure-mode "closed"
     }`
     },
     lua: {
-        crate: 'sentinel-agent-lua',
-        bin: 'sentinel-lua-agent',
-        socket: '/var/run/sentinel/lua.sock',
+        crate: 'zentinel-agent-lua',
+        bin: 'zentinel-lua-agent',
+        socket: '/var/run/zentinel/lua.sock',
         config: `agent "lua" {
         type "custom"
-        unix-socket path="/var/run/sentinel/lua.sock"
+        unix-socket path="/var/run/zentinel/lua.sock"
         events "request_headers" "response_headers"
         timeout-ms 100
         failure-mode "open"
     }`
     },
     js: {
-        crate: 'sentinel-agent-js',
-        bin: 'sentinel-js-agent',
-        socket: '/var/run/sentinel/js.sock',
+        crate: 'zentinel-agent-js',
+        bin: 'zentinel-js-agent',
+        socket: '/var/run/zentinel/js.sock',
         config: `agent "js" {
         type "custom"
-        unix-socket path="/var/run/sentinel/js.sock"
+        unix-socket path="/var/run/zentinel/js.sock"
         events "request_headers" "response_headers"
         timeout-ms 100
         failure-mode "open"
     }`
     },
     wasm: {
-        crate: 'sentinel-agent-wasm',
-        bin: 'sentinel-wasm-agent',
-        socket: '/var/run/sentinel/wasm.sock',
+        crate: 'zentinel-agent-wasm',
+        bin: 'zentinel-wasm-agent',
+        socket: '/var/run/zentinel/wasm.sock',
         config: `agent "wasm" {
         type "custom"
-        unix-socket path="/var/run/sentinel/wasm.sock"
+        unix-socket path="/var/run/zentinel/wasm.sock"
         events "request_headers" "response_headers"
         timeout-ms 50
         failure-mode "closed"
     }`
     },
     modsec: {
-        crate: 'sentinel-agent-modsec',
-        bin: 'sentinel-modsec-agent',
-        socket: '/var/run/sentinel/modsec.sock',
+        crate: 'zentinel-agent-modsec',
+        bin: 'zentinel-modsec-agent',
+        socket: '/var/run/zentinel/modsec.sock',
         config: `agent "modsec" {
         type "custom"
-        unix-socket path="/var/run/sentinel/modsec.sock"
+        unix-socket path="/var/run/zentinel/modsec.sock"
         events "request_headers" "request_body" "response_body"
         timeout-ms 200
         failure-mode "closed"
     }`
     },
     'ai-gateway': {
-        crate: 'sentinel-agent-ai-gateway',
-        bin: 'sentinel-ai-gateway-agent',
-        socket: '/var/run/sentinel/ai-gateway.sock',
+        crate: 'zentinel-agent-ai-gateway',
+        bin: 'zentinel-ai-gateway-agent',
+        socket: '/var/run/zentinel/ai-gateway.sock',
         config: `agent "ai-gateway" {
         type "custom"
-        unix-socket path="/var/run/sentinel/ai-gateway.sock"
+        unix-socket path="/var/run/zentinel/ai-gateway.sock"
         events "request_headers" "request_body"
         timeout-ms 100
         failure-mode "closed"
     }`
     },
     'websocket-inspector': {
-        crate: 'sentinel-agent-websocket-inspector',
-        bin: 'sentinel-websocket-inspector-agent',
-        socket: '/var/run/sentinel/ws-inspector.sock',
+        crate: 'zentinel-agent-websocket-inspector',
+        bin: 'zentinel-websocket-inspector-agent',
+        socket: '/var/run/zentinel/ws-inspector.sock',
         config: `agent "websocket-inspector" {
         type "custom"
-        unix-socket path="/var/run/sentinel/ws-inspector.sock"
+        unix-socket path="/var/run/zentinel/ws-inspector.sock"
         events "websocket_frame"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     'audit-logger': {
-        crate: 'sentinel-agent-audit-logger',
-        bin: 'sentinel-audit-logger-agent',
-        socket: '/var/run/sentinel/audit.sock',
+        crate: 'zentinel-agent-audit-logger',
+        bin: 'zentinel-audit-logger-agent',
+        socket: '/var/run/zentinel/audit.sock',
         config: `agent "audit-logger" {
         type "custom"
-        unix-socket path="/var/run/sentinel/audit.sock"
+        unix-socket path="/var/run/zentinel/audit.sock"
         events "request_headers" "response_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     'chaos': {
-        crate: 'sentinel-agent-chaos',
-        bin: 'sentinel-chaos-agent',
-        socket: '/var/run/sentinel/chaos.sock',
+        crate: 'zentinel-agent-chaos',
+        bin: 'zentinel-chaos-agent',
+        socket: '/var/run/zentinel/chaos.sock',
         config: `agent "chaos" {
         type "custom"
-        unix-socket path="/var/run/sentinel/chaos.sock"
+        unix-socket path="/var/run/zentinel/chaos.sock"
         events "request_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     'api-deprecation': {
-        crate: 'sentinel-agent-api-deprecation',
-        bin: 'sentinel-api-deprecation-agent',
-        socket: '/var/run/sentinel/api-deprecation.sock',
+        crate: 'zentinel-agent-api-deprecation',
+        bin: 'zentinel-api-deprecation-agent',
+        socket: '/var/run/zentinel/api-deprecation.sock',
         config: `agent "api-deprecation" {
         type "custom"
-        unix-socket path="/var/run/sentinel/api-deprecation.sock"
+        unix-socket path="/var/run/zentinel/api-deprecation.sock"
         events "request_headers"
         timeout-ms 50
         failure-mode "open"
     }`
     },
     'ip-reputation': {
-        crate: 'sentinel-agent-ip-reputation',
-        bin: 'sentinel-ip-reputation-agent',
-        socket: '/var/run/sentinel/ip-reputation.sock',
+        crate: 'zentinel-agent-ip-reputation',
+        bin: 'zentinel-ip-reputation-agent',
+        socket: '/var/run/zentinel/ip-reputation.sock',
         config: `agent "ip-reputation" {
         type "custom"
-        unix-socket path="/var/run/sentinel/ip-reputation.sock"
+        unix-socket path="/var/run/zentinel/ip-reputation.sock"
         events "request_headers"
         timeout-ms 100
         failure-mode "open"
@@ -627,33 +627,33 @@ function updateOutput() {
     if (installMethod === 'script') {
         if (selectedAgents.length > 0) {
             const agentList = selectedAgents.join(',');
-            installCode = `# Install Sentinel proxy + selected agents
-curl -fsSL https://getsentinel.raskell.io | sh -s -- --agents ${agentList}`;
+            installCode = `# Install Zentinel proxy + selected agents
+curl -fsSL https://getzentinelproxy.io | sh -s -- --agents ${agentList}`;
         } else {
-            installCode = `# Install Sentinel proxy
-curl -fsSL https://getsentinel.raskell.io | sh
+            installCode = `# Install Zentinel proxy
+curl -fsSL https://getzentinelproxy.io | sh
 
 # Select agents above to include them in the installation`;
         }
     } else if (installMethod === 'cargo') {
         if (selectedAgents.length > 0) {
-            const crates = ['sentinel-proxy', ...selectedAgents.map(a => agentConfigs[a].crate)].join(' ');
-            installCode = `# Install Sentinel proxy + selected agents
+            const crates = ['zentinel-proxy', ...selectedAgents.map(a => agentConfigs[a].crate)].join(' ');
+            installCode = `# Install Zentinel proxy + selected agents
 cargo install ${crates}`;
         } else {
-            installCode = `# Install Sentinel proxy
-cargo install sentinel-proxy
+            installCode = `# Install Zentinel proxy
+cargo install zentinel-proxy
 
 # Select agents above to include them in the installation`;
         }
     } else if (installMethod === 'oci') {
         if (selectedAgents.length > 0) {
-            const images = ['ghcr.io/raskell-io/sentinel:latest', ...selectedAgents.map(a => `ghcr.io/raskell-io/${agentConfigs[a].crate}:latest`)];
-            installCode = `# Pull Sentinel proxy + selected agent images
+            const images = ['ghcr.io/zentinelproxy/zentinel:latest', ...selectedAgents.map(a => `ghcr.io/zentinelproxy/${agentConfigs[a].crate}:latest`)];
+            installCode = `# Pull Zentinel proxy + selected agent images
 docker pull ${images.join(' \\\n    ')}`;
         } else {
-            installCode = `# Pull Sentinel proxy image
-docker pull ghcr.io/raskell-io/sentinel:latest
+            installCode = `# Pull Zentinel proxy image
+docker pull ghcr.io/zentinelproxy/zentinel:latest
 
 # Select agents above to include them in the installation`;
         }
@@ -664,8 +664,8 @@ docker pull ghcr.io/raskell-io/sentinel:latest
     Prism.highlightElement(installEl);
 
     // Update config
-    let configCode = `// Sentinel Configuration
-// https://sentinel.raskell.io
+    let configCode = `// Zentinel Configuration
+// https://zentinelproxy.io
 
 system {
     worker-threads 0  // 0 = number of CPU cores
@@ -735,25 +735,25 @@ agents {`;
 `;
             selectedAgents.forEach(agent => {
                 startupCode += `docker run -d --name ${agent} \\
-    -v /var/run/sentinel:/var/run/sentinel \\
-    ghcr.io/raskell-io/${agentConfigs[agent].crate}:latest \\
+    -v /var/run/zentinel:/var/run/zentinel \\
+    ghcr.io/zentinelproxy/${agentConfigs[agent].crate}:latest \\
     --socket ${agentConfigs[agent].socket}
 `;
             });
             startupCode += `
-# Start Sentinel
-docker run -d --name sentinel \\
+# Start Zentinel
+docker run -d --name zentinel \\
     -p 8080:8080 -p 9090:9090 \\
-    -v $(pwd)/sentinel.kdl:/etc/sentinel/sentinel.kdl:ro \\
-    -v /var/run/sentinel:/var/run/sentinel \\
-    ghcr.io/raskell-io/sentinel:latest`;
+    -v $(pwd)/zentinel.kdl:/etc/zentinel/zentinel.kdl:ro \\
+    -v /var/run/zentinel:/var/run/zentinel \\
+    ghcr.io/zentinelproxy/zentinel:latest`;
             startupNote.style.display = 'flex';
         } else {
-            startupCode = `# Start Sentinel
-docker run -d --name sentinel \\
+            startupCode = `# Start Zentinel
+docker run -d --name zentinel \\
     -p 8080:8080 -p 9090:9090 \\
-    -v $(pwd)/sentinel.kdl:/etc/sentinel/sentinel.kdl:ro \\
-    ghcr.io/raskell-io/sentinel:latest`;
+    -v $(pwd)/zentinel.kdl:/etc/zentinel/zentinel.kdl:ro \\
+    ghcr.io/zentinelproxy/zentinel:latest`;
             startupNote.style.display = 'none';
         }
     } else {
@@ -766,12 +766,12 @@ docker run -d --name sentinel \\
 `;
             });
             startupCode += `
-# Start Sentinel
-sentinel --config sentinel.kdl`;
+# Start Zentinel
+zentinel --config zentinel.kdl`;
             startupNote.style.display = 'flex';
         } else {
-            startupCode = `# Start Sentinel
-sentinel --config sentinel.kdl`;
+            startupCode = `# Start Zentinel
+zentinel --config zentinel.kdl`;
             startupNote.style.display = 'none';
         }
     }

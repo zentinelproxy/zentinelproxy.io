@@ -9,21 +9,21 @@ tags = ["mock", "testing", "development", "stubs", "api"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-mock-server"
-homepage = "https://sentinel.raskell.io/agents/mock-server/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-mock-server"
+homepage = "https://zentinelproxy.io/agents/mock-server/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-mock-server"
+crate_name = "zentinel-agent-mock-server"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the Mock Server agent supports protocol v2 with:
 
 ## Overview
 
-A mock server agent for Sentinel that intercepts requests and returns configurable stub responses. Perfect for testing, development, and API demos.
+A mock server agent for Zentinel that intercepts requests and returns configurable stub responses. Perfect for testing, development, and API demos.
 
 The agent supports sophisticated request matching, dynamic response templating with Handlebars, latency simulation, and fault injection for chaos testing.
 
@@ -56,29 +56,29 @@ The agent supports sophisticated request matching, dynamic response templating w
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install mock-server
+zentinel bundle install mock-server
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-mock-server
+cargo install zentinel-agent-mock-server
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-mock-server
-cd sentinel-agent-mock-server
+git clone https://github.com/zentinelproxy/zentinel-agent-mock-server
+cd zentinel-agent-mock-server
 cargo build --release
 ```
 
@@ -102,20 +102,20 @@ stubs:
           message: "Hello, World!"
 ```
 
-## Sentinel Configuration
+## Zentinel Configuration
 
-Add to your Sentinel proxy configuration:
+Add to your Zentinel proxy configuration:
 
 ```kdl
 agents {
-    mock-server socket="/tmp/sentinel-mock-server.sock"
+    mock-server socket="/tmp/zentinel-mock-server.sock"
 }
 ```
 
 Start the agent:
 
 ```bash
-sentinel-agent-mock-server -c mock-server.yaml
+zentinel-agent-mock-server -c mock-server.yaml
 ```
 
 ## Path Matching
@@ -482,11 +482,11 @@ stubs:
 ## CLI Options
 
 ```bash
-sentinel-agent-mock-server [OPTIONS]
+zentinel-agent-mock-server [OPTIONS]
 
 Options:
   -c, --config <PATH>        Configuration file [default: mock-server.yaml]
-  -s, --socket <PATH>        Unix socket path [default: /tmp/sentinel-mock-server.sock]
+  -s, --socket <PATH>        Unix socket path [default: /tmp/zentinel-mock-server.sock]
       --grpc-address <ADDR>  gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>    Log level [default: info]
       --print-config         Print example configuration

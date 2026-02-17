@@ -9,21 +9,21 @@ tags = ["security", "soap", "xml", "api"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-soap"
-homepage = "https://sentinel.raskell.io/agents/soap/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-soap"
+homepage = "https://zentinelproxy.io/agents/soap/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-soap"
+crate_name = "zentinel-agent-soap"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the SOAP Security agent supports protocol v2 with:
 
 ## Overview
 
-A comprehensive SOAP security agent for Sentinel that protects SOAP/XML web services from common attacks and abuse patterns. Uses [quick-xml](https://crates.io/crates/quick-xml) for fast, safe XML parsing with built-in XXE protection.
+A comprehensive SOAP security agent for Zentinel that protects SOAP/XML web services from common attacks and abuse patterns. Uses [quick-xml](https://crates.io/crates/quick-xml) for fast, safe XML parsing with built-in XXE protection.
 
 SOAP services remain critical in enterprise environments—banking, healthcare, government, and legacy integrations. This agent provides defense-in-depth controls specifically designed for SOAP 1.1/1.2 web services.
 
@@ -55,29 +55,29 @@ SOAP services remain critical in enterprise environments—banking, healthcare, 
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install soap
+zentinel bundle install soap
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-soap
+cargo install zentinel-agent-soap
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-soap
-cd sentinel-agent-soap
+git clone https://github.com/zentinelproxy/zentinel-agent-soap
+cd zentinel-agent-soap
 cargo build --release
 ```
 
@@ -86,7 +86,7 @@ cargo build --release
 ### Command Line
 
 ```bash
-sentinel-agent-soap --config config.yaml --socket /var/run/sentinel/soap.sock
+zentinel-agent-soap --config config.yaml --socket /var/run/zentinel/soap.sock
 ```
 
 ### Command Line Options
@@ -94,7 +94,7 @@ sentinel-agent-soap --config config.yaml --socket /var/run/sentinel/soap.sock
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--config`, `-c` | Path to YAML configuration file | `config.yaml` |
-| `--socket`, `-s` | Unix socket path | `/tmp/sentinel-soap.sock` |
+| `--socket`, `-s` | Unix socket path | `/tmp/zentinel-soap.sock` |
 | `--grpc-address` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--log-level`, `-l` | Log level (trace, debug, info, warn, error) | `info` |
 
@@ -158,11 +158,11 @@ body_validation:
   required_namespaces: []
 ```
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "soap" {
-    socket "/var/run/sentinel/soap.sock"
+    socket "/var/run/zentinel/soap.sock"
     timeout 100ms
     events ["request_headers" "request_body"]
 }
@@ -350,9 +350,9 @@ Errors are returned as proper SOAP Faults:
       <faultcode>soap:Client</faultcode>
       <faultstring>[DOCTYPE_DETECTED] DOCTYPE declarations are not allowed</faultstring>
       <detail>
-        <sentinel:violations xmlns:sentinel="urn:sentinel:soap:security">
-          <sentinel:violation code="DOCTYPE_DETECTED">DOCTYPE declarations are not allowed</sentinel:violation>
-        </sentinel:violations>
+        <zentinel:violations xmlns:zentinel="urn:zentinel:soap:security">
+          <zentinel:violation code="DOCTYPE_DETECTED">DOCTYPE declarations are not allowed</zentinel:violation>
+        </zentinel:violations>
       </detail>
     </soap:Fault>
   </soap:Body>
@@ -373,9 +373,9 @@ Errors are returned as proper SOAP Faults:
         <soap:Text xml:lang="en">[OPERATION_NOT_ALLOWED] Operation 'DeleteUser' is not allowed</soap:Text>
       </soap:Reason>
       <soap:Detail>
-        <sentinel:violations xmlns:sentinel="urn:sentinel:soap:security">
-          <sentinel:violation code="OPERATION_NOT_ALLOWED">Operation 'DeleteUser' is not allowed</sentinel:violation>
-        </sentinel:violations>
+        <zentinel:violations xmlns:zentinel="urn:zentinel:soap:security">
+          <zentinel:violation code="OPERATION_NOT_ALLOWED">Operation 'DeleteUser' is not allowed</zentinel:violation>
+        </zentinel:violations>
       </soap:Detail>
     </soap:Fault>
   </soap:Body>
@@ -415,7 +415,7 @@ settings:
 
 ## Resources
 
-- [GitHub Repository](https://github.com/raskell-io/sentinel-agent-soap)
+- [GitHub Repository](https://github.com/zentinelproxy/zentinel-agent-soap)
 - [quick-xml](https://crates.io/crates/quick-xml)
 - [WS-Security Specification](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss)
 - [OWASP XXE Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html)

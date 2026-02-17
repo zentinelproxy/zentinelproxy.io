@@ -9,26 +9,26 @@ tags = ["security", "waf", "core", "api-security"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-waf"
-homepage = "https://sentinel.raskell.io/agents/waf/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-waf"
+homepage = "https://zentinelproxy.io/agents/waf/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-waf"
+crate_name = "zentinel-agent-waf"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Overview
 
-A **next-generation Web Application and API Protection (WAAP)** agent for Sentinel featuring heuristic anomaly detection, n-gram analysis, and comprehensive security. Built in pure Rust with zero C dependencies.
+A **next-generation Web Application and API Protection (WAAP)** agent for Zentinel featuring heuristic anomaly detection, n-gram analysis, and comprehensive security. Built in pure Rust with zero C dependencies.
 
 ## Key Features
 
@@ -117,29 +117,29 @@ Validated via Criterion benchmarks (v1.0.0):
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install waf
+zentinel bundle install waf
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-waf
+cargo install zentinel-agent-waf
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-waf
-cd sentinel-agent-waf
+git clone https://github.com/zentinelproxy/zentinel-agent-waf
+cd zentinel-agent-waf
 cargo build --release
 ```
 
@@ -154,20 +154,20 @@ cargo build --release --features schema-validation
 ### Kubernetes (Kustomize)
 
 ```bash
-kubectl apply -k https://github.com/raskell-io/sentinel-agent-waf/deploy/kubernetes
+kubectl apply -k https://github.com/zentinelproxy/zentinel-agent-waf/deploy/kubernetes
 ```
 
 ### Helm Chart
 
 ```bash
 # Install from local chart
-helm install sentinel-waf ./deploy/helm/sentinel-waf \
-  --namespace sentinel \
+helm install zentinel-waf ./deploy/helm/zentinel-waf \
+  --namespace zentinel \
   --create-namespace
 
 # With custom values
-helm install sentinel-waf ./deploy/helm/sentinel-waf \
-  --namespace sentinel \
+helm install zentinel-waf ./deploy/helm/zentinel-waf \
+  --namespace zentinel \
   --create-namespace \
   --set waf.paranoiaLevel=2 \
   --set replicaCount=3
@@ -179,13 +179,13 @@ helm install sentinel-waf ./deploy/helm/sentinel-waf \
 
 ```bash
 # UDS transport (default)
-sentinel-waf-agent \
-  --socket /var/run/sentinel/waf.sock \
+zentinel-waf-agent \
+  --socket /var/run/zentinel/waf.sock \
   --paranoia-level 2 \
   --block-mode true
 
 # gRPC transport (v2 protocol)
-sentinel-waf-agent \
+zentinel-waf-agent \
   --grpc-address "[::1]:50051" \
   --paranoia-level 2 \
   --block-mode true
@@ -195,7 +195,7 @@ sentinel-waf-agent \
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-waf.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-waf.sock` |
 | `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (v2 protocol) | - |
 | `--paranoia-level` | `WAF_PARANOIA_LEVEL` | Sensitivity (1-4) | `1` |
 | `--sqli` | `WAF_SQLI` | SQL injection detection | `true` |
@@ -214,7 +214,7 @@ sentinel-waf-agent \
 | `--websocket-max-frame-size` | `WAF_WEBSOCKET_MAX_FRAME_SIZE` | Max frame size (bytes) | `65536` |
 | `--verbose`, `-v` | `WAF_VERBOSE` | Debug logging | `false` |
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agents {
@@ -222,7 +222,7 @@ agents {
     agent "waf" {
         type "custom"
         transport "unix_socket" {
-            path "/var/run/sentinel/waf.sock"
+            path "/var/run/zentinel/waf.sock"
         }
         events ["request_headers", "request_body_chunk", "response_body_chunk", "websocket_frame"]
         timeout-ms 50
@@ -512,7 +512,7 @@ Validate API requests against OpenAPI or GraphQL schemas to enforce API contract
     "reload-interval-secs": 300,
     "openapi": {
       "enabled": true,
-      "schema-source": "/etc/sentinel/openapi.yaml",
+      "schema-source": "/etc/zentinel/openapi.yaml",
       "validate-paths": true,
       "validate-parameters": true,
       "validate-request-body": true,
@@ -542,7 +542,7 @@ Validate API requests against OpenAPI or GraphQL schemas to enforce API contract
 ```
 
 **Schema Sources:**
-- File path: `/etc/sentinel/openapi.yaml`
+- File path: `/etc/zentinel/openapi.yaml`
 - URL: `https://api.example.com/schema.yaml` (fetched at startup)
 
 **Enforcement Modes:**
@@ -725,7 +725,7 @@ pub trait WafPlugin: Send + Sync {
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Sentinel Proxy                           │
+│                    Zentinel Proxy                           │
 └─────────────────────────┬───────────────────────────────────┘
                           │ Unix Socket
                           ▼
@@ -756,4 +756,4 @@ pub trait WafPlugin: Send + Sync {
 | [AI Gateway](/agents/ai-gateway/) | AI/LLM-specific security controls |
 | [Auth](/agents/auth/) | Authentication and authorization |
 
-> **Tip:** For rate limiting, use [Sentinel's built-in rate limiting](/configuration/limits/) instead of an agent.
+> **Tip:** For rate limiting, use [Zentinel's built-in rate limiting](/configuration/limits/) instead of an agent.

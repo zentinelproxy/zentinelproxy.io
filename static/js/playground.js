@@ -1,5 +1,5 @@
 // =============================================================================
-// Sentinel Playground
+// Zentinel Playground
 // Interactive configuration validation and request simulation
 // =============================================================================
 
@@ -10,7 +10,7 @@ import init, {
     create_sample_request,
     init_panic_hook,
     get_version
-} from '../wasm/sentinel_playground_wasm.js';
+} from '../wasm/zentinel_playground_wasm.js';
 
 // State
 let wasmReady = false;
@@ -146,8 +146,8 @@ listeners {
         address "0.0.0.0:8443"
         protocol "https"
         tls {
-            cert-file "/etc/sentinel/certs/api.crt"
-            key-file "/etc/sentinel/certs/api.key"
+            cert-file "/etc/zentinel/certs/api.crt"
+            key-file "/etc/zentinel/certs/api.key"
         }
     }
 }
@@ -310,8 +310,8 @@ listeners {
         address "0.0.0.0:8443"
         protocol "https"
         tls {
-            cert-file "/etc/sentinel/certs/cdn.crt"
-            key-file "/etc/sentinel/certs/cdn.key"
+            cert-file "/etc/zentinel/certs/cdn.crt"
+            key-file "/etc/zentinel/certs/cdn.key"
         }
     }
 
@@ -410,8 +410,8 @@ listeners {
         address "0.0.0.0:8443"
         protocol "https"
         tls {
-            cert-file "/etc/sentinel/certs/ws.crt"
-            key-file "/etc/sentinel/certs/ws.key"
+            cert-file "/etc/zentinel/certs/ws.crt"
+            key-file "/etc/zentinel/certs/ws.key"
         }
     }
 }
@@ -503,8 +503,8 @@ listeners {
         address "0.0.0.0:8443"
         protocol "https"
         tls {
-            cert-file "/etc/sentinel/certs/secure.crt"
-            key-file "/etc/sentinel/certs/secure.key"
+            cert-file "/etc/zentinel/certs/secure.crt"
+            key-file "/etc/zentinel/certs/secure.key"
             min-version "TLS1.2"
         }
     }
@@ -931,7 +931,7 @@ const simulateAgentsBtn = document.getElementById('simulate-agents-btn');
 // KDL Syntax Highlighting
 // =============================================================================
 
-// KDL keywords and node names commonly used in Sentinel config
+// KDL keywords and node names commonly used in Zentinel config
 const kdlKeywords = new Set([
     'system', 'listeners', 'listener', 'routes', 'route', 'upstreams', 'upstream',
     'matches', 'policies', 'target', 'health-check', 'agents', 'agent', 'limits',
@@ -1315,7 +1315,7 @@ function renderResponseFlowDiagram(result) {
 
         nodes.push({
             id: 'proxy',
-            label: 'Sentinel Proxy',
+            label: 'Zentinel Proxy',
             sublabel: 'response processing',
             type: 'route'
         });
@@ -1323,7 +1323,7 @@ function renderResponseFlowDiagram(result) {
         // No match - return error response
         nodes.push({
             id: 'proxy',
-            label: 'Sentinel Proxy',
+            label: 'Zentinel Proxy',
             sublabel: '404 - no route matched',
             type: 'nomatch'
         });
@@ -1879,14 +1879,14 @@ function renderAgentResponseFlow(result) {
 
         nodes.push({
             id: 'proxy',
-            label: 'Sentinel Proxy',
+            label: 'Zentinel Proxy',
             sublabel: wasShortCircuited ? 'short-circuited' : 'response processing',
             type: wasShortCircuited ? 'agent-block' : 'route'
         });
     } else {
         nodes.push({
             id: 'proxy',
-            label: 'Sentinel Proxy',
+            label: 'Zentinel Proxy',
             sublabel: '404 - no route matched',
             type: 'nomatch'
         });

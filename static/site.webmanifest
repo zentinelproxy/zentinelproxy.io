@@ -1,6 +1,6 @@
 {
-  "name": "Sentinel",
-  "short_name": "Sentinel",
+  "name": "Zentinel",
+  "short_name": "Zentinel",
   "description": "A security-first reverse proxy based on Pingora built to guard the free web.",
   "start_url": "/",
   "display": "standalone",

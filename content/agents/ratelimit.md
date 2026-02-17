@@ -9,42 +9,42 @@ tags = ["security", "traffic", "deprecated"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Deprecated"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-ratelimit"
-homepage = "https://sentinel.raskell.io/agents/ratelimit/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-ratelimit"
+homepage = "https://zentinelproxy.io/agents/ratelimit/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-ratelimit"
+crate_name = "zentinel-agent-ratelimit"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_zentinel_version = "25.12.0"
 +++
 
 <div class="deprecation-notice">
 
 ## Deprecated
 
-**This agent is deprecated as of Sentinel v26.01.** Rate limiting is now built into Sentinel core with more features and better performance.
+**This agent is deprecated as of Zentinel v26.01.** Rate limiting is now built into Zentinel core with more features and better performance.
 
-Please use [Sentinel's built-in rate limiting](/configuration/limits/) instead.
+Please use [Zentinel's built-in rate limiting](/configuration/limits/) instead.
 
 </div>
 
 ## Migration Guide
 
-Sentinel now includes comprehensive rate limiting natively. Here's how to migrate:
+Zentinel now includes comprehensive rate limiting natively. Here's how to migrate:
 
 ### Before (Agent)
 
 ```kdl
 agent "ratelimit" {
-    socket "/var/run/sentinel/ratelimit.sock"
+    socket "/var/run/zentinel/ratelimit.sock"
     timeout 100ms
 
     config {
@@ -82,7 +82,7 @@ route {
 
 ## Built-in Rate Limiting Features
 
-Sentinel's native rate limiting offers more capabilities than this agent:
+Zentinel's native rate limiting offers more capabilities than this agent:
 
 | Feature | Agent | Built-in |
 |---------|-------|----------|
@@ -109,7 +109,7 @@ rate-limit "global-api-limit" {
 
     backend redis {
         url "redis://localhost:6379"
-        key-prefix "sentinel:ratelimit:"
+        key-prefix "zentinel:ratelimit:"
     }
 }
 ```
@@ -187,46 +187,46 @@ The Rate Limiter agent provides flexible traffic control using the token bucket 
 
 #### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install ratelimit
+zentinel bundle install ratelimit
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 #### Using Cargo
 
 ```bash
-cargo install sentinel-agent-ratelimit
+cargo install zentinel-agent-ratelimit
 ```
 
 #### Using Docker
 
 ```bash
-docker pull ghcr.io/raskell-io/sentinel-agent-ratelimit:latest
+docker pull ghcr.io/zentinelproxy/zentinel-agent-ratelimit:latest
 ```
 
 ### CLI Options
 
 | Option | Env Var | Default | Description |
 |--------|---------|---------|-------------|
-| `--socket` | `RATELIMIT_AGENT_SOCKET` | `/var/run/sentinel/ratelimit.sock` | UDS socket path |
+| `--socket` | `RATELIMIT_AGENT_SOCKET` | `/var/run/zentinel/ratelimit.sock` | UDS socket path |
 | `--grpc-address` | `RATELIMIT_AGENT_GRPC_ADDRESS` | - | gRPC listen address (e.g., `0.0.0.0:50051`) |
 | `--log-level` | `RUST_LOG` | `info` | Log level (trace, debug, info, warn, error) |
 | `--json-logs` | - | `false` | Output logs in JSON format |
 
 ### Configuration
 
-Add the agent to your Sentinel configuration:
+Add the agent to your Zentinel configuration:
 
 ```kdl
 agent "ratelimit" {
-    socket "/var/run/sentinel/ratelimit.sock"
+    socket "/var/run/zentinel/ratelimit.sock"
     timeout 100ms
     fail-open false
 

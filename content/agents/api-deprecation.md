@@ -9,26 +9,26 @@ tags = ["api", "deprecation", "lifecycle", "sunset", "migration"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-api-deprecation"
-homepage = "https://sentinel.raskell.io/agents/api-deprecation/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-api-deprecation"
+homepage = "https://zentinelproxy.io/agents/api-deprecation/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-api-deprecation"
+crate_name = "zentinel-agent-api-deprecation"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Overview
 
-An API lifecycle management agent for Sentinel that helps you gracefully deprecate and sunset API endpoints. The agent adds standard RFC-compliant deprecation headers, tracks usage metrics, and supports flexible actions from warnings to redirects to blocking.
+An API lifecycle management agent for Zentinel that helps you gracefully deprecate and sunset API endpoints. The agent adds standard RFC-compliant deprecation headers, tracks usage metrics, and supports flexible actions from warnings to redirects to blocking.
 
 Perfect for managing API versioning, communicating breaking changes to clients, and monitoring migration progress.
 
@@ -57,29 +57,29 @@ As of v0.2.0, the API Deprecation agent supports protocol v2 with:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install api-deprecation
+zentinel bundle install api-deprecation
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-api-deprecation
+cargo install zentinel-agent-api-deprecation
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-api-deprecation
-cd sentinel-agent-api-deprecation
+git clone https://github.com/zentinelproxy/zentinel-agent-api-deprecation
+cd zentinel-agent-api-deprecation
 cargo build --release
 ```
 
@@ -108,13 +108,13 @@ settings:
   log_access: true
 ```
 
-## Sentinel Configuration
+## Zentinel Configuration
 
-Add to your Sentinel proxy configuration:
+Add to your Zentinel proxy configuration:
 
 ```kdl
 agents {
-    api-deprecation socket="/tmp/sentinel-api-deprecation.sock"
+    api-deprecation socket="/tmp/zentinel-api-deprecation.sock"
 }
 ```
 
@@ -267,7 +267,7 @@ settings:
 Enable the metrics endpoint:
 
 ```bash
-sentinel-agent-api-deprecation --metrics --metrics-port 9090
+zentinel-agent-api-deprecation --metrics --metrics-port 9090
 ```
 
 Available metrics:
@@ -284,23 +284,23 @@ Example Prometheus queries:
 
 ```promql
 # Requests to deprecated endpoints in last hour
-sum(increase(sentinel_api_deprecation_requests_total[1h])) by (endpoint_id)
+sum(increase(zentinel_api_deprecation_requests_total[1h])) by (endpoint_id)
 
 # Endpoints past sunset
-sentinel_api_deprecation_days_until_sunset < 0
+zentinel_api_deprecation_days_until_sunset < 0
 
 # Redirect rate
-rate(sentinel_api_deprecation_redirects_total[5m])
+rate(zentinel_api_deprecation_redirects_total[5m])
 ```
 
 ## CLI Options
 
 ```bash
-sentinel-agent-api-deprecation [OPTIONS]
+zentinel-agent-api-deprecation [OPTIONS]
 
 Options:
   -c, --config <PATH>        Configuration file [default: api-deprecation.yaml]
-  -s, --socket <PATH>        Unix socket path [default: /tmp/sentinel-api-deprecation.sock]
+  -s, --socket <PATH>        Unix socket path [default: /tmp/zentinel-api-deprecation.sock]
       --grpc-address <ADDR>  gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>    Log level [default: info]
       --print-config         Print default configuration

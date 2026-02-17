@@ -9,21 +9,21 @@ tags = ["security", "waf", "modsecurity", "owasp", "crs"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-modsec"
-homepage = "https://sentinel.raskell.io/agents/modsec/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-modsec"
+homepage = "https://zentinelproxy.io/agents/modsec/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-modsec"
+crate_name = "zentinel-agent-modsec"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_zentinel_version = "25.12.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the ModSecurity agent supports protocol v2 with:
 
 ## Overview
 
-ModSecurity WAF agent for Sentinel reverse proxy. Provides full OWASP Core Rule Set (CRS) support via libmodsecurity bindings with 800+ detection rules.
+ModSecurity WAF agent for Zentinel reverse proxy. Provides full OWASP Core Rule Set (CRS) support via libmodsecurity bindings with 800+ detection rules.
 
 > **Note:** This agent requires libmodsecurity installed on your system. For a lightweight, zero-dependency alternative with basic detection rules, see [WAF agent](/agents/waf/).
 
@@ -70,22 +70,22 @@ apt install libmodsecurity-dev
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install modsec
+zentinel bundle install modsec
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-modsec
+cargo install zentinel-agent-modsec
 ```
 
 ## Configuration
@@ -93,8 +93,8 @@ cargo install sentinel-agent-modsec
 ### Command Line
 
 ```bash
-sentinel-modsec-agent \
-  --socket /var/run/sentinel/modsec.sock \
+zentinel-modsec-agent \
+  --socket /var/run/zentinel/modsec.sock \
   --rules /etc/modsecurity/crs/crs-setup.conf \
   --rules "/etc/modsecurity/crs/rules/*.conf"
 ```
@@ -103,7 +103,7 @@ sentinel-modsec-agent \
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-modsec.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-modsec.sock` |
 | `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--rules` | `MODSEC_RULES` | Paths to rule files (supports glob patterns like `*.conf`) | - |
 | `--block-mode` | `MODSEC_BLOCK_MODE` | Block (true) or detect-only (false) | `true` |
@@ -113,11 +113,11 @@ sentinel-modsec-agent \
 | `--response-inspection` | `MODSEC_RESPONSE_INSPECTION` | Enable response body inspection | `false` |
 | `--verbose`, `-v` | `MODSEC_VERBOSE` | Enable debug logging | `false` |
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "modsec" {
-    socket "/var/run/sentinel/modsec.sock"
+    socket "/var/run/zentinel/modsec.sock"
     timeout 100ms
     events ["request_headers" "request_body_chunk" "response_body_chunk"]
 }
@@ -145,8 +145,8 @@ sudo cp /etc/modsecurity/crs/crs-setup.conf.example /etc/modsecurity/crs/crs-set
 ### Run with CRS
 
 ```bash
-sentinel-modsec-agent \
-  --socket /var/run/sentinel/modsec.sock \
+zentinel-modsec-agent \
+  --socket /var/run/zentinel/modsec.sock \
   --rules /etc/modsecurity/crs/crs-setup.conf \
   --rules "/etc/modsecurity/crs/rules/*.conf"
 ```
@@ -218,4 +218,4 @@ SecAction "id:900000,phase:1,pass,t:none,nolog,setvar:tx.blocking_paranoia_level
 | **AI Gateway** | AI-specific security controls |
 | **Auth** | Combine with authentication |
 
-> **Note:** For rate limiting, use [Sentinel's built-in rate limiting](/configuration/limits/) instead of an agent.
+> **Note:** For rate limiting, use [Zentinel's built-in rate limiting](/configuration/limits/) instead of an agent.

@@ -9,21 +9,21 @@ tags = ["security", "auth", "core", "authorization", "oidc", "mtls"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-auth"
-homepage = "https://sentinel.raskell.io/agents/auth/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-auth"
+homepage = "https://zentinelproxy.io/agents/auth/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-auth"
+crate_name = "zentinel-agent-auth"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Overview
@@ -63,14 +63,14 @@ The Auth agent provides comprehensive authentication and authorization for your 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-auth
+cargo install zentinel-agent-auth
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-auth
-cd sentinel-agent-auth
+git clone https://github.com/zentinelproxy/zentinel-agent-auth
+cd zentinel-agent-auth
 cargo build --release
 ```
 
@@ -80,30 +80,30 @@ cargo build --release
 
 ```bash
 # UDS transport (default)
-sentinel-auth-agent \
-  --socket /var/run/sentinel/auth.sock \
+zentinel-auth-agent \
+  --socket /var/run/zentinel/auth.sock \
   --jwt-secret "your-secret-key-at-least-32-characters"
 
 # gRPC transport (v2 protocol)
-sentinel-auth-agent \
+zentinel-auth-agent \
   --grpc-address "[::1]:50051" \
   --jwt-secret "your-secret-key-at-least-32-characters"
 
 # With API keys
-sentinel-auth-agent \
-  --socket /var/run/sentinel/auth.sock \
+zentinel-auth-agent \
+  --socket /var/run/zentinel/auth.sock \
   --api-keys "sk_live_abc123:production,sk_test_xyz:development"
 
 # With Basic auth
-sentinel-auth-agent \
-  --socket /var/run/sentinel/auth.sock \
+zentinel-auth-agent \
+  --socket /var/run/zentinel/auth.sock \
   --basic-auth-users "admin:secretpass,readonly:userpass"
 ```
 
 ### Environment Variables
 
 ```bash
-export AGENT_SOCKET="/var/run/sentinel/auth.sock"
+export AGENT_SOCKET="/var/run/zentinel/auth.sock"
 export JWT_SECRET="your-secret-key-at-least-32-characters"
 export JWT_ALGORITHM="HS256"
 export JWT_ISSUER="https://auth.example.com"
@@ -112,7 +112,7 @@ export API_KEYS="sk_live_abc123:production"
 
 ## Configuration
 
-### Sentinel Proxy Configuration
+### Zentinel Proxy Configuration
 
 ```kdl
 agents {
@@ -120,7 +120,7 @@ agents {
     agent "auth" {
         type "custom"
         transport "unix_socket" {
-            path "/var/run/sentinel/auth.sock"
+            path "/var/run/zentinel/auth.sock"
         }
         events ["request_headers" "request_body_chunk"]
         timeout-ms 100
@@ -181,7 +181,7 @@ agents {
 
 | Option | Environment | Description | Default |
 |--------|-------------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-auth.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-auth.sock` |
 | `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (v2 protocol) | - |
 | `--jwt-secret` | `JWT_SECRET` | JWT secret key (HS256) | - |
 | `--jwt-public-key` | `JWT_PUBLIC_KEY` | JWT public key file (RS256/ES256) | - |
@@ -201,13 +201,13 @@ agents {
 
 ```bash
 # Configure with HS256 secret
-sentinel-auth-agent --jwt-secret "your-32-char-minimum-secret-key"
+zentinel-auth-agent --jwt-secret "your-32-char-minimum-secret-key"
 
 # Configure with RS256 public key
-sentinel-auth-agent --jwt-algorithm RS256 --jwt-public-key /path/to/public.pem
+zentinel-auth-agent --jwt-algorithm RS256 --jwt-public-key /path/to/public.pem
 
 # With issuer and audience validation
-sentinel-auth-agent \
+zentinel-auth-agent \
   --jwt-secret "secret" \
   --jwt-issuer "https://auth.example.com" \
   --jwt-audience "my-api"
@@ -221,7 +221,7 @@ curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." http://localhost:8080/ap
 ### API Key
 
 ```bash
-sentinel-auth-agent --api-keys "sk_live_abc123:production,sk_test_xyz:development"
+zentinel-auth-agent --api-keys "sk_live_abc123:production,sk_test_xyz:development"
 ```
 
 Client request:
@@ -232,7 +232,7 @@ curl -H "X-API-Key: sk_live_abc123" http://localhost:8080/api
 ### Basic Auth
 
 ```bash
-sentinel-auth-agent --basic-auth-users "admin:secretpass,user:userpass"
+zentinel-auth-agent --basic-auth-users "admin:secretpass,user:userpass"
 ```
 
 Client request:
@@ -308,7 +308,7 @@ oidc {
 
 ### mTLS Client Certificates
 
-Authenticate services using X.509 client certificates. The Sentinel proxy terminates TLS and forwards the certificate:
+Authenticate services using X.509 client certificates. The Zentinel proxy terminates TLS and forwards the certificate:
 
 ```kdl
 config {
@@ -322,7 +322,7 @@ config {
 }
 ```
 
-#### Sentinel Proxy mTLS Configuration
+#### Zentinel Proxy mTLS Configuration
 
 ```kdl
 listener {
@@ -354,7 +354,7 @@ The agent supports SAML 2.0 SP-initiated SSO with built-in session persistence.
 
 ```kdl
 agent "auth" {
-    socket "/var/run/sentinel/auth.sock"
+    socket "/var/run/zentinel/auth.sock"
     events ["request_headers" "request_body_chunk"]
 
     config {
@@ -372,10 +372,10 @@ agent "auth" {
 
             // Session settings
             session-ttl-secs 28800  // 8 hours
-            session-store-path "/var/lib/sentinel-auth/sessions.redb"
+            session-store-path "/var/lib/zentinel-auth/sessions.redb"
 
             // Cookie settings
-            session-cookie-name "sentinel_saml_session"
+            session-cookie-name "zentinel_saml_session"
             cookie-secure true
             cookie-http-only true
             cookie-same-site "Lax"
@@ -407,7 +407,7 @@ agent "auth" {
 | `idp-entity-id` | string | - | IdP entity ID |
 | `idp-metadata-url` | string | - | IdP metadata URL (alternative) |
 | `session-ttl-secs` | int | `28800` | Session lifetime (8 hours) |
-| `session-store-path` | string | `/var/lib/sentinel-auth/sessions.redb` | Session database path |
+| `session-store-path` | string | `/var/lib/zentinel-auth/sessions.redb` | Session database path |
 | `clock-skew-secs` | int | `300` | Clock tolerance (5 minutes) |
 | `attribute-mapping` | object | `{}` | Map SAML attributes to headers |
 
@@ -476,7 +476,7 @@ SAML sessions are persisted using an embedded database (redb), allowing sessions
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `session-store-path` | `/var/lib/sentinel-auth/sessions.redb` | Database file path |
+| `session-store-path` | `/var/lib/zentinel-auth/sessions.redb` | Database file path |
 | `session-ttl-secs` | `28800` | Session lifetime (8 hours) |
 | `cleanup-interval-secs` | `300` | Cleanup task interval (5 min) |
 
@@ -490,7 +490,7 @@ After authentication, the Cedar policy engine evaluates whether the request is a
 config {
     authz {
         enabled true
-        policy-file "/etc/sentinel/policies/auth.cedar"
+        policy-file "/etc/zentinel/policies/auth.cedar"
         default-decision "deny"
         principal-claim "sub"
         roles-claim "roles"
@@ -576,7 +576,7 @@ config {
         enabled true
         endpoint-path "/token/exchange"
         issuer "https://auth.internal.example.com"
-        signing-key-file "/etc/sentinel/jwt-private.pem"
+        signing-key-file "/etc/zentinel/jwt-private.pem"
         signing-algorithm "RS256"
         token-ttl-secs 3600
         allowed-exchanges [
@@ -658,7 +658,7 @@ X-Auth-Claim-org_id: acme
 | 302 | SAML redirect to IdP |
 | (passthrough) | Valid credentials and authorized, request forwarded |
 
-The agent adds `WWW-Authenticate: Bearer realm="sentinel"` header on 401 responses.
+The agent adds `WWW-Authenticate: Bearer realm="zentinel"` header on 401 responses.
 
 ## Authentication Precedence
 
@@ -679,7 +679,7 @@ The first successful authentication wins. After authentication, if authorization
 
 ```kdl
 agent "auth" {
-    socket "/var/run/sentinel/auth.sock"
+    socket "/var/run/zentinel/auth.sock"
 
     config {
         // JWT for API clients
@@ -709,16 +709,16 @@ agent "auth" {
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sentinel-auth-agent
+  name: zentinel-auth-agent
 spec:
   template:
     spec:
       containers:
         - name: auth-agent
-          image: ghcr.io/raskell-io/sentinel-agent-auth:latest
+          image: ghcr.io/zentinelproxy/zentinel-agent-auth:latest
           env:
             - name: AGENT_SOCKET
-              value: /var/run/sentinel/auth.sock
+              value: /var/run/zentinel/auth.sock
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -728,9 +728,9 @@ spec:
               value: https://auth.example.com
           volumeMounts:
             - name: socket
-              mountPath: /var/run/sentinel
+              mountPath: /var/run/zentinel
             - name: sessions
-              mountPath: /var/lib/sentinel-auth
+              mountPath: /var/lib/zentinel-auth
       volumes:
         - name: socket
           emptyDir: {}
@@ -763,11 +763,11 @@ spec:
 
 ## Resources
 
-- [GitHub Repository](https://github.com/raskell-io/sentinel-agent-auth)
-- [Configuration Reference](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/configuration.md)
-- [SAML Setup Guide](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/saml.md)
-- [OIDC Authentication](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/oidc.md)
-- [mTLS Authentication](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/mtls.md)
-- [Authorization (Cedar)](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/authorization.md)
-- [Token Exchange](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/token-exchange.md)
-- [Session Management](https://github.com/raskell-io/sentinel-agent-auth/blob/main/docs/session-management.md)
+- [GitHub Repository](https://github.com/zentinelproxy/zentinel-agent-auth)
+- [Configuration Reference](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/configuration.md)
+- [SAML Setup Guide](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/saml.md)
+- [OIDC Authentication](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/oidc.md)
+- [mTLS Authentication](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/mtls.md)
+- [Authorization (Cedar)](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/authorization.md)
+- [Token Exchange](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/token-exchange.md)
+- [Session Management](https://github.com/zentinelproxy/zentinel-agent-auth/blob/main/docs/session-management.md)

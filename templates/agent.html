@@ -39,7 +39,7 @@
     "@type": "SoftwareApplication",
     "@id": "{{ current_url | safe }}/#software",
     "name": "{{ page.title }}",
-    "description": "{{ page.description | default(value='Sentinel agent') }}",
+    "description": "{{ page.description | default(value='Zentinel agent') }}",
     "applicationCategory": "SecurityApplication",
     "operatingSystem": "Cross-platform",
     {% if page.extra.version %}"softwareVersion": "{{ page.extra.version }}",{% endif %}
@@ -183,7 +183,7 @@
                     <a href="{{ page.extra.repo }}/issues" target="_blank" rel="noopener">Open an issue</a> or
                     <a href="{{ page.extra.repo }}/pulls" target="_blank" rel="noopener">submit a PR</a>.
                     {% else %}
-                    <a href="https://github.com/raskell-io/sentinel.raskell.io/issues" target="_blank" rel="noopener">Let us know</a>.
+                    <a href="https://github.com/zentinelproxy/zentinelproxy.io/issues" target="_blank" rel="noopener">Let us know</a>.
                     {% endif %}
                 </p>
             </div>

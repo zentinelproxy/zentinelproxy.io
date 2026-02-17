@@ -1,8 +1,8 @@
-# sentinel.raskell.io
+# zentinelproxy.io
 
-Marketing site and agent registry for [Sentinel](https://github.com/raskell-io/sentinel).
+Marketing site and agent registry for [Zentinel](https://github.com/zentinelproxy/zentinel).
 
-**Live:** https://sentinel.raskell.io
+**Live:** https://zentinelproxy.io
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ Visit http://127.0.0.1:1111
 ## Structure
 
 ```
-sentinel.raskell.io/
+zentinelproxy.io/
 ├── config.toml          # Zola configuration
 ├── content/
 │   ├── _index.md        # Homepage
@@ -67,9 +67,9 @@ Documentation content...
 
 ## Related
 
-- [sentinel](https://github.com/raskell-io/sentinel) — Main repository
-- [sentinel.raskell.io-docs](https://github.com/raskell-io/sentinel.raskell.io-docs) — Documentation site
-- [Discussions](https://github.com/raskell-io/sentinel/discussions) — Questions and ideas
+- [zentinel](https://github.com/zentinelproxy/zentinel) — Main repository
+- [zentinelproxy.io-docs](https://github.com/zentinelproxy/zentinelproxy.io-docs) — Documentation site
+- [Discussions](https://github.com/zentinelproxy/zentinel/discussions) — Questions and ideas
 
 ## License
 

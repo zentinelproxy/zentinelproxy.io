@@ -36,7 +36,7 @@ jobs:
         run: mise run build
 
       - name: Clone docs repo
-        run: git clone --depth 1 --recurse-submodules https://github.com/raskell-io/sentinel.raskell.io-docs.git /tmp/docs
+        run: git clone --depth 1 --recurse-submodules https://github.com/zentinelproxy/zentinelproxy.io-docs.git /tmp/docs
 
       - name: Build docs
         run: |

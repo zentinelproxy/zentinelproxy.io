@@ -1,6 +1,6 @@
 +++
 title = "Blog"
-description = "Engineering notes from the Sentinel project"
+description = "Engineering notes from the Zentinel project"
 template = "blog.html"
 page_template = "blog-page.html"
 sort_by = "date"

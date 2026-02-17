@@ -88,7 +88,7 @@
     </script>
 
     <!-- Feed -->
-    <link rel="alternate" type="application/atom+xml" title="Sentinel Feed" href="{{ get_url(path='atom.xml') | safe }}">
+    <link rel="alternate" type="application/atom+xml" title="Zentinel Feed" href="{{ get_url(path='atom.xml') | safe }}">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -117,14 +117,14 @@
             {
                 "@type": "SoftwareApplication",
                 "@id": "{{ config.base_url | safe }}/#software",
-                "name": "Sentinel",
+                "name": "Zentinel",
                 "description": "A security-first reverse proxy built on Cloudflare Pingora for production deployments",
                 "url": "{{ config.base_url | safe }}",
                 "applicationCategory": "DeveloperApplication",
                 "operatingSystem": "Linux, macOS",
                 "softwareVersion": "0.4.2",
-                "downloadUrl": "https://github.com/raskell-io/sentinel/releases",
-                "installUrl": "https://sentinel.raskell.io/docs/getting-started/installation/",
+                "downloadUrl": "https://github.com/zentinelproxy/zentinel/releases",
+                "installUrl": "https://zentinelproxy.io/docs/getting-started/installation/",
                 "screenshot": "{{ get_url(path='img/og-image.png') | safe }}",
                 "author": {
                     "@id": "{{ config.base_url | safe }}/#organization"
@@ -136,7 +136,7 @@
                 },
                 "license": "https://opensource.org/licenses/Apache-2.0",
                 "programmingLanguage": "Rust",
-                "codeRepository": "https://github.com/raskell-io/sentinel",
+                "codeRepository": "https://github.com/zentinelproxy/zentinel",
                 "featureList": [
                     "TLS termination with OCSP stapling",
                     "14+ load balancing algorithms",
@@ -229,9 +229,9 @@
         <header class="header" role="banner">
             <div class="container">
                 <nav class="nav" role="navigation" aria-label="Main navigation">
-                    <a href="{{ get_url(path='/') }}" class="logo" aria-label="Sentinel Home">
-                        <img src="{{ get_url(path='img/sentinel-mascot.avif') | safe }}" alt="Sentinel" class="logo-img">
-                        <span class="logo-text">Sentinel</span>
+                    <a href="{{ get_url(path='/') }}" class="logo" aria-label="Zentinel Home">
+                        <img src="{{ get_url(path='img/zentinel-mascot.avif') | safe }}" alt="Zentinel" class="logo-img">
+                        <span class="logo-text">Zentinel</span>
                     </a>
                     <div class="nav-links">
                         {% if config.build_search_index %}
@@ -335,7 +335,7 @@
                     <div class="footer-brand">
                         <div class="footer-mascot-wrapper" aria-hidden="true">
                             <div class="footer-mascot-glow"></div>
-                            <img src="{{ get_url(path='img/sentinel-mascot.avif') | safe }}" alt="" class="footer-mascot">
+                            <img src="{{ get_url(path='img/zentinel-mascot.avif') | safe }}" alt="" class="footer-mascot">
                         </div>
                         <div class="footer-tagline">
                             <p class="footer-title">Security-first reverse proxy<br>built to guard the free web</p>
@@ -392,7 +392,7 @@
                     </nav>
                 </div>
                 <div class="footer-bottom">
-                    <p>Sentinel is licensed under <a href="https://github.com/raskell-io/sentinel/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>. Website &copy; {{ now() | date(format='%Y') }} <a href="https://raskell.io">raskell.io</a>.</p>
+                    <p>Zentinel is licensed under <a href="https://github.com/zentinelproxy/zentinel/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>. Website &copy; {{ now() | date(format='%Y') }} <a href="https://raskell.io">raskell.io</a>.</p>
                 </div>
             </div>
             <a href="https://learn-you-the-web.raskell.io/" target="_blank" rel="noopener" class="page-peel" aria-label="Learn You The Web - An e-book about how the web works">

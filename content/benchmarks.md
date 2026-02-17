@@ -1,10 +1,10 @@
 +++
 title = "Benchmarks"
-description = "Performance, soak testing, and chaos engineering results for Sentinel reverse proxy"
+description = "Performance, soak testing, and chaos engineering results for Zentinel reverse proxy"
 template = "benchmarks.html"
 +++
 
-Sentinel includes a comprehensive testing framework validating performance, stability, and resilience. All results below are from actual test runs.
+Zentinel includes a comprehensive testing framework validating performance, stability, and resilience. All results below are from actual test runs.
 
 ## Test Coverage Overview
 
@@ -154,7 +154,7 @@ Core operations like rate limiting and geo filtering are sub-100μs, meaning the
 
 ---
 
-## WAF Engine Benchmarks (sentinel-modsec)
+## WAF Engine Benchmarks (zentinel-modsec)
 
 Pure Rust ModSecurity implementation with full OWASP CRS compatibility. Benchmarks run on macOS ARM64 using Criterion.
 
@@ -277,7 +277,7 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
 - **Body processing** scales linearly at ~40 MB/s throughput
 - **Pure Rust** - zero C/C++ dependencies, full OWASP CRS compatibility
 
-### Rust vs C++: sentinel-modsec vs libmodsecurity
+### Rust vs C++: zentinel-modsec vs libmodsecurity
 
 <div class="highlight-box" style="background: linear-gradient(135deg, var(--color-success-bg) 0%, var(--color-primary-bg) 100%); border: 2px solid var(--color-success); border-radius: 8px; padding: var(--space-lg); margin: var(--space-lg) 0;">
     <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: var(--space-sm);">Pure Rust outperforms C++ by 10-30x</div>
@@ -311,7 +311,7 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
     <div class="chart-title">Transaction Processing Latency (Lower is Better)</div>
     <div class="bar-chart">
         <div class="bar-item">
-            <span class="bar-label">sentinel (clean)</span>
+            <span class="bar-label">zentinel (clean)</span>
             <div class="bar-track">
                 <div class="bar-fill bar-fill--success" style="width: 3.3%;"></div>
             </div>
@@ -325,7 +325,7 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
             <span class="bar-value">4,831 ns</span>
         </div>
         <div class="bar-item">
-            <span class="bar-label">sentinel (SQLi)</span>
+            <span class="bar-label">zentinel (SQLi)</span>
             <div class="bar-track">
                 <div class="bar-fill bar-fill--success" style="width: 5.3%;"></div>
             </div>
@@ -341,7 +341,7 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
     </div>
 </div>
 
-| Benchmark | sentinel-modsec | libmodsecurity | Speedup |
+| Benchmark | zentinel-modsec | libmodsecurity | Speedup |
 |-----------|-----------------|----------------|---------|
 | **Clean request** | 161 ns | 4,831 ns | **30x faster** |
 | **SQLi attack request** | 295 ns | 5,545 ns | **18.8x faster** |
@@ -349,14 +349,14 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
 | **Clean traffic throughput** | 203 ns | 4,937 ns | **24.3x faster** |
 | **Attack traffic throughput** | 316 ns | 5,678 ns | **18x faster** |
 
-| Metric | sentinel-modsec | libmodsecurity |
+| Metric | zentinel-modsec | libmodsecurity |
 |--------|-----------------|----------------|
 | **Clean request throughput** | 6.2M req/s | 207K req/s |
 | **Attack detection throughput** | 3.2M req/s | 176K req/s |
 
 #### Rule Parsing Comparison
 
-| Rule Type | sentinel-modsec | libmodsecurity | Speedup |
+| Rule Type | zentinel-modsec | libmodsecurity | Speedup |
 |-----------|-----------------|----------------|---------|
 | **Simple rule** | 1.21 µs | 3.28 µs | **2.7x faster** |
 | **Complex rule** | 2.75 µs | 10.07 µs | **3.6x faster** |
@@ -484,7 +484,7 @@ Our analysis uses linear regression to detect memory growth patterns:
 
 ### Test Configuration
 
-From [`tests/soak/soak-config.kdl`](https://github.com/raskell-io/sentinel/blob/main/tests/soak/soak-config.kdl):
+From [`tests/soak/soak-config.kdl`](https://github.com/zentinelproxy/zentinel/blob/main/tests/soak/soak-config.kdl):
 
 ```kdl
 system {
@@ -506,7 +506,7 @@ system {
 
 ## Chaos Testing
 
-Fault injection validates resilience under failure conditions. All scenarios are in [`tests/chaos/`](https://github.com/raskell-io/sentinel/tree/main/tests/chaos).
+Fault injection validates resilience under failure conditions. All scenarios are in [`tests/chaos/`](https://github.com/zentinelproxy/zentinel/tree/main/tests/chaos).
 
 <div class="stats-grid">
     <div class="stat-card">
@@ -583,7 +583,7 @@ The circuit breaker protects the system from cascading failures when agents beco
 - **OPEN** (red): Circuit is tripped. Requests are immediately failed without contacting the agent. This prevents hammering a broken service.
 - **HALF-OPEN** (yellow): After a timeout, the circuit allows a limited number of probe requests. If they succeed, the circuit closes. If they fail, it reopens.
 
-**Configuration** from [`chaos-config.kdl`](https://github.com/raskell-io/sentinel/blob/main/tests/chaos/chaos-config.kdl):
+**Configuration** from [`chaos-config.kdl`](https://github.com/zentinelproxy/zentinel/blob/main/tests/chaos/chaos-config.kdl):
 
 ```kdl
 circuit-breaker {
@@ -695,7 +695,7 @@ Full integration tests run in Docker Compose with:
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Sentinel Proxy | 8080 | Main reverse proxy |
+| Zentinel Proxy | 8080 | Main reverse proxy |
 | Metrics Endpoint | 9090 | Prometheus metrics |
 | Backend (httpbin) | 8081 | Test backend |
 | Echo Agent | UDS | Header manipulation |
@@ -750,14 +750,14 @@ python3 analyze-results.py results/<timestamp>/
 
 | Metric | Description |
 |--------|-------------|
-| `sentinel_requests_total` | Total requests by route/status |
-| `sentinel_request_duration_seconds` | Latency histogram |
-| `sentinel_upstream_healthy_backends` | Backend health status |
-| `sentinel_upstream_retries_total` | Retry attempts |
-| `sentinel_agent_circuit_breaker_state` | CB state (0=closed, 1=open, 2=half-open) |
-| `sentinel_agent_failures_total` | Agent communication failures |
-| `sentinel_agent_timeouts_total` | Agent timeout events |
-| `sentinel_agent_bypasses_total` | Fail-open bypass count |
+| `zentinel_requests_total` | Total requests by route/status |
+| `zentinel_request_duration_seconds` | Latency histogram |
+| `zentinel_upstream_healthy_backends` | Backend health status |
+| `zentinel_upstream_retries_total` | Retry attempts |
+| `zentinel_agent_circuit_breaker_state` | CB state (0=closed, 1=open, 2=half-open) |
+| `zentinel_agent_failures_total` | Agent communication failures |
+| `zentinel_agent_timeouts_total` | Agent timeout events |
+| `zentinel_agent_bypasses_total` | Fail-open bypass count |
 
 ---
 
@@ -779,14 +779,14 @@ All benchmark scripts live in the main repository. To reproduce any result on yo
 ### Proxy Comparison
 
 ```bash
-git clone https://github.com/raskell-io/sentinel
-cd sentinel
+git clone https://github.com/zentinelproxy/zentinel
+cd zentinel
 
-# Install proxies you want to compare (Sentinel, nginx, HAProxy, Caddy, Envoy)
+# Install proxies you want to compare (Zentinel, nginx, HAProxy, Caddy, Envoy)
 # Then run the benchmark suite:
 cd tests/bench
 ./proxy-bench.sh                    # All proxies, default settings
-./proxy-bench.sh --proxy sentinel   # Single proxy
+./proxy-bench.sh --proxy zentinel   # Single proxy
 ./proxy-bench.sh --duration 120     # Custom duration (seconds)
 ./proxy-bench.sh --connections 200  # Custom concurrency
 ```
@@ -799,7 +799,7 @@ The script uses [oha](https://github.com/hatoo/oha) as the load generator. Each 
 
 ```bash
 cd tests/bench
-./waf-bench.sh                      # sentinel-modsec vs libmodsecurity
+./waf-bench.sh                      # zentinel-modsec vs libmodsecurity
 ```
 
 ### Soak & Chaos Tests
@@ -832,5 +832,5 @@ We're actively working on:
 ---
 
 <p style="text-align: center; color: var(--color-text-muted); margin-top: var(--space-2xl);">
-Last updated: January 2026 | Sentinel v0.4.2
+Last updated: January 2026 | Zentinel v0.4.2
 </p>

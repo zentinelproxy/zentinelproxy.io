@@ -9,21 +9,21 @@ tags = ["security", "authorization", "policy", "cedar", "rego", "opa"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Beta"
 version = "0.1.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-policy"
-homepage = "https://sentinel.raskell.io/agents/policy/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-policy"
+homepage = "https://zentinelproxy.io/agents/policy/"
 protocol_version = "v2"
 
 # Installation methods
-cabal_package = "sentinel-agent-policy"
+cabal_package = "zentinel-agent-policy"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Overview
@@ -85,8 +85,8 @@ chmod +x opa && sudo mv opa /usr/local/bin/
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-policy
-cd sentinel-agent-policy
+git clone https://github.com/zentinelproxy/zentinel-agent-policy
+cd zentinel-agent-policy
 cabal build
 cabal install
 ```
@@ -94,7 +94,7 @@ cabal install
 ### Using Cabal
 
 ```bash
-cabal install sentinel-agent-policy
+cabal install zentinel-agent-policy
 ```
 
 ## Quick Start
@@ -103,22 +103,22 @@ cabal install sentinel-agent-policy
 
 ```bash
 # Start with Cedar policy
-sentinel-policy-agent \
-  --socket /var/run/sentinel/policy.sock \
+zentinel-policy-agent \
+  --socket /var/run/zentinel/policy.sock \
   --engine cedar \
-  --policy-file /etc/sentinel/policies/authz.cedar
+  --policy-file /etc/zentinel/policies/authz.cedar
 
 # Start with Rego policy
-sentinel-policy-agent \
-  --socket /var/run/sentinel/policy.sock \
+zentinel-policy-agent \
+  --socket /var/run/zentinel/policy.sock \
   --engine rego \
-  --policy-file /etc/sentinel/policies/authz.rego
+  --policy-file /etc/zentinel/policies/authz.rego
 
 # Auto-detect engine from file extension
-sentinel-policy-agent \
-  --socket /var/run/sentinel/policy.sock \
+zentinel-policy-agent \
+  --socket /var/run/zentinel/policy.sock \
   --engine auto \
-  --policy-file /etc/sentinel/policies/authz.cedar
+  --policy-file /etc/zentinel/policies/authz.cedar
 ```
 
 ### Configuration File
@@ -129,32 +129,32 @@ Create a `policy.yaml` configuration file:
 engine: cedar  # or "rego" or "auto"
 policies:
   - type: file
-    path: /etc/sentinel/policies/authz.cedar
+    path: /etc/zentinel/policies/authz.cedar
 default_decision: deny
 cache:
   enabled: true
   ttl_seconds: 60
   max_entries: 10000
-socket_path: /var/run/sentinel/policy.sock
+socket_path: /var/run/zentinel/policy.sock
 log_level: info
 ```
 
 Then run:
 
 ```bash
-sentinel-policy-agent --config policy.yaml
+zentinel-policy-agent --config policy.yaml
 ```
 
 ## Configuration
 
-### Sentinel Proxy Configuration
+### Zentinel Proxy Configuration
 
 ```kdl
 agents {
     agent "policy" {
         type "custom"
         transport "unix_socket" {
-            path "/var/run/sentinel/policy.sock"
+            path "/var/run/zentinel/policy.sock"
         }
         events ["request_headers"]
         timeout-ms 100
@@ -176,7 +176,7 @@ routes {
 
 | Option | Environment | Description | Default |
 |--------|-------------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-policy.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-policy.sock` |
 | `--config` | `CONFIG_FILE` | Path to YAML config file | - |
 | `--engine` | `POLICY_ENGINE` | Engine: `cedar`, `rego`, `auto` | `auto` |
 | `--policy-file` | `POLICY_FILE` | Path to policy file | - |
@@ -191,15 +191,15 @@ routes {
 # Policy engine: cedar, rego, or auto (detect from file extension)
 engine: auto
 
-# Socket path for Sentinel proxy connection
-socket_path: /var/run/sentinel/policy.sock
+# Socket path for Zentinel proxy connection
+socket_path: /var/run/zentinel/policy.sock
 
 # Policy sources
 policies:
   - type: file
-    path: /etc/sentinel/policies/authz.cedar
+    path: /etc/zentinel/policies/authz.cedar
   - type: file
-    path: /etc/sentinel/policies/rbac.rego
+    path: /etc/zentinel/policies/rbac.rego
   - type: inline
     content: |
       permit(principal, action, resource)
@@ -283,7 +283,7 @@ forbid(
 ### Rego Policy
 
 ```rego
-package sentinel.authz
+package zentinel.authz
 
 import future.keywords.if
 import future.keywords.in
@@ -462,7 +462,7 @@ agents {
     // Auth agent handles authentication
     agent "auth" {
         transport "unix_socket" {
-            path "/var/run/sentinel/auth.sock"
+            path "/var/run/zentinel/auth.sock"
         }
         events ["request_headers"]
         timeout-ms 100
@@ -472,7 +472,7 @@ agents {
     // Policy agent handles fine-grained authorization
     agent "policy" {
         transport "unix_socket" {
-            path "/var/run/sentinel/policy.sock"
+            path "/var/run/zentinel/policy.sock"
         }
         events ["request_headers"]
         timeout-ms 100
@@ -502,7 +502,7 @@ The Auth agent authenticates the user and adds headers like `X-User-Id`, which t
 
 ## Resources
 
-- [GitHub Repository](https://github.com/raskell-io/sentinel-agent-policy)
+- [GitHub Repository](https://github.com/zentinelproxy/zentinel-agent-policy)
 - [Cedar Policy Language](https://www.cedarpolicy.com/)
 - [Open Policy Agent](https://www.openpolicyagent.org/)
 - [Rego Language Reference](https://www.openpolicyagent.org/docs/latest/policy-language/)

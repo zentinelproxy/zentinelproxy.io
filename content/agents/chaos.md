@@ -9,21 +9,21 @@ tags = ["chaos", "testing", "resilience", "fault-injection"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "MIT"
-repo = "https://github.com/raskell-io/sentinel-agent-chaos"
-homepage = "https://sentinel.raskell.io/agents/chaos/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-chaos"
+homepage = "https://zentinelproxy.io/agents/chaos/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-chaos"
+crate_name = "zentinel-agent-chaos"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -228,36 +228,36 @@ settings:
 Or via command line:
 
 ```bash
-sentinel-agent-chaos --dry-run
+zentinel-agent-chaos --dry-run
 ```
 
 ## Installation
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install chaos
+zentinel bundle install chaos
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### From Cargo
 
 ```bash
-cargo install sentinel-agent-chaos
+cargo install zentinel-agent-chaos
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-chaos.git
-cd sentinel-agent-chaos
+git clone https://github.com/zentinelproxy/zentinel-agent-chaos.git
+cd zentinel-agent-chaos
 cargo build --release
 ```
 
@@ -266,11 +266,11 @@ cargo build --release
 ### CLI Options
 
 ```bash
-sentinel-agent-chaos [OPTIONS]
+zentinel-agent-chaos [OPTIONS]
 
 Options:
   -c, --config <FILE>       Path to configuration file [default: chaos.yaml]
-  -s, --socket <PATH>       Unix socket path [default: /tmp/sentinel-chaos.sock]
+  -s, --socket <PATH>       Unix socket path [default: /tmp/zentinel-chaos.sock]
       --grpc-address <ADDR> gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>   Log level [default: info]
       --print-config      Print example configuration and exit
@@ -280,16 +280,16 @@ Options:
   -V, --version           Print version
 ```
 
-### Sentinel Integration
+### Zentinel Integration
 
-Add the agent to your Sentinel proxy configuration:
+Add the agent to your Zentinel proxy configuration:
 
 ```kdl
 agents {
     agent "chaos" {
         type "custom"
         transport "unix_socket" {
-            path "/tmp/sentinel-chaos.sock"
+            path "/tmp/zentinel-chaos.sock"
         }
         events ["request_headers"]
         timeout-ms 100

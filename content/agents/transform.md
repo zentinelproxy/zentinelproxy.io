@@ -9,21 +9,21 @@ tags = ["transformation", "rewriting", "core"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-transform"
-homepage = "https://sentinel.raskell.io/agents/transform/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-transform"
+homepage = "https://zentinelproxy.io/agents/transform/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-transform"
+crate_name = "zentinel-agent-transform"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_zentinel_version = "25.12.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the Transform agent supports protocol v2 with:
 
 ## Overview
 
-A configuration-driven transformation agent for Sentinel that provides advanced request and response modifications. Supports URL rewriting with regex capture groups, header manipulation with variable interpolation, and comprehensive JSON body transformations.
+A configuration-driven transformation agent for Zentinel that provides advanced request and response modifications. Supports URL rewriting with regex capture groups, header manipulation with variable interpolation, and comprehensive JSON body transformations.
 
 ## Features
 
@@ -54,29 +54,29 @@ A configuration-driven transformation agent for Sentinel that provides advanced 
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install transform
+zentinel bundle install transform
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-transform
+cargo install zentinel-agent-transform
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-transform
-cd sentinel-agent-transform
+git clone https://github.com/zentinelproxy/zentinel-agent-transform
+cd zentinel-agent-transform
 cargo build --release
 ```
 
@@ -85,25 +85,25 @@ cargo build --release
 ### Command Line
 
 ```bash
-sentinel-agent-transform \
-    --socket /var/run/sentinel/transform.sock \
+zentinel-agent-transform \
+    --socket /var/run/zentinel/transform.sock \
     --grpc-address 0.0.0.0:50051 \
-    --config /etc/sentinel/transform.yaml
+    --config /etc/zentinel/transform.yaml
 ```
 
 ### CLI Options
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-transform.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-transform.sock` |
 | `--grpc-address` | `TRANSFORM_GRPC_ADDRESS` | gRPC listen address | `0.0.0.0:50051` |
 | `--config` | `TRANSFORM_CONFIG` | Configuration file path | (required) |
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "transform" {
-    socket "/var/run/sentinel/transform.sock"
+    socket "/var/run/zentinel/transform.sock"
     timeout 50ms
     events ["request_headers" "request_body" "response_headers" "response_body"]
 }

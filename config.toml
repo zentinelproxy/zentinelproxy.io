@@ -1,8 +1,8 @@
-# Zola configuration for Sentinel website
+# Zola configuration for Zentinel website
 # https://www.getzola.org/documentation/getting-started/configuration/
 
-base_url = "https://sentinel.raskell.io"
-title = "Sentinel"
+base_url = "https://zentinelproxy.io"
+title = "Zentinel"
 description = "A security-first reverse proxy based on Pingora built to guard the free web. Sleepable ops at the edge."
 default_language = "en"
 
@@ -48,8 +48,8 @@ index_format = "elasticlunr_javascript"
 [extra]
 # Site metadata
 author = "raskell.io"
-github_repo = "https://github.com/raskell-io/sentinel"
-docs_url = "https://sentinel.raskell.io/docs/"
+github_repo = "https://github.com/zentinelproxy/zentinel"
+docs_url = "https://zentinelproxy.io/docs/"
 docs_external_url = "/docs/"
 
 # SEO metadata
@@ -57,7 +57,7 @@ keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, 
 # twitter_handle = "@raskell_io"  # Uncomment when Twitter handle is available
 
 # Social links
-github = "https://github.com/raskell-io/sentinel"
+github = "https://github.com/zentinelproxy/zentinel"
 
 # Navigation (supports dropdowns via children array)
 [[extra.nav_links]]
@@ -103,5 +103,5 @@ url = "/docs/"
 
 [[extra.nav_links]]
 name = "GitHub"
-url = "https://github.com/raskell-io/sentinel"
+url = "https://github.com/zentinelproxy/zentinel"
 external = true

@@ -9,26 +9,26 @@ tags = ["security", "privacy", "compliance", "pii", "tokenization", "encryption"
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Beta"
 version = "0.2.4"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel"
-homepage = "https://sentinel.raskell.io/agents/data-masking/"
+repo = "https://github.com/zentinelproxy/zentinel"
+homepage = "https://zentinelproxy.io/agents/data-masking/"
 protocol_version = "1.0"
 
 # Installation methods
-crate_name = "sentinel-data-masking-agent"
+crate_name = "zentinel-data-masking-agent"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "0.2.4"
+min_zentinel_version = "0.2.4"
 +++
 
 ## Overview
 
-A comprehensive data masking agent for Sentinel that protects sensitive data in API traffic through tokenization, format-preserving encryption, and pattern-based masking. Designed for organizations requiring GDPR, PCI DSS, and HIPAA compliance.
+A comprehensive data masking agent for Zentinel that protects sensitive data in API traffic through tokenization, format-preserving encryption, and pattern-based masking. Designed for organizations requiring GDPR, PCI DSS, and HIPAA compliance.
 
 The agent intercepts request and response bodies, detects sensitive fields using configured paths or automatic pattern matching, and applies reversible or irreversible masking transformations.
 
@@ -48,20 +48,20 @@ The agent intercepts request and response bodies, detects sensitive fields using
 ### Using Cargo
 
 ```bash
-cargo install sentinel-data-masking-agent
+cargo install zentinel-data-masking-agent
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel
-cd sentinel/agents/data-masking
+git clone https://github.com/zentinelproxy/zentinel
+cd zentinel/agents/data-masking
 cargo build --release
 ```
 
 ## Configuration
 
-Create a JSON configuration file or pass configuration through Sentinel's agent config:
+Create a JSON configuration file or pass configuration through Zentinel's agent config:
 
 ```json
 {
@@ -135,9 +135,9 @@ Create a JSON configuration file or pass configuration through Sentinel's agent 
 }
 ```
 
-## Sentinel Configuration
+## Zentinel Configuration
 
-Add to your Sentinel proxy configuration:
+Add to your Zentinel proxy configuration:
 
 ```kdl
 agents {
@@ -325,7 +325,7 @@ Use field names directly:
 ## CLI Options
 
 ```bash
-sentinel-data-masking-agent [OPTIONS]
+zentinel-data-masking-agent [OPTIONS]
 
 Options:
   -s, --socket <PATH>      Unix socket path [default: /tmp/data-masking-agent.sock]

@@ -9,32 +9,32 @@ tags = ["ai", "llm", "gateway", "security", "guardrails"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-ai-gateway"
-homepage = "https://sentinel.raskell.io/agents/ai-gateway/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-ai-gateway"
+homepage = "https://zentinelproxy.io/agents/ai-gateway/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-ai-gateway"
+crate_name = "zentinel-agent-ai-gateway"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Overview
 
-AI Gateway provides **pattern-based security controls** for AI API traffic (OpenAI, Anthropic, Azure OpenAI). This agent specializes in content-level pattern matching that detects known attack patterns in prompts — capabilities that complement Sentinel's built-in inference features.
+AI Gateway provides **pattern-based security controls** for AI API traffic (OpenAI, Anthropic, Azure OpenAI). This agent specializes in content-level pattern matching that detects known attack patterns in prompts — capabilities that complement Zentinel's built-in inference features.
 
 <div class="info-notice">
 
 ### Built-in vs Agent Features
 
-Sentinel v26.01 includes [built-in inference support](/configuration/inference/) for token-based rate limiting, cost tracking, and model routing. This agent focuses on **pattern-based guardrails** that analyze prompt content:
+Zentinel v26.01 includes [built-in inference support](/configuration/inference/) for token-based rate limiting, cost tracking, and model routing. This agent focuses on **pattern-based guardrails** that analyze prompt content:
 
 | Feature | Built-in | Agent |
 |---------|----------|-------|
@@ -50,7 +50,7 @@ Sentinel v26.01 includes [built-in inference support](/configuration/inference/)
 | **Schema validation** | — | Yes |
 | **Model allowlist** | — | Yes |
 
-**Recommended setup:** Use Sentinel's built-in inference features for rate limiting and cost control, and add this agent for semantic security.
+**Recommended setup:** Use Zentinel's built-in inference features for rate limiting and cost control, and add this agent for semantic security.
 
 </div>
 
@@ -99,7 +99,7 @@ Analyze and filter LLM responses before they reach the client:
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-ai-gateway
+cargo install zentinel-agent-ai-gateway
 ```
 
 ## Configuration
@@ -107,8 +107,8 @@ cargo install sentinel-agent-ai-gateway
 ### Command Line
 
 ```bash
-sentinel-ai-gateway-agent \
-  --socket /tmp/sentinel-ai.sock \
+zentinel-ai-gateway-agent \
+  --socket /tmp/zentinel-ai.sock \
   --allowed-models "gpt-4,gpt-3.5-turbo,claude-3" \
   --pii-action block \
   --output-pii-action redact \
@@ -121,7 +121,7 @@ sentinel-ai-gateway-agent \
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-ai-gateway.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-ai-gateway.sock` |
 | `--grpc-address` | `GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--allowed-models` | `ALLOWED_MODELS` | Comma-separated model allowlist | (all) |
 | `--block-mode` | `BLOCK_MODE` | Block or detect-only | `true` |
@@ -146,7 +146,7 @@ sentinel-ai-gateway-agent \
 | `--output-pii-action` | `OUTPUT_PII_ACTION` | Action on output PII: block/redact/log | `log` |
 | `--output-schema` | `OUTPUT_SCHEMA` | Path to JSON Schema for response validation | - |
 
-### Recommended Sentinel Configuration
+### Recommended Zentinel Configuration
 
 Combine built-in inference features with the agent for comprehensive protection:
 
@@ -161,7 +161,7 @@ inference "openai" {
 
 // Agent: Input and output guardrails
 agent "ai-gateway" {
-    socket "/tmp/sentinel-ai-gateway.sock"
+    socket "/tmp/zentinel-ai-gateway.sock"
     timeout 5s
     // Include response events for output guardrails
     events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]
@@ -306,8 +306,8 @@ X-AI-Gateway-Output-PII-Redacted: true
 Run with comprehensive input and output guardrails:
 
 ```bash
-sentinel-ai-gateway-agent \
-  --socket /tmp/sentinel-ai.sock \
+zentinel-ai-gateway-agent \
+  --socket /tmp/zentinel-ai.sock \
   --allowed-models "gpt-4,gpt-4-turbo,claude-3-opus" \
   --prompt-injection true \
   --jailbreak-detection true \
@@ -319,8 +319,8 @@ sentinel-ai-gateway-agent \
 ## Library Usage
 
 ```rust
-use sentinel_agent_ai_gateway::{AiGatewayAgent, AiGatewayConfig, PiiAction};
-use sentinel_agent_protocol::AgentServer;
+use zentinel_agent_ai_gateway::{AiGatewayAgent, AiGatewayConfig, PiiAction};
+use zentinel_agent_protocol::AgentServer;
 
 let config = AiGatewayConfig {
     // Input guardrails

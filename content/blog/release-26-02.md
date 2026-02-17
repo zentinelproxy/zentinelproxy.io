@@ -1,14 +1,14 @@
 +++
-title = "Sentinel 26.02: Every Binary Signed, Every Dependency Listed"
-description = "Release 26.02 adds supply chain security to every Sentinel release — cosign signatures, SLSA provenance, and SBOMs in CycloneDX and SPDX formats. Here's what we built, why it matters, and how to verify your deployment in 30 seconds."
+title = "Zentinel 26.02: Every Binary Signed, Every Dependency Listed"
+description = "Release 26.02 adds supply chain security to every Zentinel release — cosign signatures, SLSA provenance, and SBOMs in CycloneDX and SPDX formats. Here's what we built, why it matters, and how to verify your deployment in 30 seconds."
 date = 2026-01-29
 [taxonomies]
 tags = ["release", "security", "supply-chain"]
 +++
 
-Sentinel sits at the edge of your network. Every request passes through it. If someone tampers with the binary you deploy, your entire infrastructure is compromised — and you might never know.
+Zentinel sits at the edge of your network. Every request passes through it. If someone tampers with the binary you deploy, your entire infrastructure is compromised — and you might never know.
 
-Release 26.02 closes that gap. Every Sentinel release now ships with cryptographic signatures, build provenance, and a complete dependency manifest. You can verify that the binary you downloaded was built by our CI pipeline, from our source code, on GitHub-hosted infrastructure — not by a third party, not from a fork, not from a compromised build environment.
+Release 26.02 closes that gap. Every Zentinel release now ships with cryptographic signatures, build provenance, and a complete dependency manifest. You can verify that the binary you downloaded was built by our CI pipeline, from our source code, on GitHub-hosted infrastructure — not by a third party, not from a fork, not from a compromised build environment.
 
 ## What ships with every release
 
@@ -23,7 +23,7 @@ Starting with 26.02, every GitHub release includes:
 | `.spdx.json` | SPDX 2.3 | SBOM for license compliance |
 | `.intoto.jsonl` | SLSA v1.0 | Build provenance attestation |
 
-Container images (`ghcr.io/raskell-io/sentinel`) are signed with cosign and have an SBOM attached as a cosign attestation.
+Container images (`ghcr.io/zentinelproxy/zentinel`) are signed with cosign and have an SBOM attached as a cosign attestation.
 
 ## Verify a binary in 30 seconds
 
@@ -31,20 +31,20 @@ Container images (`ghcr.io/raskell-io/sentinel`) are signed with cosign and have
 VERSION="26.02_0"
 
 # Download
-curl -LO "https://github.com/raskell-io/sentinel/releases/download/${VERSION}/sentinel-${VERSION}-linux-amd64.tar.gz"
-curl -LO "https://github.com/raskell-io/sentinel/releases/download/${VERSION}/sentinel-${VERSION}-linux-amd64.tar.gz.bundle"
+curl -LO "https://github.com/zentinelproxy/zentinel/releases/download/${VERSION}/zentinel-${VERSION}-linux-amd64.tar.gz"
+curl -LO "https://github.com/zentinelproxy/zentinel/releases/download/${VERSION}/zentinel-${VERSION}-linux-amd64.tar.gz.bundle"
 
 # Verify signature
 cosign verify-blob \
-  --bundle "sentinel-${VERSION}-linux-amd64.tar.gz.bundle" \
-  --certificate-identity-regexp "github.com/raskell-io/sentinel" \
+  --bundle "zentinel-${VERSION}-linux-amd64.tar.gz.bundle" \
+  --certificate-identity-regexp "github.com/zentinelproxy/zentinel" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-  "sentinel-${VERSION}-linux-amd64.tar.gz"
+  "zentinel-${VERSION}-linux-amd64.tar.gz"
 ```
 
 If you get `Verified OK`, you know:
 
-1. The binary was built by a GitHub Actions workflow in `raskell-io/sentinel`
+1. The binary was built by a GitHub Actions workflow in `zentinelproxy/zentinel`
 2. The signature is recorded in the [Sigstore transparency log](https://docs.sigstore.dev/logging/overview/) and is publicly auditable
 3. No private keys were involved — the signing identity is a GitHub Actions OIDC token, not a key that can be stolen
 
@@ -92,9 +92,9 @@ Cosign signatures prove the binary was built by our GitHub Actions workflow. SLS
 
 ```bash
 slsa-verifier verify-artifact \
-  "sentinel-${VERSION}-linux-amd64.tar.gz" \
-  --provenance-path "sentinel-${VERSION}-linux-amd64.tar.gz.intoto.jsonl" \
-  --source-uri github.com/raskell-io/sentinel
+  "zentinel-${VERSION}-linux-amd64.tar.gz" \
+  --provenance-path "zentinel-${VERSION}-linux-amd64.tar.gz.intoto.jsonl" \
+  --source-uri github.com/zentinelproxy/zentinel
 ```
 
 This satisfies [SLSA Build Level 3](https://slsa.dev/spec/v1.0/levels), the highest level achievable with GitHub Actions.
@@ -107,13 +107,13 @@ You can feed these directly into standard vulnerability scanners:
 
 ```bash
 # Anchore grype
-grype sbom:sentinel-26.02_0-sbom.cdx.json
+grype sbom:zentinel-26.02_0-sbom.cdx.json
 
 # Aqua trivy
-trivy sbom sentinel-26.02_0-sbom.cdx.json
+trivy sbom zentinel-26.02_0-sbom.cdx.json
 
 # Google osv-scanner
-osv-scanner --sbom sentinel-26.02_0-sbom.cdx.json
+osv-scanner --sbom zentinel-26.02_0-sbom.cdx.json
 ```
 
 For container images, the SBOM is attached as a cosign attestation and can be extracted with:
@@ -121,9 +121,9 @@ For container images, the SBOM is attached as a cosign attestation and can be ex
 ```bash
 cosign verify-attestation \
   --type cyclonedx \
-  --certificate-identity-regexp "github.com/raskell-io/sentinel" \
+  --certificate-identity-regexp "github.com/zentinelproxy/zentinel" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-  ghcr.io/raskell-io/sentinel:26.02_0 | jq -r '.payload' | base64 -d | jq .
+  ghcr.io/zentinelproxy/zentinel:26.02_0 | jq -r '.payload' | base64 -d | jq .
 ```
 
 ## Enforcing verification in CI/CD
@@ -136,8 +136,8 @@ Verifying manually is fine for one-off deployments. For production pipelines, yo
 - uses: sigstore/cosign-installer@v3
 - run: |
     cosign verify \
-      ghcr.io/raskell-io/sentinel:26.02_0 \
-      --certificate-identity-regexp "github.com/raskell-io/sentinel" \
+      ghcr.io/zentinelproxy/zentinel:26.02_0 \
+      --certificate-identity-regexp "github.com/zentinelproxy/zentinel" \
       --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
 ```
 
@@ -147,7 +147,7 @@ Verifying manually is fine for one-off deployments. For production pipelines, yo
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: verify-sentinel-images
+  name: verify-zentinel-images
 spec:
   validationFailureAction: Enforce
   rules:
@@ -157,21 +157,21 @@ spec:
           - resources:
               kinds: ["Pod"]
       verifyImages:
-        - imageReferences: ["ghcr.io/raskell-io/sentinel*"]
+        - imageReferences: ["ghcr.io/zentinelproxy/zentinel*"]
           attestors:
             - entries:
                 - keyless:
-                    subject: "https://github.com/raskell-io/sentinel/*"
+                    subject: "https://github.com/zentinelproxy/zentinel/*"
                     issuer: "https://token.actions.githubusercontent.com"
                     rekor:
                       url: "https://rekor.sigstore.dev"
 ```
 
-With this policy, Kubernetes will reject any Sentinel pod whose image can't be verified against Sigstore.
+With this policy, Kubernetes will reject any Zentinel pod whose image can't be verified against Sigstore.
 
 ## What this doesn't cover (yet)
 
-Reproducible builds. You can build Sentinel from source and compare checksums, but exact byte-for-byte reproducibility depends on matching the Rust compiler version, target triple, and build environment. We include the Rust version in release notes to make this feasible, but we haven't invested in deterministic builds yet.
+Reproducible builds. You can build Zentinel from source and compare checksums, but exact byte-for-byte reproducibility depends on matching the Rust compiler version, target triple, and build environment. We include the Rust version in release notes to make this feasible, but we haven't invested in deterministic builds yet.
 
 ## What's next
 
@@ -179,17 +179,17 @@ Reproducible builds. You can build Sentinel from source and compare checksums, b
 
 ---
 
-Full verification documentation is in the [Supply Chain Security](/docs/operations/supply-chain/) operator guide. The [supply chain page](/supply-chain/) has a higher-level overview for evaluating Sentinel's security posture.
+Full verification documentation is in the [Supply Chain Security](/docs/operations/supply-chain/) operator guide. The [supply chain page](/supply-chain/) has a higher-level overview for evaluating Zentinel's security posture.
 
 Install 26.02:
 
 ```bash
 # Binary
-curl -fsSL https://getsentinel.raskell.io | sh
+curl -fsSL https://getzentinelproxy.io | sh
 
 # Container
-docker pull ghcr.io/raskell-io/sentinel:26.02_0
+docker pull ghcr.io/zentinelproxy/zentinel:26.02_0
 
 # From source
-cargo install sentinel-proxy
+cargo install zentinel-proxy
 ```

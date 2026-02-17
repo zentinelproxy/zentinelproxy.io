@@ -9,21 +9,21 @@ tags = ["security", "auth", "zero-trust", "spiffe", "mtls", "identity"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-spiffe"
-homepage = "https://sentinel.raskell.io/agents/spiffe/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-spiffe"
+homepage = "https://zentinelproxy.io/agents/spiffe/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-spiffe"
+crate_name = "zentinel-agent-spiffe"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -66,29 +66,29 @@ The SPIFFE agent provides zero-trust workload identity authentication using SPIF
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install spiffe
+zentinel bundle install spiffe
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-spiffe
+cargo install zentinel-agent-spiffe
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-spiffe
-cd sentinel-agent-spiffe
+git clone https://github.com/zentinelproxy/zentinel-agent-spiffe
+cd zentinel-agent-spiffe
 cargo build --release
 ```
 
@@ -98,13 +98,13 @@ cargo build --release
 
 ```bash
 # Basic usage with SPIRE agent
-sentinel-spiffe-agent \
-  --socket /var/run/sentinel/spiffe.sock \
+zentinel-spiffe-agent \
+  --socket /var/run/zentinel/spiffe.sock \
   --spire-socket /run/spire/sockets/agent.sock
 
 # With verbose logging
-sentinel-spiffe-agent \
-  --socket /var/run/sentinel/spiffe.sock \
+zentinel-spiffe-agent \
+  --socket /var/run/zentinel/spiffe.sock \
   --spire-socket /run/spire/sockets/agent.sock \
   --verbose
 ```
@@ -112,21 +112,21 @@ sentinel-spiffe-agent \
 ### Environment Variables
 
 ```bash
-export AGENT_SOCKET="/var/run/sentinel/spiffe.sock"
+export AGENT_SOCKET="/var/run/zentinel/spiffe.sock"
 export SPIRE_AGENT_SOCKET="/run/spire/sockets/agent.sock"
 export SPIFFE_VERBOSE="true"
 ```
 
 ## Configuration
 
-### Sentinel Proxy Configuration
+### Zentinel Proxy Configuration
 
 ```kdl
 agents {
     agent "spiffe" {
         type "custom"
         transport "unix_socket" {
-            path "/var/run/sentinel/spiffe.sock"
+            path "/var/run/zentinel/spiffe.sock"
         }
         events ["request_headers"]
         timeout-ms 100
@@ -212,7 +212,7 @@ routes {
 
 | Option | Environment | Description | Default |
 |--------|-------------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-spiffe.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-spiffe.sock` |
 | `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--spire-socket` | `SPIRE_AGENT_SOCKET` | SPIRE agent socket | `/run/spire/sockets/agent.sock` |
 | `--verbose` | `SPIFFE_VERBOSE` | Enable debug logging | `false` |
@@ -222,8 +222,8 @@ routes {
 ### Authentication Flow
 
 ```
-1. Client connects to Sentinel with mTLS
-2. Sentinel terminates TLS, forwards cert via X-Forwarded-Client-Cert header
+1. Client connects to Zentinel with mTLS
+2. Zentinel terminates TLS, forwards cert via X-Forwarded-Client-Cert header
 3. SPIFFE agent extracts certificate from header
 4. Agent parses SPIFFE ID from certificate SAN URIs
 5. Agent validates certificate against trust bundles (if connected to SPIRE)
@@ -361,26 +361,26 @@ On successful authentication:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sentinel-spiffe-agent
+  name: zentinel-spiffe-agent
 spec:
   template:
     spec:
       containers:
         - name: spiffe-agent
-          image: ghcr.io/raskell-io/sentinel-agent-spiffe:latest
+          image: ghcr.io/zentinelproxy/zentinel-agent-spiffe:latest
           env:
             - name: AGENT_SOCKET
-              value: /var/run/sentinel/spiffe.sock
+              value: /var/run/zentinel/spiffe.sock
             - name: SPIRE_AGENT_SOCKET
               value: /run/spire/sockets/agent.sock
           volumeMounts:
-            - name: sentinel-socket
-              mountPath: /var/run/sentinel
+            - name: zentinel-socket
+              mountPath: /var/run/zentinel
             - name: spire-socket
               mountPath: /run/spire/sockets
               readOnly: true
       volumes:
-        - name: sentinel-socket
+        - name: zentinel-socket
           emptyDir: {}
         - name: spire-socket
           hostPath:
@@ -414,14 +414,14 @@ spire-server entry create \
 
 ```ini
 [Unit]
-Description=Sentinel SPIFFE Agent
+Description=Zentinel SPIFFE Agent
 After=network.target spire-agent.service
 Requires=spire-agent.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/sentinel-spiffe-agent \
-  --socket /var/run/sentinel/spiffe.sock \
+ExecStart=/usr/local/bin/zentinel-spiffe-agent \
+  --socket /var/run/zentinel/spiffe.sock \
   --spire-socket /run/spire/sockets/agent.sock
 Restart=always
 RestartSec=5
@@ -430,23 +430,23 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-## Integration with Sentinel Hub
+## Integration with Zentinel Hub
 
-The SPIFFE agent works with Sentinel Hub for centralized fleet management. Hub uses SPIFFE for agent-to-hub mTLS authentication:
+The SPIFFE agent works with Zentinel Hub for centralized fleet management. Hub uses SPIFFE for agent-to-hub mTLS authentication:
 
 ```yaml
 # Hub configuration
 grpc:
   tls:
     enabled: true
-    cert_file: "/etc/sentinel-hub/certs/server.crt"
-    key_file: "/etc/sentinel-hub/certs/server.key"
+    cert_file: "/etc/zentinel-hub/certs/server.crt"
+    key_file: "/etc/zentinel-hub/certs/server.key"
     require_client_cert: true
     spiffe:
       enabled: true
       agent_socket: "/run/spire/sockets/agent.sock"
       allowed_trust_domains: ["prod.example.org"]
-      allowed_patterns: ["spiffe://.*\\.example\\.org/sentinel-agent/.*"]
+      allowed_patterns: ["spiffe://.*\\.example\\.org/zentinel-agent/.*"]
 ```
 
 ## Security Recommendations
@@ -477,7 +477,7 @@ Check SPIRE agent socket permissions:
 
 ```bash
 ls -la /run/spire/sockets/agent.sock
-# Should be accessible by the sentinel-spiffe-agent process
+# Should be accessible by the zentinel-spiffe-agent process
 ```
 
 ### Certificate Validation Failed
@@ -502,7 +502,7 @@ spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
 
 ## Resources
 
-- [GitHub Repository](https://github.com/raskell-io/sentinel-agent-spiffe)
+- [GitHub Repository](https://github.com/zentinelproxy/zentinel-agent-spiffe)
 - [SPIFFE Specification](https://spiffe.io/docs/latest/spiffe-about/overview/)
 - [SPIRE Documentation](https://spiffe.io/docs/latest/spire-about/)
 - [Zero Trust Architecture](https://www.nist.gov/publications/zero-trust-architecture)

@@ -1,16 +1,16 @@
 +++
-title = "Benchmarking Sentinel Against the Established Proxies"
-description = "We put Sentinel head-to-head with Envoy, HAProxy, nginx, and Caddy — then used the results to find and fix the per-request allocations that were costing us CPU. Three rounds of optimization later, Sentinel matches or beats every proxy we tested on tail latency."
+title = "Benchmarking Zentinel Against the Established Proxies"
+description = "We put Zentinel head-to-head with Envoy, HAProxy, nginx, and Caddy — then used the results to find and fix the per-request allocations that were costing us CPU. Three rounds of optimization later, Zentinel matches or beats every proxy we tested on tail latency."
 date = 2026-01-28
 [taxonomies]
 tags = ["performance", "rust", "benchmarks"]
 +++
 
-We set out to answer a simple question: how does Sentinel stack up against the established reverse proxies?
+We set out to answer a simple question: how does Zentinel stack up against the established reverse proxies?
 
-Envoy, HAProxy, nginx, and Caddy are battle-tested infrastructure that have been optimized over years — some over decades. Sentinel is newer, built on Cloudflare's [Pingora](https://github.com/cloudflare/pingora) framework in Rust. We wanted to know where we stood.
+Envoy, HAProxy, nginx, and Caddy are battle-tested infrastructure that have been optimized over years — some over decades. Zentinel is newer, built on Cloudflare's [Pingora](https://github.com/cloudflare/pingora) framework in Rust. We wanted to know where we stood.
 
-The initial answer: Sentinel's latency was competitive but it was burning more CPU than it should. So we dug in, profiled, and fixed the bottlenecks we found. Three rounds of targeted optimization later, Sentinel matches or beats every proxy we tested on tail latency while maintaining a small memory footprint.
+The initial answer: Zentinel's latency was competitive but it was burning more CPU than it should. So we dug in, profiled, and fixed the bottlenecks we found. Three rounds of targeted optimization later, Zentinel matches or beats every proxy we tested on tail latency while maintaining a small memory footprint.
 
 This post walks through what we measured, what we changed, and what we learned.
 
@@ -22,21 +22,21 @@ Everything ran natively on the same machine — no Docker, no network hops. Each
 
 ## Starting point
 
-The initial benchmark told a clear story. Sentinel's latency was competitive but its CPU usage stood out:
+The initial benchmark told a clear story. Zentinel's latency was competitive but its CPU usage stood out:
 
 | Proxy | p50 | p99 | Peak Memory | Avg CPU |
 |-------|-----|-----|-------------|---------|
-| Sentinel | 0.43ms | 0.77ms | 49.1MB | 57.7% |
+| Zentinel | 0.43ms | 0.77ms | 49.1MB | 57.7% |
 | nginx | 0.41ms | 0.83ms | 309.9MB | 32.1% |
 | Envoy | 0.68ms | 1.25ms | 41.1MB | 34.4% |
 | Caddy | 0.58ms | 1.19ms | 55.8MB | 103.6% |
 | HAProxy | 0.88ms | 38.34ms | 25.7MB | 39.9% |
 
-Sentinel already had the best p99 of the group, but was burning 57.7% CPU to get there. That extra CPU was doing *something*, and it wasn't making requests faster. The question was: what's eating those cycles?
+Zentinel already had the best p99 of the group, but was burning 57.7% CPU to get there. That extra CPU was doing *something*, and it wasn't making requests faster. The question was: what's eating those cycles?
 
 ## Round 1: The agent header map
 
-The first thing we found was in the agent processing path. Sentinel's [agent architecture](https://sentinel.raskell.io/agents/) allows external processes to inspect and modify requests. Even when no agents are configured on a route, the code path that prepares headers for agent processing was doing unnecessary work.
+The first thing we found was in the agent processing path. Zentinel's [agent architecture](https://zentinelproxy.io/agents/) allows external processes to inspect and modify requests. Even when no agents are configured on a route, the code path that prepares headers for agent processing was doing unnecessary work.
 
 In `handlers.rs`, every request with agent filters rebuilt a `HashMap<String, Vec<String>>` from scratch:
 
@@ -104,7 +104,7 @@ The third round targeted three independent allocations, each on the hottest path
 
 ### Route cache key: zero-alloc on cache hit
 
-Sentinel caches route matching results in a `DashMap` (lock-free concurrent HashMap). The cache key is built from the request method, host, and path. Before optimization, this used `format!()`:
+Zentinel caches route matching results in a `DashMap` (lock-free concurrent HashMap). The cache key is built from the request method, host, and path. Before optimization, this used `format!()`:
 
 ```rust
 // Before: heap allocation on every request
@@ -183,13 +183,13 @@ After all three rounds:
 
 | Proxy | p50 | p99 | Peak Memory | Avg CPU |
 |-------|-----|-----|-------------|---------|
-| **Sentinel** | **0.38ms** | **0.69ms** | **49.6MB** | **42.1%** |
+| **Zentinel** | **0.38ms** | **0.69ms** | **49.6MB** | **42.1%** |
 | nginx | 0.38ms | 0.69ms | 310.2MB | 29.0% |
 | Envoy | 0.45ms | 0.88ms | 41.1MB | 27.1% |
 | Caddy | 0.49ms | 1.00ms | 55.1MB | 91.2% |
 | HAProxy | 0.88ms | 37.32ms | 25.7MB | 38.6% |
 
-Sentinel now matches or beats every proxy on latency while keeping a small memory footprint. The CPU gap with the C/C++ proxies narrowed significantly — from nearly 2x down to roughly 1.5x — and the remaining difference is accounted for by security headers that Sentinel adds by default and kernel-level overhead outside our control.
+Zentinel now matches or beats every proxy on latency while keeping a small memory footprint. The CPU gap with the C/C++ proxies narrowed significantly — from nearly 2x down to roughly 1.5x — and the remaining difference is accounted for by security headers that Zentinel adds by default and kernel-level overhead outside our control.
 
 ### Progression across rounds
 
@@ -201,7 +201,7 @@ Sentinel now matches or beats every proxy on latency while keeping a small memor
 
 ## Where the remaining CPU goes
 
-After the optimizations, we profiled Sentinel under load to understand what the remaining CPU was actually doing:
+After the optimizations, we profiled Zentinel under load to understand what the remaining CPU was actually doing:
 
 | Component | % of CPU |
 |-----------|----------|
@@ -213,9 +213,9 @@ After the optimizations, we profiled Sentinel under load to understand what the 
 
 The 47% TCP connection overhead is a test artifact — the profiling setup wasn't pooling backend connections. In production with warmed connection pools, this cost drops to near-zero.
 
-The 4% in response header insertion comes from Sentinel's security headers (`X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`). This is the cost of adding security value over a raw proxy — and it's the right tradeoff.
+The 4% in response header insertion comes from Zentinel's security headers (`X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`). This is the cost of adding security value over a raw proxy — and it's the right tradeoff.
 
-The rest is kernel I/O, Pingora framework internals (HTTP parsing, connection management), and jemalloc. All outside Sentinel's control.
+The rest is kernel I/O, Pingora framework internals (HTTP parsing, connection management), and jemalloc. All outside Zentinel's control.
 
 ## What we got wrong
 
@@ -223,7 +223,7 @@ Not every suggestion panned out. A few things we investigated that turned out to
 
 **"200+ trace!() calls cause overhead"** — Actually 65 `trace!()` calls. When the trace level is disabled (production default), each macro compiles down to a single atomic load + comparison. At 10,000 requests/second, 65 always-false atomic comparisons per request cost roughly nothing. Removing them would trade real observability for unmeasurable gains.
 
-**"UUID trace ID generation is expensive"** — Sentinel uses TinyFlake, not UUIDs. The IDs are 11 characters, not 36. Not a meaningful allocation.
+**"UUID trace ID generation is expensive"** — Zentinel uses TinyFlake, not UUIDs. The IDs are 11 characters, not 36. Not a meaningful allocation.
 
 **"Route config clone is expensive"** — The route config is `Arc<RouteConfig>`. Cloning it is a single atomic refcount increment.
 
@@ -241,17 +241,17 @@ Not every suggestion panned out. A few things we investigated that turned out to
 
 ## Try it yourself
 
-All the optimizations described in this post ship in Sentinel v0.4.5 (release [26.01_11](https://github.com/raskell-io/sentinel/releases/tag/26.01_11)). You can grab it and run your own benchmarks:
+All the optimizations described in this post ship in Zentinel v0.4.5 (release [26.01_11](https://github.com/zentinelproxy/zentinel/releases/tag/26.01_11)). You can grab it and run your own benchmarks:
 
 ```bash
 # From crates.io
-cargo install sentinel-proxy
+cargo install zentinel-proxy
 
 # Or download a prebuilt binary (Linux, macOS)
-curl -fsSL https://getsentinel.raskell.io | sh
+curl -fsSL https://getzentinelproxy.io | sh
 
 # Or pull the container image
-docker pull ghcr.io/raskell-io/sentinel:26.01_11
+docker pull ghcr.io/zentinelproxy/zentinel:26.01_11
 ```
 
 ---

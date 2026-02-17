@@ -9,21 +9,21 @@ tags = ["grpc", "security", "authorization", "rate-limiting"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "MIT"
-repo = "https://github.com/raskell-io/sentinel-agent-grpc-inspector"
-homepage = "https://sentinel.raskell.io/agents/grpc-inspector/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-grpc-inspector"
+homepage = "https://zentinelproxy.io/agents/grpc-inspector/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-grpc-inspector"
+crate_name = "zentinel-agent-grpc-inspector"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -186,29 +186,29 @@ The agent returns appropriate gRPC status codes when blocking requests:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install grpc-inspector
+zentinel bundle install grpc-inspector
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### From Cargo
 
 ```bash
-cargo install sentinel-agent-grpc-inspector
+cargo install zentinel-agent-grpc-inspector
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-grpc-inspector.git
-cd sentinel-agent-grpc-inspector
+git clone https://github.com/zentinelproxy/zentinel-agent-grpc-inspector.git
+cd zentinel-agent-grpc-inspector
 cargo build --release
 ```
 
@@ -217,7 +217,7 @@ cargo build --release
 ### CLI Options
 
 ```bash
-sentinel-agent-grpc-inspector [OPTIONS]
+zentinel-agent-grpc-inspector [OPTIONS]
 
 Options:
   -c, --config <FILE>       Path to configuration file [default: grpc-inspector.yaml]
@@ -230,14 +230,14 @@ Options:
   -V, --version           Print version
 ```
 
-### Sentinel Integration
+### Zentinel Integration
 
-Add the agent to your Sentinel proxy configuration:
+Add the agent to your Zentinel proxy configuration:
 
 ```yaml
 agents:
   - name: grpc-inspector
-    socket: /tmp/sentinel-grpc-inspector.sock
+    socket: /tmp/zentinel-grpc-inspector.sock
     on_request: true
     on_response: false
 ```

@@ -262,7 +262,7 @@
                     <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
             </summary>
-            <p class="category-description">Maintained by the Sentinel Core Team</p>
+            <p class="category-description">Maintained by the Zentinel Core Team</p>
             <div class="agents-grid">
                 {# Iterate in order: Stable, Beta, Planned #}
                 {% for agent in stable_agents %}
@@ -586,7 +586,7 @@
                         </div>
                         <h3 class="agent-name">Submit Your Agent</h3>
                         <p class="agent-description">Built something useful? Share it with the community and get it listed here.</p>
-                        <a href="https://github.com/raskell-io/sentinel.raskell.io/issues/new?template=new-agent.yml" class="btn btn-secondary btn-sm">
+                        <a href="https://github.com/zentinelproxy/zentinelproxy.io/issues/new?template=new-agent.yml" class="btn btn-secondary btn-sm">
                             Get Listed
                         </a>
                     </div>
@@ -605,7 +605,7 @@
                 <div class="why-agents">
                     <div class="philosophy-content">
                         <p>
-                            Sentinel's core philosophy is simple: <strong>the dataplane should be boring</strong>. Stable, bounded, predictable.
+                            Zentinel's core philosophy is simple: <strong>the dataplane should be boring</strong>. Stable, bounded, predictable.
                             No 3 AM wake-ups. No memory explosions. No cascading failures from a misbehaving script.
                         </p>
                         <p>
@@ -616,7 +616,7 @@
                         <p>
                             <strong>Agents are where innovation lives.</strong> By moving complex logic to external processes behind a
                             stable contract, we get the best of both worlds: a rock-solid dataplane that never crashes, and unlimited
-                            extensibility for security policies. A broken agent cannot crash Sentinel. It gets circuit-broken,
+                            extensibility for security policies. A broken agent cannot crash Zentinel. It gets circuit-broken,
                             falls back to a safe default, and life goes on.
                         </p>
                         <p>
@@ -627,7 +627,7 @@
                         <p>
                             This is how we keep the internet safe: by enabling <em>everyone</em>—from solo developers to enterprise
                             security teams—to implement their own policies without compromising the stability of the underlying
-                            infrastructure. Your WAF rules, your auth logic, your rate limits, your threat models. Sentinel just
+                            infrastructure. Your WAF rules, your auth logic, your rate limits, your threat models. Zentinel just
                             makes sure the traffic flows reliably while your agents make the decisions.
                         </p>
                     </div>
@@ -638,7 +638,7 @@
                             </div>
                             <div class="principle-text">
                                 <strong>Isolation</strong>
-                                <span>Agent crashes don't crash Sentinel</span>
+                                <span>Agent crashes don't crash Zentinel</span>
                             </div>
                         </div>
                         <div class="principle">
@@ -682,9 +682,9 @@
             </summary>
             <div class="create-agent-content">
                 <p>
-                    Agents are external processes that extend Sentinel's capabilities. They communicate via
+                    Agents are external processes that extend Zentinel's capabilities. They communicate via
                     <strong>Unix domain sockets</strong> (for local agents) or <strong>gRPC</strong> (for remote/distributed agents),
-                    using the protocol defined in the <a href="https://github.com/raskell-io/sentinel/tree/main/crates/agent-protocol" target="_blank" rel="noopener"><code>agent-protocol</code></a> crate.
+                    using the protocol defined in the <a href="https://github.com/zentinelproxy/zentinel/tree/main/crates/agent-protocol" target="_blank" rel="noopener"><code>agent-protocol</code></a> crate.
                     This allows you to implement custom security logic in any language.
                 </p>
 
@@ -706,7 +706,7 @@
                             </div>
                             <div class="explainer-content">
                                 <strong>Unix Socket &amp; gRPC</strong>
-                                <span>Two transport options: <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener">Unix domain sockets</a> for local agents (4-byte length prefix + JSON), or <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener">gRPC</a> for remote/distributed agents</span>
+                                <span>Two transport options: <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener">Unix domain sockets</a> for local agents (4-byte length prefix + JSON), or <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener">gRPC</a> for remote/distributed agents</span>
                             </div>
                         </div>
                         <div class="explainer-item">
@@ -715,7 +715,7 @@
                             </div>
                             <div class="explainer-content">
                                 <strong>Connection Pooling</strong>
-                                <span>Sentinel maintains persistent connections to agents, eliminating connection overhead per request</span>
+                                <span>Zentinel maintains persistent connections to agents, eliminating connection overhead per request</span>
                             </div>
                         </div>
                         <div class="explainer-item">
@@ -799,7 +799,7 @@
                             </div>
                             <div class="explainer-content">
                                 <strong>Auto-Reconnect</strong>
-                                <span>Sentinel automatically reconnects to agents after crashes with exponential backoff</span>
+                                <span>Zentinel automatically reconnects to agents after crashes with exponential backoff</span>
                             </div>
                         </div>
                         <div class="explainer-item">
@@ -817,27 +817,27 @@
                 <div class="protocol-docs-links">
                     <h4>Protocol Documentation</h4>
                     <div class="docs-grid">
-                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/architecture.md" target="_blank" rel="noopener" class="doc-link">
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/architecture.md" target="_blank" rel="noopener" class="doc-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
                             Architecture
                         </a>
-                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener" class="doc-link">
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/protocol.md" target="_blank" rel="noopener" class="doc-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/></svg>
                             Wire Protocol
                         </a>
-                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/handler.md" target="_blank" rel="noopener" class="doc-link">
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/handler.md" target="_blank" rel="noopener" class="doc-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                             Handler Interface
                         </a>
-                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/api.md" target="_blank" rel="noopener" class="doc-link">
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/api.md" target="_blank" rel="noopener" class="doc-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/><rect width="18" height="14" x="3" y="5" rx="2"/></svg>
                             Client/Server API
                         </a>
-                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/errors.md" target="_blank" rel="noopener" class="doc-link">
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/errors.md" target="_blank" rel="noopener" class="doc-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
                             Error Handling
                         </a>
-                        <a href="https://github.com/raskell-io/sentinel/blob/main/crates/agent-protocol/docs/examples.md" target="_blank" rel="noopener" class="doc-link">
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/agent-protocol/docs/examples.md" target="_blank" rel="noopener" class="doc-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
                             Examples
                         </a>
@@ -861,7 +861,7 @@
                         <span class="qi-badge">Security</span>
                     </div>
                     <p>OWASP-compatible web application firewall with SQL injection, XSS, and path traversal protection.</p>
-                    <code class="qi-command">cargo install sentinel-agent-waf</code>
+                    <code class="qi-command">cargo install zentinel-agent-waf</code>
                 </div>
 
                 <div class="quick-install-card">
@@ -870,7 +870,7 @@
                         <span class="qi-badge">Traffic</span>
                     </div>
                     <p>Token bucket rate limiting with configurable limits per IP, user, or custom key.</p>
-                    <code class="qi-command">cargo install sentinel-agent-ratelimit</code>
+                    <code class="qi-command">cargo install zentinel-agent-ratelimit</code>
                 </div>
 
                 <div class="quick-install-card">
@@ -879,7 +879,7 @@
                         <span class="qi-badge">Security</span>
                     </div>
                     <p>Block requests by IP address, CIDR range, path pattern, or User-Agent.</p>
-                    <code class="qi-command">cargo install sentinel-agent-denylist</code>
+                    <code class="qi-command">cargo install zentinel-agent-denylist</code>
                 </div>
 
                 <div class="quick-install-card">
@@ -888,7 +888,7 @@
                         <span class="qi-badge">Observability</span>
                     </div>
                     <p>Structured audit logging for compliance, debugging, and security analysis.</p>
-                    <code class="qi-command">cargo install sentinel-agent-audit-logger</code>
+                    <code class="qi-command">cargo install zentinel-agent-audit-logger</code>
                 </div>
 
                 <div class="quick-install-card">
@@ -897,7 +897,7 @@
                         <span class="qi-badge">Security</span>
                     </div>
                     <p>Block malicious IPs using threat intelligence feeds and reputation scoring.</p>
-                    <code class="qi-command">cargo install sentinel-agent-ip-reputation</code>
+                    <code class="qi-command">cargo install zentinel-agent-ip-reputation</code>
                 </div>
 
                 <div class="quick-install-card">
@@ -906,7 +906,7 @@
                         <span class="qi-badge">Testing</span>
                     </div>
                     <p>Controlled fault injection for resilience testing in staging environments.</p>
-                    <code class="qi-command">cargo install sentinel-agent-chaos</code>
+                    <code class="qi-command">cargo install zentinel-agent-chaos</code>
                 </div>
             </div>
         </div>
@@ -921,7 +921,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                         Customize Installation
                     </a>
-                    <a href="https://github.com/raskell-io/sentinel/discussions/new?category=ideas" target="_blank" rel="noopener" class="cta-button secondary">
+                    <a href="https://github.com/zentinelproxy/zentinel/discussions/new?category=ideas" target="_blank" rel="noopener" class="cta-button secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         Request an Agent
                     </a>
@@ -938,7 +938,7 @@
             </summary>
             <div class="create-agent-content">
                 <p>
-                    Extend Sentinel with custom security logic, authentication, rate limiting, or any HTTP processing you need.
+                    Extend Zentinel with custom security logic, authentication, rate limiting, or any HTTP processing you need.
                     Use one of our official SDKs or implement the protocol directly.
                 </p>
 
@@ -946,121 +946,121 @@
                 <h3>Official SDKs</h3>
                 <p class="sdk-intro">Choose the SDK for your preferred language. Each provides a simple, idiomatic API for building agents.</p>
                 <div class="sdk-grid">
-                    <a href="https://github.com/raskell-io/sentinel-agent-rust-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-rust-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo rust">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg" alt="Rust" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Rust SDK</span>
-                                <span class="sdk-package">sentinel-agent-sdk</span>
+                                <span class="sdk-package">zentinel-agent-sdk</span>
                             </div>
                         </div>
-                        <p class="sdk-description">Native performance with zero-cost abstractions. Uses the same protocol crate as Sentinel itself.</p>
+                        <p class="sdk-description">Native performance with zero-cost abstractions. Uses the same protocol crate as Zentinel itself.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">cargo add sentinel-agent-sdk</span>
+                            <span class="sdk-install">cargo add zentinel-agent-sdk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
 
-                    <a href="https://github.com/raskell-io/sentinel-agent-go-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-go-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo go">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original-wordmark.svg" alt="Go" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Go SDK</span>
-                                <span class="sdk-package">sentinel-agent-sdk</span>
+                                <span class="sdk-package">zentinel-agent-sdk</span>
                             </div>
                         </div>
                         <p class="sdk-description">Idiomatic Go with goroutine-per-connection model. Simple, fast, and production-ready.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">go get github.com/raskell-io/sentinel-agent-go-sdk</span>
+                            <span class="sdk-install">go get github.com/zentinelproxy/zentinel-agent-go-sdk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
 
-                    <a href="https://github.com/raskell-io/sentinel-agent-kotlin-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-kotlin-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo kotlin">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kotlin/kotlin-original.svg" alt="Kotlin" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Kotlin SDK</span>
-                                <span class="sdk-package">sentinel-agent-sdk</span>
+                                <span class="sdk-package">zentinel-agent-sdk</span>
                             </div>
                         </div>
                         <p class="sdk-description">Coroutine-based async agents with excellent Java interop. Ideal for JVM environments.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">implementation("io.raskell:sentinel-agent-sdk:0.2.0")</span>
+                            <span class="sdk-install">implementation("io.raskell:zentinel-agent-sdk:0.2.0")</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
 
-                    <a href="https://github.com/raskell-io/sentinel-agent-python-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-python-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo python">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="Python" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Python SDK</span>
-                                <span class="sdk-package">sentinel-agent-sdk</span>
+                                <span class="sdk-package">zentinel-agent-sdk</span>
                             </div>
                         </div>
                         <p class="sdk-description">Async-first design with asyncio. Fluent Decision builder and typed configuration support.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">pip install sentinel-agent-sdk</span>
+                            <span class="sdk-install">pip install zentinel-agent-sdk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
 
-                    <a href="https://github.com/raskell-io/sentinel-agent-typescript-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-typescript-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo typescript">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" alt="TypeScript" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">TypeScript SDK</span>
-                                <span class="sdk-package">@sentinel-proxy/agent-sdk</span>
+                                <span class="sdk-package">@zentinel-proxy/agent-sdk</span>
                             </div>
                         </div>
                         <p class="sdk-description">Full type safety with TypeScript. Works with Node.js, Deno, and Bun runtimes.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">npm install @sentinel-proxy/agent-sdk</span>
+                            <span class="sdk-install">npm install @zentinel-proxy/agent-sdk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
 
-                    <a href="https://github.com/raskell-io/sentinel-agent-elixir-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-elixir-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo elixir">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/elixir/elixir-original.svg" alt="Elixir" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Elixir SDK</span>
-                                <span class="sdk-package">sentinel_agent_sdk</span>
+                                <span class="sdk-package">zentinel_agent_sdk</span>
                             </div>
                         </div>
                         <p class="sdk-description">Fault-tolerant agents with OTP supervision. Perfect for distributed, resilient systems.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">mix deps.get sentinel_agent_sdk</span>
+                            <span class="sdk-install">mix deps.get zentinel_agent_sdk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
 
-                    <a href="https://github.com/raskell-io/sentinel-agent-haskell-sdk" class="sdk-card" target="_blank" rel="noopener">
+                    <a href="https://github.com/zentinelproxy/zentinel-agent-haskell-sdk" class="sdk-card" target="_blank" rel="noopener">
                         <div class="sdk-header">
                             <div class="sdk-logo haskell">
                                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/haskell/haskell-original.svg" alt="Haskell" width="28" height="28">
                             </div>
                             <div class="sdk-info">
                                 <span class="sdk-name">Haskell SDK</span>
-                                <span class="sdk-package">sentinel-agent-protocol</span>
+                                <span class="sdk-package">zentinel-agent-protocol</span>
                             </div>
                         </div>
                         <p class="sdk-description">Type-safe agents with ReaderT pattern and unliftio. GHC2021 with full protocol v2 support.</p>
                         <div class="sdk-footer">
-                            <span class="sdk-install">cabal install sentinel-agent-protocol</span>
+                            <span class="sdk-install">cabal install zentinel-agent-protocol</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                         </div>
                     </a>
@@ -1086,15 +1086,15 @@
                     <div class="cta-step">
                         <span class="step-number">3</span>
                         <div class="step-content">
-                            <strong>Configure Sentinel</strong>
-                            <span>Add your agent to the Sentinel config with a Unix socket path and attach it to routes via filters</span>
+                            <strong>Configure Zentinel</strong>
+                            <span>Add your agent to the Zentinel config with a Unix socket path and attach it to routes via filters</span>
                         </div>
                     </div>
                     <div class="cta-step">
                         <span class="step-number">4</span>
                         <div class="step-content">
                             <strong>Run and test</strong>
-                            <span>Start your agent, reload Sentinel, and verify your logic with test requests</span>
+                            <span>Start your agent, reload Zentinel, and verify your logic with test requests</span>
                         </div>
                     </div>
                 </div>
@@ -1112,7 +1112,7 @@
                         <button class="code-tab" data-lang="haskell">Haskell</button>
                     </div>
                     <div class="code-panels">
-                        <pre class="code-panel active language-rust" data-lang="rust"><code class="language-rust">use sentinel_agent_sdk::{Agent, Decision, Request};
+                        <pre class="code-panel active language-rust" data-lang="rust"><code class="language-rust">use zentinel_agent_sdk::{Agent, Decision, Request};
 
 struct MyAgent;
 
@@ -1129,7 +1129,7 @@ impl Agent for MyAgent {
 }</code></pre>
                         <pre class="code-panel language-go" data-lang="go"><code class="language-go">package main
 
-import "github.com/raskell-io/sentinel-agent-go-sdk/agent"
+import "github.com/zentinelproxy/zentinel-agent-go-sdk/agent"
 
 type MyAgent struct{}
 
@@ -1141,7 +1141,7 @@ func (a *MyAgent) OnRequest(req *agent.Request) *agent.Decision {
     }
     return agent.Allow()
 }</code></pre>
-                        <pre class="code-panel language-kotlin" data-lang="kotlin"><code class="language-kotlin">import io.raskell.sentinel.agent.*
+                        <pre class="code-panel language-kotlin" data-lang="kotlin"><code class="language-kotlin">import io.raskell.zentinel.agent.*
 
 class MyAgent : Agent {
     override val name = "my-agent"
@@ -1156,7 +1156,7 @@ class MyAgent : Agent {
         }
     }
 }</code></pre>
-                        <pre class="code-panel language-python" data-lang="python"><code class="language-python">from sentinel_agent_sdk import Agent, Decision, Request
+                        <pre class="code-panel language-python" data-lang="python"><code class="language-python">from zentinel_agent_sdk import Agent, Decision, Request
 
 class MyAgent(Agent):
     @property
@@ -1167,7 +1167,7 @@ class MyAgent(Agent):
         if request.path_starts_with("/admin"):
             return Decision.deny().with_body("Access denied").with_tag("blocked")
         return Decision.allow()</code></pre>
-                        <pre class="code-panel language-typescript" data-lang="typescript"><code class="language-typescript">import { Agent, Decision, Request } from '@sentinel-proxy/agent-sdk';
+                        <pre class="code-panel language-typescript" data-lang="typescript"><code class="language-typescript">import { Agent, Decision, Request } from '@zentinel-proxy/agent-sdk';
 
 class MyAgent extends Agent {
     name = 'my-agent';
@@ -1182,7 +1182,7 @@ class MyAgent extends Agent {
     }
 }</code></pre>
                         <pre class="code-panel language-elixir" data-lang="elixir"><code class="language-elixir">defmodule MyAgent do
-  use SentinelAgentSdk.Agent
+  use ZentinelAgentSdk.Agent
 
   @impl true
   def name, do: "my-agent"
@@ -1198,7 +1198,7 @@ class MyAgent extends Agent {
     end
   end
 end</code></pre>
-                        <pre class="code-panel language-haskell" data-lang="haskell"><code class="language-haskell">import Sentinel.Agent.Protocol
+                        <pre class="code-panel language-haskell" data-lang="haskell"><code class="language-haskell">import Zentinel.Agent.Protocol
 import Data.Text qualified as T
 
 instance AgentHandler IO where
@@ -1215,9 +1215,9 @@ main = runAgent defaultConfig id</code></pre>
                     </div>
                 </div>
 
-                {# Sentinel Configuration #}
-                <h3>Sentinel Configuration</h3>
-                <p>Configure Sentinel to connect to your agent:</p>
+                {# Zentinel Configuration #}
+                <h3>Zentinel Configuration</h3>
+                <p>Configure Zentinel to connect to your agent:</p>
                 <pre class="config-example language-kdl"><code class="language-kdl">agents {
     agent "my-agent" type="custom" {
         unix-socket path="/tmp/my-agent.sock"
@@ -1322,7 +1322,7 @@ routes {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-haskell.min.js"></script>
 <script>
 (function() {
-    // Define KDL language for Prism (Sentinel config format)
+    // Define KDL language for Prism (Zentinel config format)
     Prism.languages.kdl = {
         'comment': {
             pattern: /\/\/.*|\/\*[\s\S]*?\*\/|#.*/,

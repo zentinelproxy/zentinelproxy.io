@@ -9,21 +9,21 @@ tags = ["security", "graphql", "api"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-graphql-security"
-homepage = "https://sentinel.raskell.io/agents/graphql-security/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-graphql-security"
+homepage = "https://zentinelproxy.io/agents/graphql-security/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-graphql-security"
+crate_name = "zentinel-agent-graphql-security"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the GraphQL Security agent supports protocol v2 with:
 
 ## Overview
 
-A comprehensive GraphQL security agent for Sentinel that protects GraphQL APIs from common attacks and abuse patterns. Uses [Apollo Parser](https://crates.io/crates/apollo-parser) for spec-compliant GraphQL parsing.
+A comprehensive GraphQL security agent for Zentinel that protects GraphQL APIs from common attacks and abuse patterns. Uses [Apollo Parser](https://crates.io/crates/apollo-parser) for spec-compliant GraphQL parsing.
 
 GraphQL's flexibility makes it powerful but also introduces unique security challenges—deeply nested queries, expensive operations, and schema exposure can lead to denial-of-service, data leakage, and abuse. This agent provides defense-in-depth controls specifically designed for GraphQL.
 
@@ -57,29 +57,29 @@ GraphQL's flexibility makes it powerful but also introduces unique security chal
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install graphql-security
+zentinel bundle install graphql-security
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-graphql-security
+cargo install zentinel-agent-graphql-security
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-graphql-security
-cd sentinel-agent-graphql-security
+git clone https://github.com/zentinelproxy/zentinel-agent-graphql-security
+cd zentinel-agent-graphql-security
 cargo build --release
 ```
 
@@ -88,7 +88,7 @@ cargo build --release
 ### Command Line
 
 ```bash
-sentinel-agent-graphql-security --config config.yaml --socket /var/run/sentinel/graphql.sock
+zentinel-agent-graphql-security --config config.yaml --socket /var/run/zentinel/graphql.sock
 ```
 
 ### Command Line Options
@@ -96,7 +96,7 @@ sentinel-agent-graphql-security --config config.yaml --socket /var/run/sentinel/
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--config`, `-c` | Path to YAML configuration file | `config.yaml` |
-| `--socket`, `-s` | Unix socket path | `/tmp/sentinel-graphql-security.sock` |
+| `--socket`, `-s` | Unix socket path | `/tmp/zentinel-graphql-security.sock` |
 | `--grpc-address` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--log-level`, `-l` | Log level (trace, debug, info, warn, error) | `info` |
 
@@ -166,15 +166,15 @@ field_auth:
 persisted_queries:
   enabled: false
   mode: allowlist  # or "cache"
-  allowlist_file: "/etc/sentinel/graphql-allowlist.json"
+  allowlist_file: "/etc/zentinel/graphql-allowlist.json"
   require_hash: false
 ```
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "graphql-security" {
-    socket "/var/run/sentinel/graphql.sock"
+    socket "/var/run/zentinel/graphql.sock"
     timeout 100ms
     events ["request_headers" "request_body"]
 }
@@ -382,7 +382,7 @@ Errors are returned as GraphQL-compliant responses (HTTP 200):
       "message": "Query depth of 15 exceeds maximum allowed depth of 10",
       "extensions": {
         "code": "DEPTH_EXCEEDED",
-        "sentinel": true,
+        "zentinel": true,
         "actual": 15,
         "max": 10
       }
@@ -422,7 +422,7 @@ settings:
 
 ## Resources
 
-- [GitHub Repository](https://github.com/raskell-io/sentinel-agent-graphql-security)
+- [GitHub Repository](https://github.com/zentinelproxy/zentinel-agent-graphql-security)
 - [Apollo Parser](https://crates.io/crates/apollo-parser)
 - [GraphQL Security Best Practices](https://graphql.org/learn/security/)
 - [OWASP GraphQL Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html)

@@ -2295,7 +2295,7 @@
         "http_errors": {}
       }
     },
-    "sentinel": {
+    "zentinel": {
       "version": "0.4.4",
       "rps": 9999.579794620575,
       "latency": {

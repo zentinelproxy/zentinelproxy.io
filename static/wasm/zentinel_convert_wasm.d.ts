@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 /**
- * Convert a configuration string to Sentinel KDL format
+ * Convert a configuration string to Zentinel KDL format
  *
  * # Arguments
  * * `config` - The source configuration content

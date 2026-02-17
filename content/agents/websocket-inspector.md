@@ -9,21 +9,21 @@ tags = ["websocket", "security", "real-time", "inspection"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-websocket-inspector"
-homepage = "https://sentinel.raskell.io/agents/websocket-inspector/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-websocket-inspector"
+homepage = "https://zentinelproxy.io/agents/websocket-inspector/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-websocket-inspector"
+crate_name = "zentinel-agent-websocket-inspector"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -38,22 +38,22 @@ As of v0.2.0, the WebSocket Inspector agent supports protocol v2 with:
 
 ## Overview
 
-WebSocket Inspector provides **content-level security analysis** for WebSocket connections. This agent processes individual frames sent by Sentinel's native WebSocket support, enabling deep inspection of real-time bidirectional traffic.
+WebSocket Inspector provides **content-level security analysis** for WebSocket connections. This agent processes individual frames sent by Zentinel's native WebSocket support, enabling deep inspection of real-time bidirectional traffic.
 
 <div class="info-notice">
 
-### How It Works with Sentinel
+### How It Works with Zentinel
 
-Sentinel v26.01 includes [native WebSocket support](/features/#websocket) that handles:
+Zentinel v26.01 includes [native WebSocket support](/features/#websocket) that handles:
 - RFC 6455 compliant connection upgrades
 - Frame parsing and encoding
 - Frame masking/unmasking
 - Connection management
 
-When you enable WebSocket inspection, Sentinel routes each frame to this agent for security analysis:
+When you enable WebSocket inspection, Zentinel routes each frame to this agent for security analysis:
 
 ```
-Client ←→ Sentinel ←→ WebSocket Inspector ←→ Backend
+Client ←→ Zentinel ←→ WebSocket Inspector ←→ Backend
               │                │
        Frame Routing    Content Analysis
               │                │
@@ -128,47 +128,47 @@ Prevent resource exhaustion:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install websocket-inspector
+zentinel bundle install websocket-inspector
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-websocket-inspector
+cargo install zentinel-agent-websocket-inspector
 ```
 
 ## Quick Start
 
 ```bash
 # Install
-cargo install sentinel-agent-websocket-inspector
+cargo install zentinel-agent-websocket-inspector
 
 # Run with defaults (XSS, SQLi, command injection detection enabled)
-sentinel-ws-agent --socket /tmp/sentinel-ws.sock
+zentinel-ws-agent --socket /tmp/zentinel-ws.sock
 
 # With rate limiting
-sentinel-ws-agent \
+zentinel-ws-agent \
   --max-messages-per-sec 100 \
   --max-bytes-per-sec 1048576
 
 # With JSON Schema validation
-sentinel-ws-agent --json-schema /path/to/schema.json
+zentinel-ws-agent --json-schema /path/to/schema.json
 ```
 
 ## Configuration Options
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-ws.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-ws.sock` |
 | `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--xss-detection` | `WS_XSS` | Enable XSS detection | `true` |
 | `--sqli-detection` | `WS_SQLI` | Enable SQLi detection | `true` |
@@ -186,13 +186,13 @@ sentinel-ws-agent --json-schema /path/to/schema.json
 | `--log-frames` | `WS_LOG_FRAMES` | Log all frames | `false` |
 | `--inspect-binary` | `WS_INSPECT_BINARY` | Inspect binary frames | `false` |
 
-## Sentinel Configuration
+## Zentinel Configuration
 
 Enable WebSocket support on a route and attach the inspector agent:
 
 ```kdl
 agent "websocket-inspector" {
-    socket "/tmp/sentinel-ws.sock"
+    socket "/tmp/zentinel-ws.sock"
     timeout 50ms
     events ["websocket_frame"]
     failure-mode open
@@ -210,7 +210,7 @@ route {
 
 ### Frame Inspection Events
 
-When `events ["websocket_frame"]` is configured, Sentinel sends each frame to the agent with:
+When `events ["websocket_frame"]` is configured, Zentinel sends each frame to the agent with:
 
 ```json
 {
@@ -305,7 +305,7 @@ route {
 Run the agent with chat-specific settings:
 
 ```bash
-sentinel-ws-agent \
+zentinel-ws-agent \
   --socket /tmp/chat-ws.sock \
   --xss-detection true \
   --sqli-detection true \
@@ -319,9 +319,9 @@ sentinel-ws-agent \
 For WebSocket APIs with strict message formats:
 
 ```bash
-sentinel-ws-agent \
+zentinel-ws-agent \
   --socket /tmp/api-ws.sock \
-  --json-schema /etc/sentinel/ws-api-schema.json \
+  --json-schema /etc/zentinel/ws-api-schema.json \
   --block-mode true
 ```
 

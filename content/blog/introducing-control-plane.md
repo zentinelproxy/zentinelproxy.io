@@ -1,16 +1,16 @@
 +++
-title = "Introducing the Sentinel Control Plane: Fleet Management Built on Elixir"
-description = "The Sentinel Control Plane is a fleet management system for Sentinel reverse proxies — built with Elixir/Phoenix and LiveView. It handles configuration distribution, deployment orchestration, and real-time node monitoring. Here's what we built, why we chose Elixir, and how the internals work."
+title = "Introducing the Zentinel Control Plane: Fleet Management Built on Elixir"
+description = "The Zentinel Control Plane is a fleet management system for Zentinel reverse proxies — built with Elixir/Phoenix and LiveView. It handles configuration distribution, deployment orchestration, and real-time node monitoring. Here's what we built, why we chose Elixir, and how the internals work."
 date = 2026-02-16
 [taxonomies]
 tags = ["control-plane", "elixir", "fleet-management", "release"]
 +++
 
-Managing one Sentinel proxy is straightforward. A KDL config file, a binary, a `systemd` unit. But as deployments grow — multiple regions, staging environments, dozens of nodes — the operational questions multiply. How do you push a config change to 30 nodes without taking everything down at once? How do you know which nodes are actually running which configuration? How do you roll back when a bad config makes it past review?
+Managing one Zentinel proxy is straightforward. A KDL config file, a binary, a `systemd` unit. But as deployments grow — multiple regions, staging environments, dozens of nodes — the operational questions multiply. How do you push a config change to 30 nodes without taking everything down at once? How do you know which nodes are actually running which configuration? How do you roll back when a bad config makes it past review?
 
-These questions started arriving from the community. [Issue #36](https://github.com/raskell-io/sentinel/issues/36) captured what several users were asking for: a dashboard for monitoring routes and upstreams, a way to manage configuration through a UI, health status at a glance, and safe deployment workflows. The request was clear — Sentinel needed a control plane.
+These questions started arriving from the community. [Issue #36](https://github.com/zentinelproxy/zentinel/issues/36) captured what several users were asking for: a dashboard for monitoring routes and upstreams, a way to manage configuration through a UI, health status at a glance, and safe deployment workflows. The request was clear — Zentinel needed a control plane.
 
-Today we're announcing the [Sentinel Control Plane](https://github.com/raskell-io/sentinel-control-plane), a fleet management system purpose-built for Sentinel reverse proxies. It handles configuration distribution, rolling deployments with health gates, real-time node monitoring, and audit logging — with a real-time web UI and a full API.
+Today we're announcing the [Zentinel Control Plane](https://github.com/zentinelproxy/zentinel-control-plane), a fleet management system purpose-built for Zentinel reverse proxies. It handles configuration distribution, rolling deployments with health gates, real-time node monitoring, and audit logging — with a real-time web UI and a full API.
 
 ## Why Elixir and Phoenix
 
@@ -45,7 +45,7 @@ Every mutation is recorded in a tamper-evident audit log. Let's look at each sta
 When an operator uploads a KDL configuration — through the UI, API, or a GitOps webhook — the control plane creates a bundle record and enqueues compilation as an Oban job:
 
 ```elixir
-defmodule SentinelCp.Bundles.CompileWorker do
+defmodule ZentinelCp.Bundles.CompileWorker do
   use Oban.Worker, queue: :default, max_attempts: 3
 
   def perform(%Oban.Job{args: %{"bundle_id" => bundle_id}}) do
@@ -71,7 +71,7 @@ defmodule SentinelCp.Bundles.CompileWorker do
           })
 
           Phoenix.PubSub.broadcast(
-            SentinelCp.PubSub,
+            ZentinelCp.PubSub,
             "bundles:#{bundle.project_id}",
             {:bundle_compiled, bundle_id}
           )
@@ -89,7 +89,7 @@ end
 
 The compilation pipeline does several things in sequence:
 
-1. **Validates** the KDL config by calling the actual `sentinel validate` binary — the same parser the proxy uses
+1. **Validates** the KDL config by calling the actual `zentinel validate` binary — the same parser the proxy uses
 2. **Assembles** a tar.zst archive containing the config, manifest with per-file SHA256 checksums, internal CA certificates (if configured), and plugin files
 3. **Uploads** the archive to S3/MinIO at a content-addressed path
 4. **Signs** the archive with Ed25519 if signing is enabled — nodes verify this signature before activating
@@ -99,7 +99,7 @@ The compilation pipeline does several things in sequence:
 The signing module is deliberately simple — thin wrappers around Erlang's `:crypto`:
 
 ```elixir
-defmodule SentinelCp.Bundles.Signing do
+defmodule ZentinelCp.Bundles.Signing do
   def sign(data, private_key) when is_binary(data) and is_binary(private_key) do
     :crypto.sign(:eddsa, :none, data, [private_key, :ed25519])
   end
@@ -109,7 +109,7 @@ defmodule SentinelCp.Bundles.Signing do
   end
 
   def sign_bundle(bundle_data) do
-    config = Application.get_env(:sentinel_cp, :bundle_signing, [])
+    config = Application.get_env(:zentinel_cp, :bundle_signing, [])
 
     if config[:enabled] do
       private_key = load_private_key(config)
@@ -129,7 +129,7 @@ No external signing service. No HSM abstraction layer. Ed25519 is fast, the keys
 This is the heart of the control plane. The rollout system is a state machine driven by a self-scheduling Oban worker that ticks every 5 seconds:
 
 ```elixir
-defmodule SentinelCp.Rollouts.TickWorker do
+defmodule ZentinelCp.Rollouts.TickWorker do
   use Oban.Worker,
     queue: :rollouts,
     max_attempts: 3,
@@ -177,7 +177,7 @@ The rollout system supports four strategies, each with different batching and he
 The canary strategy doesn't just shift traffic — it compares canary node metrics against baseline nodes and makes automated promotion/rollback decisions:
 
 ```elixir
-defmodule SentinelCp.Rollouts.CanaryAnalysis do
+defmodule ZentinelCp.Rollouts.CanaryAnalysis do
   @default_config %{
     "error_rate_threshold" => 5.0,
     "latency_p99_threshold_ms" => 500,
@@ -227,7 +227,7 @@ Gates are combined with AND logic. If any gate fails for more than 50 seconds an
 
 ## Node management
 
-Sentinel proxy nodes interact with the control plane through a simple lifecycle:
+Zentinel proxy nodes interact with the control plane through a simple lifecycle:
 
 1. **Register** — `POST /api/v1/projects/:slug/nodes/register` — the node gets a unique key
 2. **Heartbeat** — `POST /api/v1/nodes/:id/heartbeat` — sent every 10 seconds with status, metrics, and health info
@@ -247,7 +247,7 @@ If auto-remediation is enabled for the project, the control plane creates a targ
 Every mutation in the control plane — bundle creation, rollout start, node registration, config change — is recorded in an audit log with HMAC chain linking:
 
 ```elixir
-defmodule SentinelCp.Audit do
+defmodule ZentinelCp.Audit do
   def log(attrs) do
     previous_hash = ChainVerifier.get_latest_hash()
     entry_hash = ChainVerifier.compute_entry_hash(attrs, previous_hash)
@@ -270,22 +270,22 @@ The audit log records the actor (user, API key, node, or system), the action, th
 
 ## Fleet simulator
 
-Testing rollout strategies against production nodes is risky. The control plane includes a built-in fleet simulator — GenServer processes that behave like real Sentinel nodes:
+Testing rollout strategies against production nodes is risky. The control plane includes a built-in fleet simulator — GenServer processes that behave like real Zentinel nodes:
 
 ```elixir
 # Spawn 10 simulated nodes
-{:ok, pid} = SentinelCp.Simulator.Fleet.spawn_nodes("my-project", 10, %{
+{:ok, pid} = ZentinelCp.Simulator.Fleet.spawn_nodes("my-project", 10, %{
   failure_rate: 0.05,       # 5% chance of activation failure
   heartbeat_interval_ms: 5_000,
   apply_delay_ms: 2_000    # Simulate 2s activation time
 })
 
 # Watch them register, heartbeat, and pull bundles
-SentinelCp.Simulator.Fleet.get_summary(pid)
+ZentinelCp.Simulator.Fleet.get_summary(pid)
 # => %{total: 10, online: 10, activating: 3, active: 7}
 
 # Trigger random failures to test rollback behavior
-SentinelCp.Simulator.Fleet.trigger_random_failures(pid, 3)
+ZentinelCp.Simulator.Fleet.trigger_random_failures(pid, 3)
 ```
 
 Each simulated node registers with the control plane, sends periodic heartbeats with synthetic metrics, polls for bundle updates, and simulates activation with a configurable failure rate. You can test canary analysis, health gate behavior, and auto-rollback without deploying anything.
@@ -296,15 +296,15 @@ The entire system starts under a single OTP supervisor:
 
 ```elixir
 children = [
-  SentinelCpWeb.Telemetry,
-  SentinelCp.Repo,
-  {Phoenix.PubSub, name: SentinelCp.PubSub},
-  SentinelCp.PromEx,                              # Prometheus metrics
-  SentinelCp.RateLimit,                            # ETS-backed token bucket
-  SentinelCp.Services.Acme.ChallengeStore,         # ACME challenge tokens
-  {Oban, Application.fetch_env!(:sentinel_cp, Oban)},
-  SentinelCpWeb.Endpoint,                          # Phoenix HTTP/WS
-  {Absinthe.Subscription, SentinelCpWeb.Endpoint}  # GraphQL subscriptions
+  ZentinelCpWeb.Telemetry,
+  ZentinelCp.Repo,
+  {Phoenix.PubSub, name: ZentinelCp.PubSub},
+  ZentinelCp.PromEx,                              # Prometheus metrics
+  ZentinelCp.RateLimit,                            # ETS-backed token bucket
+  ZentinelCp.Services.Acme.ChallengeStore,         # ACME challenge tokens
+  {Oban, Application.fetch_env!(:zentinel_cp, Oban)},
+  ZentinelCpWeb.Endpoint,                          # Phoenix HTTP/WS
+  {Absinthe.Subscription, ZentinelCpWeb.Endpoint}  # GraphQL subscriptions
 ]
 ```
 
@@ -334,8 +334,8 @@ The control plane includes several features we haven't covered in detail:
 Docker Compose gets everything running in one command:
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-control-plane.git
-cd sentinel-control-plane
+git clone https://github.com/zentinelproxy/zentinel-control-plane.git
+cd zentinel-control-plane
 docker compose up
 ```
 
@@ -347,10 +347,10 @@ For local development with hot-reloading:
 mise install && mise run setup && mise run dev
 ```
 
-The fleet simulator lets you test the full workflow without real Sentinel nodes. Create a project, upload a KDL config, watch it compile, spawn simulated nodes, create a rollout, and observe the deployment progress in real-time through the LiveView dashboard.
+The fleet simulator lets you test the full workflow without real Zentinel nodes. Create a project, upload a KDL config, watch it compile, spawn simulated nodes, create a rollout, and observe the deployment progress in real-time through the LiveView dashboard.
 
 ---
 
-The control plane is open source and available at [github.com/raskell-io/sentinel-control-plane](https://github.com/raskell-io/sentinel-control-plane). Documentation covers [architecture](https://github.com/raskell-io/sentinel-control-plane/tree/main/docs), [deployment strategies](https://github.com/raskell-io/sentinel-control-plane/tree/main/docs), [API reference](https://github.com/raskell-io/sentinel-control-plane/tree/main/docs), and [node management](https://github.com/raskell-io/sentinel-control-plane/tree/main/docs). Feature requests and bug reports go to [GitHub Issues](https://github.com/raskell-io/sentinel-control-plane/issues). For broader discussion, join us on [GitHub Discussions](https://github.com/raskell-io/sentinel/discussions).
+The control plane is open source and available at [github.com/zentinelproxy/zentinel-control-plane](https://github.com/zentinelproxy/zentinel-control-plane). Documentation covers [architecture](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs), [deployment strategies](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs), [API reference](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs), and [node management](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs). Feature requests and bug reports go to [GitHub Issues](https://github.com/zentinelproxy/zentinel-control-plane/issues). For broader discussion, join us on [GitHub Discussions](https://github.com/zentinelproxy/zentinel/discussions).
 
-The [control plane page](/control-plane/) has a complete feature overview. If you're evaluating Sentinel for fleet deployment, start there.
+The [control plane page](/control-plane/) has a complete feature overview. If you're evaluating Zentinel for fleet deployment, start there.

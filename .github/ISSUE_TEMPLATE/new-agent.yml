@@ -1,5 +1,5 @@
 name: Submit New Agent
-description: Submit your Sentinel agent to be listed in the Agent Registry
+description: Submit your Zentinel agent to be listed in the Agent Registry
 title: "[Agent] "
 labels: ["agent-submission"]
 body:
@@ -8,13 +8,13 @@ body:
       value: |
         ## Submit Your Agent to the Registry
 
-        Thank you for building a Sentinel agent! Please fill out the information below so we can add it to the registry.
+        Thank you for building a Zentinel agent! Please fill out the information below so we can add it to the registry.
 
         Before submitting, ensure your agent:
-        - Uses the `sentinel-agent-protocol` crate
+        - Uses the `zentinel-agent-protocol` crate
         - Has a public repository with documentation
         - Includes installation instructions
-        - Has been tested with the current Sentinel release
+        - Has been tested with the current Zentinel release
 
   - type: input
     id: agent-name
@@ -30,21 +30,21 @@ body:
     attributes:
       label: Crate Name
       description: The crates.io package name (if published)
-      placeholder: sentinel-agent-awesome
+      placeholder: zentinel-agent-awesome
 
   - type: input
     id: docker-image
     attributes:
       label: Docker Image
       description: The Docker image name (if available)
-      placeholder: ghcr.io/username/sentinel-agent-awesome
+      placeholder: ghcr.io/username/zentinel-agent-awesome
 
   - type: input
     id: repository
     attributes:
       label: Repository URL
       description: Link to the source code repository
-      placeholder: https://github.com/username/sentinel-agent-awesome
+      placeholder: https://github.com/username/zentinel-agent-awesome
     validations:
       required: true
 
@@ -140,11 +140,11 @@ body:
     id: configuration
     attributes:
       label: Configuration Example
-      description: Show how to configure the agent in Sentinel
+      description: Show how to configure the agent in Zentinel
       placeholder: |
         ```kdl
         agent "my-agent" {
-            socket "/var/run/sentinel/my-agent.sock"
+            socket "/var/run/zentinel/my-agent.sock"
             timeout 100ms
 
             config {
@@ -172,9 +172,9 @@ body:
       label: Submission Checklist
       description: Please confirm the following
       options:
-        - label: My agent uses `sentinel-agent-protocol` for communication
+        - label: My agent uses `zentinel-agent-protocol` for communication
           required: true
-        - label: I have tested the agent with the current Sentinel release
+        - label: I have tested the agent with the current Zentinel release
           required: true
         - label: The repository includes documentation
           required: true

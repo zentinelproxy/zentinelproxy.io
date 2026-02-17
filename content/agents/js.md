@@ -9,21 +9,21 @@ tags = ["scripting", "javascript", "extensibility"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-js"
-homepage = "https://sentinel.raskell.io/agents/js/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-js"
+homepage = "https://zentinelproxy.io/agents/js/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-js"
+crate_name = "zentinel-agent-js"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "25.12.0"
+min_zentinel_version = "25.12.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the JavaScript agent supports protocol v2 with:
 
 ## Overview
 
-JavaScript scripting agent for Sentinel reverse proxy. Write custom request/response processing logic in JavaScript using the fast, lightweight QuickJS engine.
+JavaScript scripting agent for Zentinel reverse proxy. Write custom request/response processing logic in JavaScript using the fast, lightweight QuickJS engine.
 
 ## Features
 
@@ -54,22 +54,22 @@ JavaScript scripting agent for Sentinel reverse proxy. Write custom request/resp
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install js
+zentinel bundle install js
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-js
+cargo install zentinel-agent-js
 ```
 
 ## Configuration
@@ -77,25 +77,25 @@ cargo install sentinel-agent-js
 ### Command Line
 
 ```bash
-sentinel-js-agent --socket /var/run/sentinel/js.sock \
-  --script /etc/sentinel/scripts/handler.js
+zentinel-js-agent --socket /var/run/zentinel/js.sock \
+  --script /etc/zentinel/scripts/handler.js
 ```
 
 ### Environment Variables
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-js.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-js.sock` |
 | `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50052`) | - |
 | `--script` | `JS_SCRIPT` | JavaScript script file | (required) |
 | `--verbose` | `JS_VERBOSE` | Enable debug logging | `false` |
 | `--fail-open` | `FAIL_OPEN` | Allow requests on script errors | `false` |
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "js" {
-    socket "/var/run/sentinel/js.sock"
+    socket "/var/run/zentinel/js.sock"
     timeout 100ms
     events ["request_headers" "response_headers"]
 }
@@ -132,7 +132,7 @@ function on_request_headers(request) {
 | `on_response_headers(response)` | Called when response headers are received |
 | `on_response_body(response)` | Called when response body is available |
 
-> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Sentinel configuration.
+> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Zentinel configuration.
 
 ### Request Object
 

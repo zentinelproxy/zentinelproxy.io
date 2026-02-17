@@ -9,21 +9,21 @@ tags = ["ip-reputation", "threat-intelligence", "security", "blocklist", "tor"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "MIT"
-repo = "https://github.com/raskell-io/sentinel-agent-ip-reputation"
-homepage = "https://sentinel.raskell.io/agents/ip-reputation/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-ip-reputation"
+homepage = "https://zentinelproxy.io/agents/ip-reputation/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-ip-reputation"
+crate_name = "zentinel-agent-ip-reputation"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -80,7 +80,7 @@ Load blocklists from files in multiple formats:
 blocklists:
   - name: "internal-blocklist"
     enabled: true
-    path: "/etc/sentinel/blocklist.txt"
+    path: "/etc/zentinel/blocklist.txt"
     format: plain              # plain, csv, or json
     action: block              # block or flag
     refresh_interval_seconds: 300
@@ -156,29 +156,29 @@ settings:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install ip-reputation
+zentinel bundle install ip-reputation
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### From Cargo
 
 ```bash
-cargo install sentinel-agent-ip-reputation
+cargo install zentinel-agent-ip-reputation
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-ip-reputation.git
-cd sentinel-agent-ip-reputation
+git clone https://github.com/zentinelproxy/zentinel-agent-ip-reputation.git
+cd zentinel-agent-ip-reputation
 cargo build --release
 ```
 
@@ -187,11 +187,11 @@ cargo build --release
 ### CLI Options
 
 ```bash
-sentinel-agent-ip-reputation [OPTIONS]
+zentinel-agent-ip-reputation [OPTIONS]
 
 Options:
   -c, --config <FILE>       Path to configuration file [default: ip-reputation.yaml]
-  -s, --socket <PATH>       Unix socket path [default: /tmp/sentinel-ip-reputation.sock]
+  -s, --socket <PATH>       Unix socket path [default: /tmp/zentinel-ip-reputation.sock]
       --grpc-address <ADDR> gRPC listen address (e.g., 0.0.0.0:50051)
   -L, --log-level <LEVEL>   Log level [default: info]
       --print-config      Print example configuration and exit
@@ -200,14 +200,14 @@ Options:
   -V, --version           Print version
 ```
 
-### Sentinel Integration
+### Zentinel Integration
 
-Add the agent to your Sentinel proxy configuration:
+Add the agent to your Zentinel proxy configuration:
 
 ```yaml
 agents:
   - name: ip-reputation
-    socket: /tmp/sentinel-ip-reputation.sock
+    socket: /tmp/zentinel-ip-reputation.sock
     on_request: true
     on_response: false
 ```
@@ -242,7 +242,7 @@ abuseipdb:
 blocklists:
   - name: "internal-blocklist"
     enabled: true
-    path: "/etc/sentinel/blocklist.txt"
+    path: "/etc/zentinel/blocklist.txt"
     format: plain
     action: block
     refresh_interval_seconds: 300

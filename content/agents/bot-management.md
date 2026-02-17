@@ -9,26 +9,26 @@ tags = ["security", "bot-detection", "core"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-bot-management"
-homepage = "https://sentinel.raskell.io/agents/bot-management/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-bot-management"
+homepage = "https://zentinelproxy.io/agents/bot-management/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-bot-management"
+crate_name = "zentinel-agent-bot-management"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Overview
 
-A comprehensive bot detection and management agent for Sentinel. Analyzes multiple signals to classify traffic as human, good bot (search engines, monitors), or bad bot (scrapers, attackers), returning a bot score with configurable ALLOW/BLOCK/CHALLENGE decisions.
+A comprehensive bot detection and management agent for Zentinel. Analyzes multiple signals to classify traffic as human, good bot (search engines, monitors), or bad bot (scrapers, attackers), returning a bot score with configurable ALLOW/BLOCK/CHALLENGE decisions.
 
 ## Protocol v2 Features
 
@@ -54,29 +54,29 @@ As of v0.2.0, the Bot Management agent supports protocol v2 with:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install bot-management
+zentinel bundle install bot-management
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-bot-management
+cargo install zentinel-agent-bot-management
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-bot-management
-cd sentinel-agent-bot-management
+git clone https://github.com/zentinelproxy/zentinel-agent-bot-management
+cd zentinel-agent-bot-management
 cargo build --release
 ```
 
@@ -85,17 +85,17 @@ cargo build --release
 ### Command Line
 
 ```bash
-sentinel-agent-bot-management \
-    --socket /var/run/sentinel/bot-management.sock \
+zentinel-agent-bot-management \
+    --socket /var/run/zentinel/bot-management.sock \
     --grpc-address 0.0.0.0:50051 \
-    --config /etc/sentinel/bot-management.yaml
+    --config /etc/zentinel/bot-management.yaml
 ```
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "bot-management" {
-    socket "/var/run/sentinel/bot-management.sock"
+    socket "/var/run/zentinel/bot-management.sock"
     timeout 50ms
     events ["request_headers"]
 }
@@ -136,7 +136,7 @@ allow_list:
 challenge:
   default_type: javascript
   token_validity_seconds: 300
-  cookie_name: "_sentinel_bot_check"
+  cookie_name: "_zentinel_bot_check"
 
 behavioral:
   max_sessions: 100000
@@ -223,7 +223,7 @@ For verified good bots (Googlebot, etc.), the request is immediately allowed reg
 
 ## Challenge System
 
-When a request falls in the CHALLENGE range (30-80), the agent returns a challenge decision. Sentinel can be configured to:
+When a request falls in the CHALLENGE range (30-80), the agent returns a challenge decision. Zentinel can be configured to:
 
 1. **JavaScript Challenge**: Require JS execution proof
 2. **CAPTCHA Challenge**: Redirect to CAPTCHA page

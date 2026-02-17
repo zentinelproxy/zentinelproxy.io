@@ -9,21 +9,21 @@ tags = ["mqtt", "iot", "security", "authentication", "acl", "rate-limiting"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-mqtt-gateway"
-homepage = "https://sentinel.raskell.io/agents/mqtt-gateway/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-mqtt-gateway"
+homepage = "https://zentinelproxy.io/agents/mqtt-gateway/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-mqtt-gateway"
+crate_name = "zentinel-agent-mqtt-gateway"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -57,10 +57,10 @@ MQTT Gateway provides **comprehensive security controls** for MQTT traffic in Io
 
 ## How It Works
 
-MQTT Gateway operates on MQTT packets transported via WebSocket. Sentinel's native WebSocket support handles frame parsing, and this agent inspects the MQTT protocol content within binary frames:
+MQTT Gateway operates on MQTT packets transported via WebSocket. Zentinel's native WebSocket support handles frame parsing, and this agent inspects the MQTT protocol content within binary frames:
 
 ```
-MQTT Client ←→ Sentinel ←→ MQTT Gateway Agent ←→ MQTT Broker
+MQTT Client ←→ Zentinel ←→ MQTT Gateway Agent ←→ MQTT Broker
      │              │               │
   WebSocket    Frame Routing   MQTT Parsing
      │              │          ACL Check
@@ -139,7 +139,7 @@ Multiple authentication providers evaluated in order:
     "providers": [
       {
         "type": "file",
-        "path": "/etc/sentinel/mqtt-users.json"
+        "path": "/etc/zentinel/mqtt-users.json"
       },
       {
         "type": "jwt",
@@ -204,7 +204,7 @@ Detect malicious content in MQTT message payloads:
       ]
     },
     "json-schema": {
-      "schema-file": "/etc/sentinel/sensor-schema.json",
+      "schema-file": "/etc/zentinel/sensor-schema.json",
       "topics": ["sensors/+/data"],
       "block-on-failure": true
     },
@@ -306,29 +306,29 @@ Control which topics can use retained messages:
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install mqtt-gateway
+zentinel bundle install mqtt-gateway
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-mqtt-gateway
+cargo install zentinel-agent-mqtt-gateway
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/raskell-io/sentinel-agent-mqtt-gateway
-cd sentinel-agent-mqtt-gateway
+git clone https://github.com/zentinelproxy/zentinel-agent-mqtt-gateway
+cd zentinel-agent-mqtt-gateway
 cargo build --release
 ```
 
@@ -336,16 +336,16 @@ cargo build --release
 
 ```bash
 # Run with defaults
-sentinel-mqtt-agent --socket /tmp/sentinel-mqtt.sock
+zentinel-mqtt-agent --socket /tmp/zentinel-mqtt.sock
 
 # With configuration file
-sentinel-mqtt-agent \
-  --socket /tmp/sentinel-mqtt.sock \
-  --config /etc/sentinel/mqtt-gateway.json
+zentinel-mqtt-agent \
+  --socket /tmp/zentinel-mqtt.sock \
+  --config /etc/zentinel/mqtt-gateway.json
 
 # With JSON logging
-sentinel-mqtt-agent \
-  --socket /tmp/sentinel-mqtt.sock \
+zentinel-mqtt-agent \
+  --socket /tmp/zentinel-mqtt.sock \
   --json-logs \
   --log-level debug
 ```
@@ -354,19 +354,19 @@ sentinel-mqtt-agent \
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-mqtt-agent.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-mqtt-agent.sock` |
 | `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--config` | `MQTT_CONFIG` | Configuration file path | - |
 | `--log-level` | `MQTT_LOG_LEVEL` | Log level (trace, debug, info, warn, error) | `info` |
 | `--json-logs` | - | Enable JSON log format | `false` |
 
-## Sentinel Configuration
+## Zentinel Configuration
 
 Enable WebSocket support and attach the MQTT Gateway agent:
 
 ```kdl
 agent "mqtt-gateway" {
-    socket "/tmp/sentinel-mqtt.sock"
+    socket "/tmp/zentinel-mqtt.sock"
     timeout 100ms
     events ["websocket_frame"]
     failure-mode closed
@@ -403,7 +403,7 @@ route {
     "providers": [
       {
         "type": "file",
-        "path": "/etc/sentinel/mqtt-users.json"
+        "path": "/etc/zentinel/mqtt-users.json"
       }
     ],
     "min-client-id-length": 5,

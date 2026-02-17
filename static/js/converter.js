@@ -1,6 +1,6 @@
 /**
- * Sentinel Config Converter - WebAssembly powered configuration converter
- * Converts nginx, HAProxy, Traefik, Caddy, and Envoy configs to Sentinel KDL
+ * Zentinel Config Converter - WebAssembly powered configuration converter
+ * Converts nginx, HAProxy, Traefik, Caddy, and Envoy configs to Zentinel KDL
  */
 
 import init, {
@@ -10,7 +10,7 @@ import init, {
     get_supported_formats,
     get_version,
     init_panic_hook
-} from '../wasm/sentinel_convert_wasm.js';
+} from '../wasm/zentinel_convert_wasm.js';
 
 // State
 let wasmReady = false;
@@ -46,8 +46,8 @@ const cliInstallTabs = document.querySelectorAll('.cli-install-tab');
 
 // Install commands for each method
 const INSTALL_COMMANDS = {
-    cargo: 'cargo install sentinel-convert',
-    source: 'git clone https://github.com/raskell-io/sentinel && cd sentinel && cargo install --path crates/sentinel-convert'
+    cargo: 'cargo install zentinel-convert',
+    source: 'git clone https://github.com/zentinelproxy/zentinel && cd zentinel && cargo install --path crates/zentinel-convert'
 };
 
 // Sample configurations

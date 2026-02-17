@@ -9,21 +9,21 @@ tags = ["scripting", "wasm", "extensibility", "performance"]
 
 [extra]
 official = true
-author = "Sentinel Core Team"
-author_url = "https://github.com/raskell-io"
+author = "Zentinel Core Team"
+author_url = "https://github.com/zentinelproxy"
 status = "Stable"
 version = "0.2.0"
 license = "Apache-2.0"
-repo = "https://github.com/raskell-io/sentinel-agent-wasm"
-homepage = "https://sentinel.raskell.io/agents/wasm/"
+repo = "https://github.com/zentinelproxy/zentinel-agent-wasm"
+homepage = "https://zentinelproxy.io/agents/wasm/"
 protocol_version = "v2"
 
 # Installation methods
-crate_name = "sentinel-agent-wasm"
+crate_name = "zentinel-agent-wasm"
 docker_image = ""
 
 # Compatibility
-min_sentinel_version = "26.01.0"
+min_zentinel_version = "26.01.0"
 +++
 
 ## Protocol v2 Features
@@ -38,7 +38,7 @@ As of v0.2.0, the WebAssembly agent supports protocol v2 with:
 
 ## Overview
 
-WebAssembly agent for Sentinel reverse proxy. Execute custom Wasm modules for high-performance request/response processing. Write modules in Rust, Go, C, AssemblyScript, or any language that compiles to WebAssembly.
+WebAssembly agent for Zentinel reverse proxy. Execute custom Wasm modules for high-performance request/response processing. Write modules in Rust, Go, C, AssemblyScript, or any language that compiles to WebAssembly.
 
 ## Features
 
@@ -54,22 +54,22 @@ WebAssembly agent for Sentinel reverse proxy. Execute custom Wasm modules for hi
 
 ### Using Bundle (Recommended)
 
-The easiest way to install this agent is via the Sentinel bundle command:
+The easiest way to install this agent is via the Zentinel bundle command:
 
 ```bash
 # Install just this agent
-sentinel bundle install wasm
+zentinel bundle install wasm
 
 # Or install all available agents
-sentinel bundle install --all
+zentinel bundle install --all
 ```
 
-The bundle command automatically downloads the correct binary for your platform and places it in `~/.sentinel/agents/`.
+The bundle command automatically downloads the correct binary for your platform and places it in `~/.zentinel/agents/`.
 
 ### Using Cargo
 
 ```bash
-cargo install sentinel-agent-wasm
+cargo install zentinel-agent-wasm
 ```
 
 ## Configuration
@@ -77,26 +77,26 @@ cargo install sentinel-agent-wasm
 ### Command Line
 
 ```bash
-sentinel-wasm-agent --socket /var/run/sentinel/wasm.sock \
-  --module /etc/sentinel/modules/security.wasm
+zentinel-wasm-agent --socket /var/run/zentinel/wasm.sock \
+  --module /etc/zentinel/modules/security.wasm
 ```
 
 ### Environment Variables
 
 | Option | Env Var | Description | Default |
 |--------|---------|-------------|---------|
-| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/sentinel-wasm.sock` |
+| `--socket` | `AGENT_SOCKET` | Unix socket path | `/tmp/zentinel-wasm.sock` |
 | `--grpc-address` | `AGENT_GRPC_ADDRESS` | gRPC listen address (e.g., `0.0.0.0:50051`) | - |
 | `--module` | `WASM_MODULE` | Wasm module file (.wasm) | (required) |
 | `--pool-size` | `WASM_POOL_SIZE` | Instance pool size | `4` |
 | `--verbose` | `WASM_VERBOSE` | Enable debug logging | `false` |
 | `--fail-open` | `FAIL_OPEN` | Allow requests on module errors | `false` |
 
-### Sentinel Configuration
+### Zentinel Configuration
 
 ```kdl
 agent "wasm" {
-    socket "/var/run/sentinel/wasm.sock"
+    socket "/var/run/zentinel/wasm.sock"
     timeout 50ms
     events ["request_headers" "response_headers"]
 }
@@ -224,7 +224,7 @@ For body inspection, additional handler functions are available:
 | `on_response_headers(ptr, len) -> i64` | Called when response headers are received |
 | `on_response_body(ptr, len) -> i64` | Called when response body is available |
 
-> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Sentinel configuration.
+> **Note:** Body hooks require `events ["request_headers" "request_body_chunk" "response_headers" "response_body_chunk"]` in the Zentinel configuration.
 
 ### Body Mutation
 

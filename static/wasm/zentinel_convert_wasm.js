@@ -120,7 +120,7 @@ if (!('encodeInto' in cachedTextEncoder)) {
 let WASM_VECTOR_LEN = 0;
 
 /**
- * Convert a configuration string to Sentinel KDL format
+ * Convert a configuration string to Zentinel KDL format
  *
  * # Arguments
  * * `config` - The source configuration content
@@ -366,7 +366,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('sentinel_convert_wasm_bg.wasm', import.meta.url);
+        module_or_path = new URL('zentinel_convert_wasm_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
