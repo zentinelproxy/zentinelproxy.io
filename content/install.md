@@ -3,5 +3,5 @@ title = "Install"
 template = "redirect.html"
 
 [extra]
-redirect_to = "/docs/getting-started/installation/"
+redirect_to = "https://docs.zentinelproxy.io/getting-started/installation/"
 +++

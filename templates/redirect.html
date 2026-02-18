@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    {%- set target_url = get_url(path=page.extra.redirect_to) -%}
+    {%- if page.extra.redirect_to is starting_with("http") -%}
+        {%- set target_url = page.extra.redirect_to -%}
+    {%- else -%}
+        {%- set target_url = get_url(path=page.extra.redirect_to) -%}
+    {%- endif -%}
     <meta http-equiv="refresh" content="0; url={{ target_url | safe }}">
     <title>Redirecting...</title>
     <link rel="canonical" href="{{ target_url | safe }}">
