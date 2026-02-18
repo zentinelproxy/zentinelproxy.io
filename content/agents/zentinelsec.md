@@ -55,7 +55,7 @@ ZentinelSec is a pure Rust ModSecurity-compatible WAF agent for Zentinel. It pro
 
 ## Performance: 10-30x Faster than C++
 
-ZentinelSec uses the [zentinel-modsec](/docs/zentinel-modsec/) engine, a pure Rust implementation that **outperforms the C++ libmodsecurity by 10-30x**.
+ZentinelSec uses the [zentinel-modsec](https://docs.zentinelproxy.io/zentinel-modsec/) engine, a pure Rust implementation that **outperforms the C++ libmodsecurity by 10-30x**.
 
 <div class="stats-grid">
     <div class="stat-card">

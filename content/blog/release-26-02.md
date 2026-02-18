@@ -175,11 +175,11 @@ Reproducible builds. You can build Zentinel from source and compare checksums, b
 
 ## What's next
 
-26.02 is a supply chain release — it doesn't change proxy behavior. The next feature release will focus on configuration improvements and observability enhancements. Watch the [changelog](/docs/appendix/changelog/) for updates.
+26.02 is a supply chain release — it doesn't change proxy behavior. The next feature release will focus on configuration improvements and observability enhancements. Watch the [changelog](https://docs.zentinelproxy.io/appendix/changelog/) for updates.
 
 ---
 
-Full verification documentation is in the [Supply Chain Security](/docs/operations/supply-chain/) operator guide. The [supply chain page](/supply-chain/) has a higher-level overview for evaluating Zentinel's security posture.
+Full verification documentation is in the [Supply Chain Security](https://docs.zentinelproxy.io/operations/supply-chain/) operator guide. The [supply chain page](/supply-chain/) has a higher-level overview for evaluating Zentinel's security posture.
 
 Install 26.02:
 
