@@ -115,5 +115,5 @@ cargo install zentinel-proxy
 docker pull ghcr.io/zentinelproxy/zentinel:26.02_1
 
 # Binary
-curl -fsSL https://getzentinelproxy.io | sh
+curl -fsSL https://get.zentinelproxy.io | sh
 ```
