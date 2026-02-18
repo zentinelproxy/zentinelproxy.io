@@ -288,7 +288,7 @@
                         </button>
                     </div>
                     <pre id="install-code" class="language-bash"><code class="language-bash"># Install Zentinel proxy
-curl -fsSL https://getzentinelproxy.io | sh
+curl -fsSL https://get.zentinelproxy.io | sh
 
 # Select agents above to include them in the installation</code></pre>
                 </div>
@@ -628,10 +628,10 @@ function updateOutput() {
         if (selectedAgents.length > 0) {
             const agentList = selectedAgents.join(',');
             installCode = `# Install Zentinel proxy + selected agents
-curl -fsSL https://getzentinelproxy.io | sh -s -- --agents ${agentList}`;
+curl -fsSL https://get.zentinelproxy.io | sh -s -- --agents ${agentList}`;
         } else {
             installCode = `# Install Zentinel proxy
-curl -fsSL https://getzentinelproxy.io | sh
+curl -fsSL https://get.zentinelproxy.io | sh
 
 # Select agents above to include them in the installation`;
         }
