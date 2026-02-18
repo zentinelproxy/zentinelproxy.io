@@ -185,7 +185,7 @@ Install 26.02:
 
 ```bash
 # Binary
-curl -fsSL https://getzentinelproxy.io | sh
+curl -fsSL https://get.zentinelproxy.io | sh
 
 # Container
 docker pull ghcr.io/zentinelproxy/zentinel:26.02_0

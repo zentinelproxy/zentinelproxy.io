@@ -248,7 +248,7 @@ All the optimizations described in this post ship in Zentinel v0.4.5 (release [2
 cargo install zentinel-proxy
 
 # Or download a prebuilt binary (Linux, macOS)
-curl -fsSL https://getzentinelproxy.io | sh
+curl -fsSL https://get.zentinelproxy.io | sh
 
 # Or pull the container image
 docker pull ghcr.io/zentinelproxy/zentinel:26.01_11
