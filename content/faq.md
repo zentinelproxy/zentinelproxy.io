@@ -3,5 +3,5 @@ title = "FAQ"
 template = "redirect.html"
 
 [extra]
-redirect_to = "/docs/appendix/faq/"
+redirect_to = "https://docs.zentinelproxy.io/appendix/faq/"
 +++
