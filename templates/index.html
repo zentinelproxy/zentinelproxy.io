@@ -1,4 +1,65 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+
+{% block head %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "How does Zentinel compare to nginx or Envoy?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Zentinel takes a fundamentally different approach to reverse proxying. Built in Rust on Cloudflare's Pingora, it prioritizes memory safety and explicit configuration over hidden defaults. It features isolated agent architecture (a buggy plugin can't crash your proxy), no magic (every behavior requires explicit configuration), and built-in OpenTelemetry support for metrics, tracing, and logging."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Is Zentinel production-ready?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The core proxy is production-ready — routing, upstreams, health checks, TLS, KDL configuration with validation, the agent protocol (auth, WAF, rate limiting), and signed binaries with SBOM and SLSA attestations. Some features are in beta: hot reload, gRPC proxying, WebSocket long-lived connections, and some community agents."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What platforms are supported?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Pre-built binaries are available for Linux x86_64 (glibc 2.17+), macOS (Intel and Apple Silicon), and official OCI container images for amd64 and arm64. Linux ARM64 users can build from source or use container images."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How do agents work?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Agents are Zentinel's extension mechanism — isolated processes that hook into request/response phases without risking proxy stability. Each agent runs in its own process (crashes don't affect the proxy), agents are language agnostic (Rust, Go, Python, or any language with gRPC support), and they intercept requests at on_request, on_response, or on_error phases."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I migrate from nginx or HAProxy?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes — Zentinel provides a Config Converter to paste your nginx, HAProxy, or Traefik config and get equivalent KDL, a Playground to test and validate converted configurations, and a Migration Guide with step-by-step instructions for common setups."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Is Zentinel free to use?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, completely. Zentinel is open source under the Apache 2.0 license. There are no usage limits, no phone-home (Zentinel never contacts external servers), and you can modify freely — fork it, extend it, embed it in your products."
+            }
+        }
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
 <!-- Heat wave distortion filter for tropical backgrounds -->
 <svg class="heat-wave-defs" aria-hidden="true">
     <defs>

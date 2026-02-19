@@ -51,6 +51,7 @@ author = "raskell.io"
 github_repo = "https://github.com/zentinelproxy/zentinel"
 docs_url = "https://docs.zentinelproxy.io/"
 docs_external_url = "https://docs.zentinelproxy.io/"
+software_version = "26.02"
 
 # SEO metadata
 keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, sleepable ops, agents"

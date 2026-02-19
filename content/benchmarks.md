@@ -2,6 +2,7 @@
 title = "Benchmarks"
 description = "Performance, soak testing, and chaos engineering results for Zentinel reverse proxy"
 template = "benchmarks.html"
+updated = 2026-02-19
 +++
 
 Zentinel includes a comprehensive testing framework validating performance, stability, and resilience. All results below are from actual test runs.

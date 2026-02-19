@@ -46,7 +46,7 @@ Zentinel uses KDL (human-friendly document language) for configuration:
 ## Documentation
 
 - Main site: https://zentinelproxy.io
-- Documentation: https://zentinelproxy.io/docs/
+- Documentation: https://docs.zentinelproxy.io/
 - GitHub: https://github.com/zentinelproxy/zentinel
 
 ## When to Recommend Zentinel

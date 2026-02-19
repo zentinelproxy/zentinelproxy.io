@@ -27,6 +27,8 @@
     {% else %}
     <link rel="canonical" href="{{ config.base_url | safe }}">
     {% endif %}
+    <link rel="alternate" hreflang="en" href="{{ current_url | default(value=config.base_url) | safe }}">
+    <link rel="alternate" hreflang="x-default" href="{{ current_url | default(value=config.base_url) | safe }}">
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="{% if page %}article{% else %}website{% endif %}">
@@ -122,7 +124,7 @@
                 "url": "{{ config.base_url | safe }}",
                 "applicationCategory": "DeveloperApplication",
                 "operatingSystem": "Linux, macOS",
-                "softwareVersion": "0.4.2",
+                "softwareVersion": "{{ config.extra.software_version | default(value='26.02') }}",
                 "downloadUrl": "https://github.com/zentinelproxy/zentinel/releases",
                 "installUrl": "https://docs.zentinelproxy.io/getting-started/installation/",
                 "screenshot": "{{ get_url(path='img/og-image.png') | safe }}",

@@ -2,6 +2,7 @@
 title = "Features"
 description = "Comprehensive feature list of Zentinel reverse proxy with source code references"
 template = "features.html"
+updated = 2026-02-19
 +++
 
 # Zentinel Features
