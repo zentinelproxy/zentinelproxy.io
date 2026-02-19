@@ -101,7 +101,6 @@ url = "/blog/"
 [[extra.nav_links]]
 name = "Docs"
 url = "https://docs.zentinelproxy.io/"
-external = true
 
 [[extra.nav_links]]
 name = "GitHub"
