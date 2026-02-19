@@ -151,11 +151,12 @@
                             tls.rs
                         </a>
                     </div>
-                    <p class="feature-description">Enterprise-grade TLS with SNI routing and hot certificate reload.</p>
+                    <p class="feature-description">Enterprise-grade TLS with SNI routing and hot certificate reload. Covers both listener-side (client to proxy) and upstream-side (proxy to backend) TLS.</p>
                     <ul class="feature-list">
                         <li>SNI (Server Name Indication) based certificate selection</li>
                         <li>Wildcard certificate matching</li>
                         <li>mTLS client certificate verification (inbound)</li>
+                        <li><strong>Upstream TLS</strong> - Secure connections to HTTPS backends</li>
                         <li>Certificate hot-reload (SIGHUP trigger)</li>
                         <li>OCSP stapling support</li>
                     </ul>
@@ -182,7 +183,7 @@
                     </ul>
                     <div class="feature-code-ref">
                         <strong>Functions:</strong> <code>load_client_cert_key</code>, <code>build_upstream_tls_config</code>
-                        <br><a href="https://docs.zentinelproxy.io/mtls-upstreams/" style="font-size: 0.9em;">View configuration guide &rarr;</a>
+                        <br><a href="https://docs.zentinelproxy.io/configuration/upstreams/#upstream-tls" style="font-size: 0.9em;">View configuration guide &rarr;</a>
                     </div>
                 </div>
 
