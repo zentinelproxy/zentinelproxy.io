@@ -49,8 +49,8 @@ index_format = "elasticlunr_javascript"
 # Site metadata
 author = "raskell.io"
 github_repo = "https://github.com/zentinelproxy/zentinel"
-docs_url = "https://zentinelproxy.io/docs/"
-docs_external_url = "/docs/"
+docs_url = "https://docs.zentinelproxy.io/"
+docs_external_url = "https://docs.zentinelproxy.io/"
 
 # SEO metadata
 keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, sleepable ops, agents"
@@ -99,7 +99,8 @@ url = "/blog/"
 
 [[extra.nav_links]]
 name = "Docs"
-url = "/docs/"
+url = "https://docs.zentinelproxy.io/"
+external = true
 
 [[extra.nav_links]]
 name = "GitHub"
