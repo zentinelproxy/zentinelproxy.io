@@ -59,6 +59,7 @@ keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, 
 
 # Social links
 github = "https://github.com/zentinelproxy/zentinel"
+discord = "https://discord.gg/jN57RsT2"
 
 # Navigation (supports dropdowns via children array)
 [[extra.nav_links]]
