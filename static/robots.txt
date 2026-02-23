@@ -7,8 +7,11 @@ Allow: /
 Disallow: /api/
 Disallow: /_*
 
-# Sitemap location
+# Sitemap locations
 Sitemap: https://zentinelproxy.io/sitemap.xml
+Sitemap: https://registry.zentinelproxy.io/sitemap.xml
+Sitemap: https://api.zentinelproxy.io/sitemap.xml
+Sitemap: https://docs.zentinelproxy.io/sitemap.xml
 
 # AI Crawlers - Welcome to index our content
 # These help AI assistants provide accurate information about Zentinel
