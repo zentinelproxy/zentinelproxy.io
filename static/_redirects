@@ -7,3 +7,7 @@
 /config      /docs/configuration/                 301
 /examples    /docs/examples/                      301
 /faq         /docs/appendix/faq/                  301
+
+# Agent registry moved to registry.zentinelproxy.io
+/agents/*    https://registry.zentinelproxy.io/:splat  301
+/agents/     https://registry.zentinelproxy.io/        301

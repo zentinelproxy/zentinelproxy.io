@@ -81,7 +81,8 @@ name = "Benchmarks"
 url = "/benchmarks/"
 [[extra.nav_links.children]]
 name = "Agents"
-url = "/agents/"
+url = "https://registry.zentinelproxy.io/"
+external = true
 [[extra.nav_links.children]]
 name = "Converter"
 url = "/converter/"
