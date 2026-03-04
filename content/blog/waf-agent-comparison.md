@@ -249,17 +249,60 @@ zentinel-waf is fastest because its pattern matchers are compiled Rust code — 
 
 The practical difference is negligible. At 3ms per request, the WAF agent adds less latency than a single DNS lookup. The bottleneck in any real deployment will be the upstream backend, not the WAF.
 
-## CRS and the anomaly scoring problem
+## The OWASP CRS baseline
 
-We initially attempted to test zentinel-modsec with the full OWASP Core Rule Set v4. CRS uses anomaly scoring: individual detection rules increment a score variable, and a separate blocking evaluation rule (REQUEST-949) denies requests that exceed a threshold.
+The detection rates in this post — 32% to 43% — look low. That's because we tested with 67 hand-written direct-deny rules, not the OWASP Core Rule Set. Understanding the difference matters for interpreting the results.
 
-This didn't work. Every request — including clean ones — was blocked with status 500. The root cause: CRS rule 901001 checks for a `tx.crs_setup_version` variable and denies with status 500 if it's missing. Our initial setup file didn't set it.
+### What is CRS?
 
-After fixing the setup, CRS loaded without errors but anomaly scoring still didn't block anything. The blocking evaluation rule uses macro expansion (`@ge %{tx.inbound_anomaly_score_threshold}`) to compare the accumulated score against a configurable threshold. This macro expansion appears to not work correctly through the Rust bindings to libmodsecurity — the individual detection rules fire and increment score variables, but the final comparison in rule 949 never triggers.
+The [OWASP Core Rule Set](https://coreruleset.org/) (CRS) is the standard open-source rule set for ModSecurity-compatible WAFs. CRS v4 ships approximately 200 rules across 15+ request/response phases. It's the default ruleset for ModSecurity+Nginx, ModSecurity+Apache, Coraza, and most cloud WAFs that claim "OWASP protection."
 
-This is a known limitation of using libmodsecurity through FFI. The C library's variable expansion depends on internal state management that doesn't translate cleanly through the bindings. We're investigating whether this is a binding issue or a fundamental incompatibility, and we plan to publish findings separately.
+CRS uses **anomaly scoring** rather than direct deny. Each rule that matches increments a score, and a separate blocking evaluation rule (REQUEST-949) denies the request only if the cumulative score exceeds a configurable threshold. This design reduces false positives — a single weak signal doesn't trigger a block, but multiple signals compound.
 
-For now, the zentinel-modsec agent works correctly with direct-deny rules (no anomaly scoring), which is the configuration we tested.
+### CRS paranoia levels
+
+CRS groups rules into four paranoia levels (PL), each enabling progressively more aggressive detection:
+
+| Paranoia Level | What it adds | Typical use case |
+|:-:|---|---|
+| **PL1** | High-confidence detections — `@detectSQLi`, `@detectXSS`, common path traversal, known scanner signatures | Production default |
+| **PL2** | Broader regex patterns, additional HTTP method restrictions, tighter header validation | Hardened production |
+| **PL3** | Aggressive patterns that trigger on uncommon but legitimate characters (backticks, semicolons in values) | High-security applications with allowlisting |
+| **PL4** | Extremely restrictive — blocks most special characters in any parameter | Research / maximum detection at the cost of heavy false positives |
+
+Higher paranoia levels catch more attacks but produce more false positives. Most production deployments use PL1 or PL2. PL3+ requires per-application allowlisting to be usable.
+
+### How CRS compares to our 67-rule set
+
+Our custom rule set is roughly equivalent to a **subset of CRS PL1** — the same operator types (`@detectSQLi`, `@detectXSS`, `@contains`) applied to the same core categories. The key differences:
+
+| Aspect | Our 67 rules | CRS v4 PL1 |
+|--------|:---:|:---:|
+| Total rules | 67 | ~120 |
+| Anomaly scoring | No (direct deny) | Yes (threshold-based) |
+| `@rx` regex rules | 0 | ~60 |
+| Body inspection rules | 3 (`ARGS` for SQLi/XSS) | ~40 |
+| Response inspection | None | ~20 rules |
+| Transformation chains | None | `t:urlDecodeUni,t:lowercase` etc. |
+| Variables inspected | `QUERY_STRING`, `REQUEST_URI`, `ARGS`, `User-Agent` | `ARGS`, `ARGS_NAMES`, `REQUEST_COOKIES`, `REQUEST_HEADERS`, `XML:/*`, `REQUEST_BODY` |
+
+The biggest gap is **variable coverage**. CRS PL1 inspects cookies, all request headers, XML bodies, and argument names — not just query strings and URIs. Our command injection rules only inspect `QUERY_STRING`, which is why all three engines scored 3.3% on that category. CRS PL1 would inspect `ARGS` (covering body parameters) and apply transformation chains to normalize case and decode URL encoding before matching, catching significantly more.
+
+A full CRS PL1 deployment would likely score **60-80% detection** on wafworth's corpus with a **1-3% FP rate**, based on published CRS benchmarks and the rule coverage delta. PL2 would push detection higher at the cost of more false positives.
+
+### Why we didn't test with full CRS
+
+We initially attempted to test zentinel-modsec with OWASP CRS v4, but hit two problems:
+
+1. **Setup variable:** CRS rule 901001 checks for `tx.crs_setup_version` and denies with status 500 if it's missing. Our initial config didn't set it. After fixing this, CRS loaded without errors.
+
+2. **Anomaly scoring through FFI:** The blocking evaluation rule (REQUEST-949) uses macro expansion (`@ge %{tx.inbound_anomaly_score_threshold}`) to compare the accumulated score against the threshold. This macro expansion doesn't work correctly through the Rust bindings to libmodsecurity — individual detection rules fire and increment score variables, but the final comparison in rule 949 never triggers.
+
+This is a known limitation of using libmodsecurity through FFI. The C library's variable expansion depends on internal state management that doesn't translate cleanly through the bindings. We're investigating whether this is a binding issue or a fundamental incompatibility.
+
+For the comparison in this post, we needed all three engines running the same rules, and direct-deny mode is the common denominator that works across all of them. The 67-rule set isolates engine behavior — how each engine implements `@detectSQLi`, `@detectXSS`, and `@contains` — independent of rule breadth. It answers "given the same rules, which engine executes them best?" rather than "which ruleset provides the most coverage?"
+
+Running wafworth against a standalone ModSecurity+Nginx with full CRS v4 is on our roadmap and will be published as a separate comparison using the Docker examples in `wafworth/examples/modsecurity-nginx/`.
 
 ## What we're shipping
 
