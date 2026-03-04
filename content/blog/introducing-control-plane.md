@@ -354,3 +354,7 @@ The fleet simulator lets you test the full workflow without real Zentinel nodes.
 The control plane is open source and available at [github.com/zentinelproxy/zentinel-control-plane](https://github.com/zentinelproxy/zentinel-control-plane). Documentation covers [architecture](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs), [deployment strategies](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs), [API reference](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs), and [node management](https://github.com/zentinelproxy/zentinel-control-plane/tree/main/docs). Feature requests and bug reports go to [GitHub Issues](https://github.com/zentinelproxy/zentinel-control-plane/issues). For broader discussion, join us on [GitHub Discussions](https://github.com/zentinelproxy/zentinel/discussions).
 
 The [control plane page](/control-plane/) has a complete feature overview. If you're evaluating Zentinel for fleet deployment, start there.
+
+---
+
+**New to Zentinel?** [Install the proxy](/install/) and follow the [quickstart](/quickstart/) to get a reverse proxy running in minutes. Check the [features page](/features/) for the full capability list, or see how Zentinel stacks up on the [benchmarks page](/benchmarks/).

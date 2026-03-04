@@ -193,3 +193,7 @@ docker pull ghcr.io/zentinelproxy/zentinel:26.02_0
 # From source
 cargo install zentinel-proxy
 ```
+
+---
+
+**Explore Zentinel** — read the full [supply chain security page](/supply-chain/) for verification details, see how Zentinel performs on the [benchmarks page](/benchmarks/), or browse all 26 agents in the [agent registry](https://registry.zentinelproxy.io). For fleet deployments, the [control plane](/control-plane/) handles configuration distribution and safe rollouts.

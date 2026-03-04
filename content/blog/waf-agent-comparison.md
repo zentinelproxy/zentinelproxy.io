@@ -372,3 +372,7 @@ wafworth compare -r results/my-waf/ -r results/zentinel-zentinelsec/ -o comparis
 The `examples/` directory includes Docker Compose setups for ModSecurity+Nginx, Coraza+Caddy, and Zentinel, so you can spin up a comparison environment in minutes.
 
 598 tests, 18 categories, full confusion matrices. No engine scored above 50% detection. That's not a failure of the engines — it's an honest measurement of where pattern-based WAFs stand against a modern attack corpus. Defense in depth isn't a platitude. It's an engineering requirement.
+
+---
+
+**Get started with Zentinel** — [Install the proxy](/install/) in under a minute, explore the [agent registry](https://registry.zentinelproxy.io) for all 26 agents including WAF, or check the [benchmarks page](/benchmarks/) for full performance and detection data. Managing multiple nodes? The [control plane](/control-plane/) handles fleet-wide config distribution and safe rollouts.
