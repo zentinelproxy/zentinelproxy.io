@@ -258,4 +258,12 @@ docker pull ghcr.io/zentinelproxy/zentinel:26.01_11
 
 The full benchmark results are available on the [benchmarks page](/benchmarks/), including interactive charts for latency, throughput, memory, and CPU across all five proxies.
 
-**Want to see what Zentinel can do beyond raw speed?** Explore the [features page](/features/) for WAF agents, rate limiting, and more. Browse the [agent registry](https://registry.zentinelproxy.io) for all 26 agents, or check how Zentinel handles [supply chain security](/supply-chain/) for every release.
+<div class="blog-cta">
+    <div class="blog-cta__title">Beyond Raw Speed</div>
+    <div class="blog-cta__subtitle">Zentinel isn't just fast — it comes with WAF, rate limiting, bot management, and 23 more agents. Every release is signed and attested.</div>
+    <div class="blog-cta__actions">
+        <a href="/features/" class="btn btn-gradient">Features</a>
+        <a href="https://registry.zentinelproxy.io" class="btn btn-secondary" target="_blank" rel="noopener">Agent Registry</a>
+        <a href="/supply-chain/" class="btn btn-secondary">Supply Chain</a>
+    </div>
+</div>

@@ -288,6 +288,12 @@ The bundle command works offline with the embedded lock file. It works with netw
 
 26 agents, four platforms each, 104 download URLs — all generated at build time from 26 Markdown files.
 
----
-
-**Browse available agents** at the [agent registry](https://registry.zentinelproxy.io), or [install Zentinel](/install/) and run `zentinel bundle install` to get started. See the [features page](/features/) for the full capability overview, or dive into the [configuration reference](/config/) to wire agents into your proxy.
+<div class="blog-cta">
+    <div class="blog-cta__title">Explore the Agent Ecosystem</div>
+    <div class="blog-cta__subtitle">Browse all 26 agents in the registry, or install Zentinel and run <code>zentinel bundle install</code> to get started.</div>
+    <div class="blog-cta__actions">
+        <a href="https://registry.zentinelproxy.io" class="btn btn-gradient" target="_blank" rel="noopener">Agent Registry</a>
+        <a href="/install/" class="btn btn-secondary">Install Zentinel</a>
+        <a href="/features/" class="btn btn-secondary">Features</a>
+    </div>
+</div>

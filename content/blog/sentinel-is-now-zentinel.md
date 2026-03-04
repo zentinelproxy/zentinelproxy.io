@@ -66,6 +66,12 @@ We're continuing to ship features and improvements under the Zentinel name. The 
 
 If you run into any issues with the migration, [open an issue](https://github.com/zentinelproxy/zentinel/issues) or reach out on the [discussions board](https://github.com/zentinelproxy/zentinel/discussions).
 
----
-
-**Discover Zentinel** — see the [features page](/features/) for everything the proxy can do, [install it](/install/) in under a minute, or browse the [agent registry](https://registry.zentinelproxy.io) for WAF, rate limiting, bot management, and 23 more agents.
+<div class="blog-cta">
+    <div class="blog-cta__title">Discover Zentinel</div>
+    <div class="blog-cta__subtitle">Same proxy, new name. See what Zentinel can do, install it in under a minute, or browse all 26 agents.</div>
+    <div class="blog-cta__actions">
+        <a href="/features/" class="btn btn-gradient">Features</a>
+        <a href="/install/" class="btn btn-secondary">Install</a>
+        <a href="https://registry.zentinelproxy.io" class="btn btn-secondary" target="_blank" rel="noopener">Agent Registry</a>
+    </div>
+</div>
