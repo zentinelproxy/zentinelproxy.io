@@ -188,6 +188,44 @@ zentinel-zentinelsec wins despite a lower detection rate because its false-posit
 
 Youden's J index (detection rate minus FP rate) tells the same story from a different angle. A J of 0.362 means zentinelsec is pulling 36.2% better than random chance, while zentinel-waf's higher detection is partially offset by its 9% FP rate.
 
+### A true positive and a false positive
+
+These are abstract metrics. Two concrete examples from the test run make them tangible.
+
+**True positive — SQL injection caught by zentinel-zentinelsec:**
+
+```yaml
+# Test: sqli-basic-001
+# "Classic OR 1=1 injection"
+GET /api/users?id=1'%20OR%20'1'%3D'1 HTTP/1.1
+```
+
+The query string contains `id=1' OR '1'='1` — a textbook SQL injection that would bypass an authentication query like `SELECT * FROM users WHERE id = '1' OR '1'='1'`. The `@detectSQLi` operator (powered by libinjection) tokenizes the input, recognizes the SQL structure, and the rule fires:
+
+```
+SecRule QUERY_STRING "@detectSQLi" "id:942100,phase:1,deny,status:403"
+```
+
+Result: **403 Blocked.** This is a true positive — an attack correctly identified and stopped. zentinel-zentinelsec caught this; zentinel-waf did not, because its compiled pattern matchers don't include libinjection-style tokenization for this particular payload shape.
+
+**False positive — legitimate search blocked by zentinel-waf:**
+
+```yaml
+# Test: ssti-fp-001
+# "False positive - mustache-like display"
+GET /api/search?q=price%20is%20%7B%7Bprice%7D%7D%20dollars HTTP/1.1
+```
+
+The query string decodes to `q=price is {{price}} dollars` — a user searching for template syntax, perhaps looking up how to use a Handlebars or Mustache template variable. The SSTI rule fires on the `{{` substring:
+
+```
+SecRule QUERY_STRING "@contains {{" "id:934100,phase:1,deny,status:403"
+```
+
+Result: **403 Blocked.** This is a false positive — legitimate traffic blocked because a blunt `@contains` rule can't distinguish template injection from a user typing double braces. A real customer gets a 403 error page instead of search results.
+
+This is the tradeoff that balanced accuracy captures. zentinel-waf's SSTI rule catches more template injection attacks, but it also blocks users who type `{{` in search boxes, Slack-style `{{variable}}` references in CMS content, or Jinja documentation. zentinel-zentinelsec avoids this particular false positive because its `@contains` matching handles the same rule with slightly different input normalization, but it catches fewer SSTI attacks as a result.
+
 ## Per-category breakdown
 
 This is where the comparison gets interesting:
