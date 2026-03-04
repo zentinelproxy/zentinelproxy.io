@@ -290,7 +290,6 @@ The bundle command works offline with the embedded lock file. It works with netw
 
 <div class="blog-cta">
     <div class="blog-cta__title">Explore the Agent Ecosystem</div>
-    <div class="blog-cta__subtitle">Browse all 26 agents in the registry, or install Zentinel and run <code>zentinel bundle install</code> to get started.</div>
     <div class="blog-cta__actions">
         <a href="https://registry.zentinelproxy.io" class="btn btn-gradient" target="_blank" rel="noopener">Agent Registry</a>
         <a href="/install/" class="btn btn-secondary">Install Zentinel</a>

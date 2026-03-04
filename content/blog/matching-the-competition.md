@@ -260,7 +260,6 @@ The full benchmark results are available on the [benchmarks page](/benchmarks/),
 
 <div class="blog-cta">
     <div class="blog-cta__title">Beyond Raw Speed</div>
-    <div class="blog-cta__subtitle">Zentinel isn't just fast — it comes with WAF, rate limiting, bot management, and 23 more agents. Every release is signed and attested.</div>
     <div class="blog-cta__actions">
         <a href="/features/" class="btn btn-gradient">Features</a>
         <a href="https://registry.zentinelproxy.io" class="btn btn-secondary" target="_blank" rel="noopener">Agent Registry</a>

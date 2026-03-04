@@ -196,7 +196,6 @@ cargo install zentinel-proxy
 
 <div class="blog-cta">
     <div class="blog-cta__title">Explore Zentinel</div>
-    <div class="blog-cta__subtitle">Read the full supply chain security details, see performance benchmarks, or manage fleet deployments with the control plane.</div>
     <div class="blog-cta__actions">
         <a href="/supply-chain/" class="btn btn-gradient">Supply Chain</a>
         <a href="/benchmarks/" class="btn btn-secondary">Benchmarks</a>

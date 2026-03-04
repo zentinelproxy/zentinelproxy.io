@@ -68,7 +68,6 @@ If you run into any issues with the migration, [open an issue](https://github.co
 
 <div class="blog-cta">
     <div class="blog-cta__title">Discover Zentinel</div>
-    <div class="blog-cta__subtitle">Same proxy, new name. See what Zentinel can do, install it in under a minute, or browse all 26 agents.</div>
     <div class="blog-cta__actions">
         <a href="/features/" class="btn btn-gradient">Features</a>
         <a href="/install/" class="btn btn-secondary">Install</a>

@@ -375,7 +375,6 @@ The `examples/` directory includes Docker Compose setups for ModSecurity+Nginx, 
 
 <div class="blog-cta">
     <div class="blog-cta__title">Try Zentinel</div>
-    <div class="blog-cta__subtitle">Install the proxy in under a minute. Browse all 26 agents — including WAF, rate limiting, and bot management — in the registry.</div>
     <div class="blog-cta__actions">
         <a href="/install/" class="btn btn-gradient">Install Zentinel</a>
         <a href="https://registry.zentinelproxy.io" class="btn btn-secondary" target="_blank" rel="noopener">Agent Registry</a>

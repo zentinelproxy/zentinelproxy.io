@@ -120,7 +120,6 @@ curl -fsSL https://get.zentinelproxy.io | sh
 
 <div class="blog-cta">
     <div class="blog-cta__title">Learn More About Zentinel</div>
-    <div class="blog-cta__subtitle">See the full capability list, check how Zentinel stacks up against nginx, Envoy, HAProxy, and Caddy, or browse all 26 agents.</div>
     <div class="blog-cta__actions">
         <a href="/features/" class="btn btn-gradient">Features</a>
         <a href="/benchmarks/" class="btn btn-secondary">Benchmarks</a>

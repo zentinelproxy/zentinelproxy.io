@@ -357,7 +357,6 @@ The [control plane page](/control-plane/) has a complete feature overview. If yo
 
 <div class="blog-cta">
     <div class="blog-cta__title">Get Started with Zentinel</div>
-    <div class="blog-cta__subtitle">Install the proxy and follow the quickstart to get a reverse proxy running in minutes. The control plane adds fleet management on top.</div>
     <div class="blog-cta__actions">
         <a href="/install/" class="btn btn-gradient">Install Zentinel</a>
         <a href="/control-plane/" class="btn btn-secondary">Control Plane</a>
