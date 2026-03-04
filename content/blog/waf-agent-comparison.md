@@ -373,6 +373,12 @@ The `examples/` directory includes Docker Compose setups for ModSecurity+Nginx, 
 
 598 tests, 18 categories, full confusion matrices. No engine scored above 50% detection. That's not a failure of the engines — it's an honest measurement of where pattern-based WAFs stand against a modern attack corpus. Defense in depth isn't a platitude. It's an engineering requirement.
 
----
-
-**Get started with Zentinel** — [Install the proxy](/install/) in under a minute, explore the [agent registry](https://registry.zentinelproxy.io) for all 26 agents including WAF, or check the [benchmarks page](/benchmarks/) for full performance and detection data. Managing multiple nodes? The [control plane](/control-plane/) handles fleet-wide config distribution and safe rollouts.
+<div class="blog-cta">
+    <div class="blog-cta__title">Try Zentinel</div>
+    <div class="blog-cta__subtitle">Install the proxy in under a minute. Browse all 26 agents — including WAF, rate limiting, and bot management — in the registry.</div>
+    <div class="blog-cta__actions">
+        <a href="/install/" class="btn btn-gradient">Install Zentinel</a>
+        <a href="https://registry.zentinelproxy.io" class="btn btn-secondary" target="_blank" rel="noopener">Agent Registry</a>
+        <a href="/benchmarks/" class="btn btn-secondary">Benchmarks</a>
+    </div>
+</div>

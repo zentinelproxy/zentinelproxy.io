@@ -355,6 +355,12 @@ The control plane is open source and available at [github.com/zentinelproxy/zent
 
 The [control plane page](/control-plane/) has a complete feature overview. If you're evaluating Zentinel for fleet deployment, start there.
 
----
-
-**New to Zentinel?** [Install the proxy](/install/) and follow the [quickstart](/quickstart/) to get a reverse proxy running in minutes. Check the [features page](/features/) for the full capability list, or see how Zentinel stacks up on the [benchmarks page](/benchmarks/).
+<div class="blog-cta">
+    <div class="blog-cta__title">Get Started with Zentinel</div>
+    <div class="blog-cta__subtitle">Install the proxy and follow the quickstart to get a reverse proxy running in minutes. The control plane adds fleet management on top.</div>
+    <div class="blog-cta__actions">
+        <a href="/install/" class="btn btn-gradient">Install Zentinel</a>
+        <a href="/control-plane/" class="btn btn-secondary">Control Plane</a>
+        <a href="/benchmarks/" class="btn btn-secondary">Benchmarks</a>
+    </div>
+</div>
