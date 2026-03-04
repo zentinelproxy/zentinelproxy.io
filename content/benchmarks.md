@@ -2,7 +2,7 @@
 title = "Benchmarks"
 description = "Performance, soak testing, and chaos engineering results for Zentinel reverse proxy"
 template = "benchmarks.html"
-updated = 2026-02-19
+updated = 2026-03-04
 +++
 
 Zentinel includes a comprehensive testing framework validating performance, stability, and resilience. All results below are from actual test runs.
@@ -633,60 +633,141 @@ circuit-breaker {
 
 ## Security Validation
 
-### WAF Testing (OWASP CRS)
+### WAF Testing with [wafworth](https://github.com/zentinelproxy/wafworth)
 
-Validated against OWASP attack patterns with the WAF agent running OWASP Core Rule Set:
+598 test cases across 18 OWASP-aligned attack categories, tested against three WAF engine configurations on Zentinel. Results from `wafworth run` on 2026-03-04.
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">598</div>
+        <div class="stat-label">Test Cases</div>
+        <div class="stat-detail">18 attack categories</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">43</div>
+        <div class="stat-label">CVE Tests</div>
+        <div class="stat-detail">2014–2026</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">WAF Engines</div>
+        <div class="stat-detail">Head-to-head comparison</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">&lt;3ms</div>
+        <div class="stat-label">p50 Latency</div>
+        <div class="stat-detail">All engines</div>
+    </div>
+</div>
+
+### Overall Comparison
+
+| Metric | zentinel&#8209;waf | zentinel&#8209;zentinelsec | zentinel&#8209;modsec |
+|--------|:---------:|:------------------:|:-------------:|
+| **Detection Rate** | **43.1%** | 38.7% | 32.1% |
+| **FP Rate** | 9.0% | **2.5%** | **2.5%** |
+| **Precision** | 94.9% | **98.4%** | 98.1% |
+| **F1 Score** | **0.59** | 0.56 | 0.48 |
+| **Balanced Accuracy** | 67.0% | **68.1%** | 64.8% |
+| **p50 Latency** | **2.49ms** | 2.59ms | 2.54ms |
+| **p99 Latency** | **3.04ms** | 3.60ms | 3.49ms |
+
+### Per-Category Detection Rates
 
 <div class="chart-container">
-    <div class="chart-title">Attack Detection Results</div>
+    <div class="chart-title">Detection Rate by Category — zentinel-waf (Higher is Better)</div>
     <div class="bar-chart">
         <div class="bar-item">
-            <span class="bar-label">SQL Injection</span>
+            <span class="bar-label">SSRF</span>
             <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 100%;"></div>
+                <div class="bar-fill bar-fill--success" style="width: 80%;"></div>
             </div>
-            <span class="bar-value" style="color: var(--color-success);">BLOCKED</span>
-        </div>
-        <div class="bar-item">
-            <span class="bar-label">XSS</span>
-            <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 100%;"></div>
-            </div>
-            <span class="bar-value" style="color: var(--color-success);">BLOCKED</span>
+            <span class="bar-value">80%</span>
         </div>
         <div class="bar-item">
             <span class="bar-label">Path Traversal</span>
             <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 100%;"></div>
+                <div class="bar-fill bar-fill--success" style="width: 80%;"></div>
             </div>
-            <span class="bar-value" style="color: var(--color-success);">BLOCKED</span>
-        </div>
-        <div class="bar-item">
-            <span class="bar-label">Cmd Injection</span>
-            <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 100%;"></div>
-            </div>
-            <span class="bar-value" style="color: var(--color-success);">BLOCKED</span>
+            <span class="bar-value">80%</span>
         </div>
         <div class="bar-item">
             <span class="bar-label">Scanner Detection</span>
             <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 100%;"></div>
+                <div class="bar-fill bar-fill--success" style="width: 80%;"></div>
             </div>
-            <span class="bar-value" style="color: var(--color-success);">BLOCKED</span>
+            <span class="bar-value">80%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">XSS</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--success" style="width: 73%;"></div>
+            </div>
+            <span class="bar-value">73%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">SSTI</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 60%;"></div>
+            </div>
+            <span class="bar-value">60%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">WAF Bypass</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 56%;"></div>
+            </div>
+            <span class="bar-value">56%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">Known CVEs</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 54%;"></div>
+            </div>
+            <span class="bar-value">54%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">SQL Injection</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: 38%;"></div>
+            </div>
+            <span class="bar-value">38%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">Protocol</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--secondary" style="width: 32%;"></div>
+            </div>
+            <span class="bar-value">32%</span>
+        </div>
+        <div class="bar-item">
+            <span class="bar-label">Evasion</span>
+            <div class="bar-track">
+                <div class="bar-fill bar-fill--secondary" style="width: 24%;"></div>
+            </div>
+            <span class="bar-value">24%</span>
         </div>
     </div>
 </div>
 
-| Attack Type | Payload Example | Result |
-|-------------|-----------------|--------|
-| SQL Injection | `' OR 1=1--` | **Blocked** |
-| XSS | `<script>alert(1)</script>` | **Blocked** |
-| Path Traversal | `../../etc/passwd` | **Blocked** |
-| Command Injection | `; cat /etc/passwd` | **Blocked** |
-| Scanner Detection | SQLMap User-Agent | **Blocked** |
+| Category | zentinel&#8209;waf | zentinel&#8209;zentinelsec | zentinel&#8209;modsec |
+|----------|:---------:|:------------------:|:-------------:|
+| Cross-Site Scripting | **73%** | 70% | 70% |
+| Path Traversal | **80%** | 50% | 53% |
+| SQL Injection | 38% | **67%** | 25% |
+| SSRF | **80%** | 60% | 60% |
+| Scanner Detection | **80%** | 7% | 33% |
+| Known CVEs | **54%** | 19% | 16% |
+| WAF Bypass | **56%** | 52% | 48% |
+| SSTI | **60%** | 53% | 47% |
+| Evasion Techniques | 24% | **52%** | 48% |
+| Command Injection | 3% | 3% | 3% |
+| XXE | 0% | 0% | 0% |
+| File Upload | 0% | 0% | 0% |
 
-All OWASP Top 10 attack patterns are blocked with the CRS rule set.
+<div class="highlight-box" style="background: var(--color-surface); border-left: 4px solid var(--color-primary); padding: var(--space-md); margin: var(--space-lg) 0;">
+<strong>About these results:</strong> Detection rates reflect <em>plain encoding only</em> against wafworth's hardened test corpus (580+ attack tests plus 50 false-positive tests). The corpus intentionally includes advanced evasion techniques, polyglot payloads, and novel CVE exploits that go beyond standard OWASP CRS coverage. Run <code>wafworth run --encodings plain,url,hex</code> to test encoding bypass resilience. See the <a href="https://github.com/zentinelproxy/wafworth" style="color: var(--color-primary);">wafworth repo</a> for full methodology.
+</div>
 
 ---
 
@@ -833,5 +914,5 @@ We're actively working on:
 ---
 
 <p style="text-align: center; color: var(--color-text-muted); margin-top: var(--space-2xl);">
-Last updated: January 2026 | Zentinel v0.4.2
+Last updated: March 2026 | Zentinel v0.4.2
 </p>
