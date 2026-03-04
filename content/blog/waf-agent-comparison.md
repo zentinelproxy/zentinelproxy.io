@@ -99,7 +99,64 @@ Zentinel's [agent architecture](/agents/) allows WAF logic to run as an external
 
 **zentinel-modsec** — A wrapper around [libmodsecurity](https://github.com/owasp-modsecurity/ModSecurity) (the C library behind ModSecurity v3). Full compatibility with OWASP CRS v4, including the libinjection-based operators. Communicates via UDS.
 
-All three were tested with the same custom rule set using `@detectSQLi`, `@detectXSS`, and `@contains` operators — a set of roughly 75 direct-deny rules covering SQLi, XSS, path traversal, command injection, SSRF, SSTI, scanner detection, and CVE patterns. This gives a fair apples-to-apples comparison of the engines themselves, independent of rule complexity.
+### Test configuration
+
+All three were tested with the same custom rule set — 67 `SecRule` directives in direct-deny mode (no anomaly scoring). The full rule file and proxy configs are in [`bench/`](https://github.com/zentinelproxy/wafworth/tree/main/bench).
+
+**Shared settings across all agents:**
+
+| Setting | Value |
+|---------|-------|
+| Failure mode | `closed` (block on agent error) |
+| Body inspection | Enabled (`SecRequestBodyAccess On`) |
+| Max request body | 1 MB (1,048,576 bytes) |
+| Agent timeout | 5,000ms |
+| Rule mode | Direct deny — every matching rule returns 403 immediately |
+| Anomaly scoring | Disabled (no CRS, no score thresholds) |
+| Backend | Simple HTTP echo server on `127.0.0.1:19090` |
+
+**zentinel-waf** (UDS on `/tmp/zentinel-waf-test.sock`):
+
+```kdl
+config {
+    paranoia-level 1
+    sqli #true
+    xss #true
+    path-traversal #true
+    command-injection #true
+    protocol #true
+    scanner-detection #true
+    block-mode #true
+    body-inspection #true
+}
+```
+
+This agent doesn't use SecRules. The `paranoia-level 1` setting restricts it to high-confidence detections only.
+
+**zentinel-zentinelsec** (gRPC on `127.0.0.1:50051`) and **zentinel-modsec** (UDS on `/tmp/zentinel-modsec-test.sock`) both loaded the same rule file:
+
+```
+SecRuleEngine On
+SecRequestBodyAccess On
+```
+
+Followed by 67 `SecRule` directives covering 8 categories:
+
+| Category | Rules | Operators | Variables inspected |
+|----------|:-----:|-----------|---------------------|
+| SQL Injection | 8 | `@detectSQLi`, `@contains` | `QUERY_STRING`, `REQUEST_URI`, `ARGS` |
+| XSS | 9 | `@detectXSS`, `@contains` | `QUERY_STRING`, `REQUEST_URI`, `ARGS` |
+| Path Traversal | 8 | `@contains` | `REQUEST_URI`, `QUERY_STRING` |
+| Command Injection | 11 | `@contains` | `QUERY_STRING` only |
+| SSRF | 10 | `@contains` | `QUERY_STRING` |
+| SSTI | 4 | `@contains` | `QUERY_STRING` |
+| Scanner Detection | 7 | `@contains` | `REQUEST_HEADERS:User-Agent` |
+| CVE Patterns | 8 | `@contains` | `REQUEST_URI` |
+
+Two things to note about this rule set:
+
+1. **Command injection rules only inspect `QUERY_STRING`.** This is why all three engines score 3.3% on command injection — payloads in request bodies, cookies, and headers are invisible to the rules. This is a rule gap, not an engine gap.
+2. **No `@rx` (regex) rules.** All pattern matching uses `@detectSQLi`, `@detectXSS`, and `@contains`. This keeps the comparison focused on engine behavior rather than regex implementation differences.
 
 ## Overall results
 
