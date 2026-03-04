@@ -1,6 +1,6 @@
 +++
 title = "598 Attack Payloads, Three WAF Engines, One Verdict"
-description = "We built waf-playbook, an open-source WAF testing framework with 598 tests across 18 OWASP-aligned categories, and used it to benchmark Zentinel's three WAF agent implementations against each other. No engine won everywhere. Here's what the confusion matrices actually say."
+description = "We built wafworth, an open-source WAF testing framework with 598 tests across 18 OWASP-aligned categories, and used it to benchmark Zentinel's three WAF agent implementations against each other. No engine won everywhere. Here's what the confusion matrices actually say."
 date = 2026-03-04
 [taxonomies]
 tags = ["security", "waf", "agents", "benchmarks", "modsecurity"]
@@ -8,7 +8,7 @@ tags = ["security", "waf", "agents", "benchmarks", "modsecurity"]
 
 WAF marketing pages love to claim "99.9% detection" without disclosing the false-positive rate, the test corpus, or whether the tests include anything beyond `<script>alert(1)</script>`. We wanted real numbers for Zentinel's WAF agents — numbers attached to a reproducible test suite that anyone can run.
 
-So we built [waf-playbook](https://github.com/zentinelproxy/waf-playbook), an open-source WAF testing framework, and ran 598 test cases against all three of Zentinel's WAF agent implementations. The results were not what we expected.
+So we built [wafworth](https://github.com/zentinelproxy/wafworth), an open-source WAF testing framework, and ran 598 test cases against all three of Zentinel's WAF agent implementations. The results were not what we expected.
 
 ## Why another WAF testing tool?
 
@@ -192,27 +192,27 @@ Based on these results, we're making three changes:
 
 ## Try it yourself
 
-waf-playbook is open source and runs against any WAF. The test suite isn't Zentinel-specific — it tests HTTP responses against expected status codes.
+wafworth is open source and runs against any WAF. The test suite isn't Zentinel-specific — it tests HTTP responses against expected status codes.
 
 ```bash
 # Install
-pip install waf-playbook
+pip install wafworth
 
 # Run against any WAF
-waf-playbook run \
+wafworth run \
   --target http://your-waf:8080 \
   --name my-waf \
   --block-status 403 \
   --output results/my-waf/
 
 # Compare multiple WAFs
-waf-playbook compare \
+wafworth compare \
   -r results/waf-a/ \
   -r results/waf-b/ \
   -o results/comparison/
 
 # CI integration: fail if detection drops below 90%
-waf-playbook run \
+wafworth run \
   --target http://your-waf:8080 \
   --fail-under 0.90 \
   --fail-fp-over 0.05
