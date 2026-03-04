@@ -65,3 +65,7 @@ These redirects will remain active indefinitely.
 We're continuing to ship features and improvements under the Zentinel name. The rename doesn't slow anything down — it just gives us a clearer identity as the project grows.
 
 If you run into any issues with the migration, [open an issue](https://github.com/zentinelproxy/zentinel/issues) or reach out on the [discussions board](https://github.com/zentinelproxy/zentinel/discussions).
+
+---
+
+**Discover Zentinel** — see the [features page](/features/) for everything the proxy can do, [install it](/install/) in under a minute, or browse the [agent registry](https://registry.zentinelproxy.io) for WAF, rate limiting, bot management, and 23 more agents.

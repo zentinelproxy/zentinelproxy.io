@@ -117,3 +117,7 @@ docker pull ghcr.io/zentinelproxy/zentinel:26.02_1
 # Binary
 curl -fsSL https://get.zentinelproxy.io | sh
 ```
+
+---
+
+**Learn more about Zentinel** — see the [features page](/features/) for the full capability list, check the [benchmarks](/benchmarks/) showing how Zentinel stacks up against nginx, Envoy, HAProxy, and Caddy, or browse the [agent registry](https://registry.zentinelproxy.io) for WAF, rate limiting, and 24 more agents.

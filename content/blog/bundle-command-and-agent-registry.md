@@ -287,3 +287,7 @@ We don't need any of that. The artifacts live on GitHub Releases, which GitHub o
 The bundle command works offline with the embedded lock file. It works with network access by fetching from the API. It works in air-gapped environments by pointing `ZENTINEL_API_URL` at an internal mirror. The only hard dependency is GitHub Releases being reachable — and if you need to remove that dependency, you can host the tarballs anywhere and override the URLs.
 
 26 agents, four platforms each, 104 download URLs — all generated at build time from 26 Markdown files.
+
+---
+
+**Browse available agents** at the [agent registry](https://registry.zentinelproxy.io), or [install Zentinel](/install/) and run `zentinel bundle install` to get started. See the [features page](/features/) for the full capability overview, or dive into the [configuration reference](/config/) to wire agents into your proxy.
