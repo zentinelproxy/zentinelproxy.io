@@ -2,17 +2,25 @@
 # Fake zentinel for demo recording
 case "$1" in
     --version)
-        echo "zentinel 0.5.12 (release 26.03, commit a1b2c3d)"
+        echo "zentinel 0.5.12 (release 26.03_1, commit a1b2c3d)"
         ;;
     test)
-        echo "  INFO Testing configuration file: zentinel.kdl"
-        echo "  INFO Configuration is valid ✓"
+        echo " INFO Testing configuration file: zentinel.kdl"
+        echo " INFO Configuration loaded successfully path=zentinel.kdl routes=1 upstreams=1 agents=0 listeners=1"
+        echo " INFO Configuration test successful:"
+        echo " INFO   - 1 listener(s)"
+        echo " INFO   - 1 route(s)"
+        echo " INFO   - 1 upstream(s)"
+        echo "zentinel: configuration file zentinel.kdl test is successful"
         ;;
     run)
-        echo "  INFO Zentinel v0.5.12 starting"
-        echo "  INFO Listener http bound to 0.0.0.0:8080"
-        echo "  INFO Upstream backend -> 127.0.0.1:3000 (round_robin)"
-        echo "  INFO Metrics available at 0.0.0.0:9090/metrics"
-        echo "  INFO Ready - serving traffic"
+        echo " INFO zentinel: Loading configuration from: zentinel.kdl"
+        echo " INFO zentinel_proxy::proxy: Starting Zentinel Proxy"
+        echo " INFO zentinel_config: Configuration loaded successfully path=zentinel.kdl routes=1 upstreams=1 agents=0 listeners=1"
+        echo " INFO zentinel_proxy::upstream: Upstream pool created successfully upstream_id=backend target_count=1"
+        echo " INFO zentinel: HTTP listening on: 0.0.0.0:8080"
+        echo " INFO zentinel: Zentinel proxy started successfully"
+        echo " INFO zentinel: Configuration hot reload enabled (SIGHUP)"
+        echo " INFO zentinel: Graceful shutdown enabled (SIGTERM/SIGINT)"
         ;;
 esac
