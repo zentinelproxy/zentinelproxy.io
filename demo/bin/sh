@@ -1,0 +1,14 @@
+#!/bin/bash
+# Fake sh for demo - when piped from curl, show install output
+echo ""
+echo "  ╭─────────────────────────────────────╮"
+echo "  │       Zentinel Installer v0.5.12     │"
+echo "  ╰─────────────────────────────────────╯"
+echo ""
+echo "  ✓ Detected platform: aarch64-apple-darwin"
+echo "  ✓ Downloading zentinel v0.5.12..."
+echo "  ✓ Verifying signature (cosign)..."
+echo "  ✓ Installed to /usr/local/bin/zentinel"
+echo ""
+echo "  Run: zentinel --config zentinel.kdl"
+echo ""

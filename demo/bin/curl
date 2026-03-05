@@ -1,0 +1,9 @@
+#!/bin/bash
+# Fake curl for demo recording
+if [[ "$*" == *"localhost:8080"* ]]; then
+    echo "{"
+    echo '  "status": "ok",'
+    echo '  "upstream": "127.0.0.1:3000",'
+    echo '  "latency_ms": 0.42'
+    echo "}"
+fi

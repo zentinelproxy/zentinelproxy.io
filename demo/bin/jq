@@ -1,0 +1,3 @@
+#!/bin/bash
+# Fake jq for demo - just pass through stdin
+cat
