@@ -1109,6 +1109,48 @@ body > .nav-dropdown__menu {
     }
 }
 
+.hero-animation {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    object-fit: cover;
+    object-position: right center;
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        transparent 15%,
+        rgba(0, 0, 0, 0.1) 25%,
+        rgba(0, 0, 0, 0.3) 35%,
+        rgba(0, 0, 0, 0.5) 45%,
+        rgba(0, 0, 0, 0.7) 55%,
+        rgba(0, 0, 0, 0.9) 65%,
+        black 75%,
+        black 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        transparent 15%,
+        rgba(0, 0, 0, 0.1) 25%,
+        rgba(0, 0, 0, 0.3) 35%,
+        rgba(0, 0, 0, 0.5) 45%,
+        rgba(0, 0, 0, 0.7) 55%,
+        rgba(0, 0, 0, 0.9) 65%,
+        black 75%,
+        black 100%
+    );
+}
+
+// Terminal Demo Section
+.terminal-demo {
+    padding: var(--space-3xl) 0;
+
+    &__wrapper {
+        display: flex;
+        justify-content: center;
+    }
+}
+
 // Hero Terminal
 .hero-terminal {
     width: 480px;
@@ -1118,7 +1160,6 @@ body > .nav-dropdown__menu {
     background: #1e1e2e;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    pointer-events: auto;
 
     &__chrome {
         display: flex;
@@ -1180,19 +1221,6 @@ body > .nav-dropdown__menu {
 @keyframes terminal-blink {
     0%, 50% { opacity: 1; }
     51%, 100% { opacity: 0; }
-}
-
-.hero-visual {
-    // Override for terminal
-    pointer-events: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-xl);
-
-    @media (max-width: 768px) {
-        padding: var(--space-md);
-    }
 }
 
 // ============================================
