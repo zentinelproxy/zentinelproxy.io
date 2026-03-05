@@ -101,6 +101,64 @@
         color: var(--color-text-muted);
         font-size: 0.9375rem;
     }
+
+    /* Version badge */
+    .customize-version {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-family: var(--font-mono);
+        color: var(--color-text-muted);
+        background: var(--color-bg-elevated);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-full);
+        padding: 2px var(--space-sm);
+        margin-top: var(--space-sm);
+    }
+
+    /* Verification section */
+    .verify-output {
+        margin-top: var(--space-md);
+        padding: var(--space-md);
+        background: #1e1e2e;
+        border-radius: var(--radius-md);
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: #cdd6f4;
+        white-space: pre;
+        overflow-x: auto;
+    }
+    [data-theme="light"] .verify-output {
+        background: #f5f5f5;
+        color: #333;
+    }
+    .verify-output .g { color: #a6e3a1; }
+    .verify-output .m { color: #6c7086; }
+    [data-theme="light"] .verify-output .g { color: #40a02b; }
+    [data-theme="light"] .verify-output .m { color: #6c6f85; }
+
+    /* Checklist */
+    .checklist {
+        list-style: none;
+        padding: 0;
+        margin: var(--space-lg) 0 0;
+        display: grid;
+        gap: var(--space-sm);
+    }
+    .checklist li {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: 0.9375rem;
+        color: var(--color-text-muted);
+    }
+    .checklist li svg {
+        flex-shrink: 0;
+        color: var(--color-primary);
+    }
+    .checklist li strong {
+        color: var(--color-text);
+    }
 </style>
 {% endblock %}
 
@@ -110,6 +168,7 @@
         <header class="customize-header">
             <h1>{{ page.title }}</h1>
             <p class="customize-subtitle">{{ page.description }}</p>
+            <span class="customize-version">Zentinel {{ config.extra.software_version }}</span>
         </header>
 
         <div class="customize-content">
@@ -374,30 +433,79 @@ zentinel --config zentinel.kdl</code></pre>
                 </div>
                 <p class="section-note" id="startup-note" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                    <span>Start agents before running Zentinel. Each agent runs as a separate process and communicates via Unix socket.</span>
+                    <span>Start agents before running Zentinel. Each agent runs as a separate process and communicates via Unix socket. Install agents with <code>zentinel bundle install</code> or <code>cargo install &lt;agent-crate&gt;</code>.</span>
+                </p>
+            </div>
+
+            <!-- Verify -->
+            <div class="customize-section">
+                <h2>
+                    <span class="section-number">6</span>
+                    Verify It Works
+                </h2>
+                <p class="section-description">Send a request to confirm the proxy is running and forwarding traffic.</p>
+                <div class="code-output">
+                    <div class="code-header">
+                        <span class="code-label">Shell</span>
+                        <button class="copy-btn" onclick="copyCode('verify-code')" aria-label="Copy to clipboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                    <pre id="verify-code" class="language-bash"><code class="language-bash"># Test the proxy is forwarding requests
+curl -i http://localhost:8080/</code></pre>
+                </div>
+                <div class="verify-output"><span class="m">HTTP/1.1</span> <span class="g">200 OK</span>
+<span class="m">x-zentinel-request-id:</span> a1b2c3d4-e5f6-7890
+<span class="m">x-zentinel-upstream:</span> 127.0.0.1:3000</div>
+                <p class="section-note">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    <span>Make sure your backend (127.0.0.1:3000) is running before testing. If you see a <code>502</code>, the proxy is working but can't reach the upstream.</span>
                 </p>
             </div>
 
             <!-- Next Steps -->
             <div class="customize-section next-steps">
                 <h2>
-                    <span class="section-number">6</span>
-                    Next Steps
+                    <span class="section-number">7</span>
+                    What's Next
                 </h2>
-                <div class="next-steps-grid">
+                <ul class="checklist">
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span><strong>Add TLS</strong> — Configure HTTPS listeners with your certificates. <a href="https://docs.zentinelproxy.io/configuration/listeners/">Listener docs</a></span>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span><strong>Add more routes</strong> — Match by path, host, headers, or methods. <a href="https://docs.zentinelproxy.io/configuration/routes/">Routing docs</a></span>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span><strong>Install agents</strong> — Add WAF, rate limiting, or auth with <code>zentinel bundle install</code>. <a href="https://registry.zentinelproxy.io/" target="_blank" rel="noopener">Agent registry</a></span>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span><strong>Enable health checks</strong> — Monitor upstream availability automatically. <a href="https://docs.zentinelproxy.io/configuration/upstreams/">Upstream docs</a></span>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span><strong>Deploy to production</strong> — systemd, Docker, or Kubernetes. <a href="https://docs.zentinelproxy.io/deployment/">Deployment guide</a></span>
+                    </li>
+                </ul>
+                <div class="next-steps-grid" style="margin-top: var(--space-xl);">
                     <a href="{{ config.extra.docs_external_url }}" class="next-step-card">
                         <div class="next-step-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                         </div>
-                        <h3>Read the Docs</h3>
-                        <p>Learn about configuration, routing, and advanced features</p>
+                        <h3>Full Documentation</h3>
+                        <p>Configuration reference, examples, and operations guide</p>
                     </a>
                     <a href="https://registry.zentinelproxy.io/" class="next-step-card" target="_blank" rel="noopener">
                         <div class="next-step-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
                         </div>
-                        <h3>Explore Agents</h3>
-                        <p>Discover all available agents and their capabilities</p>
+                        <h3>Agent Registry</h3>
+                        <p>Browse 25+ agents for security, observability, and traffic management</p>
                     </a>
                     <a href="{{ config.extra.github }}" class="next-step-card">
                         <div class="next-step-icon">

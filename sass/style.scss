@@ -1150,6 +1150,13 @@ body > .nav-dropdown__menu {
         display: flex;
         justify-content: center;
     }
+
+    &__cta {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-md);
+        margin-top: var(--space-xl);
+    }
 }
 
 // Hero Terminal
@@ -1596,6 +1603,11 @@ body > .nav-dropdown__menu {
 // ============================================
 .use-cases {
     padding: var(--space-3xl) 0;
+
+    &__cta {
+        text-align: center;
+        margin-top: var(--space-xl);
+    }
 }
 
 .use-cases-grid {
