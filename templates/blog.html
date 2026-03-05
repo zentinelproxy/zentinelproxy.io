@@ -4,6 +4,7 @@
 {% block description %}Engineering blog from the Zentinel project — performance, architecture, and lessons from building a security-first reverse proxy{% endblock %}
 
 {% block head %}
+<link rel="alternate" type="application/atom+xml" title="Zentinel Blog Feed" href="{{ get_url(path='blog/atom.xml') | safe }}">
 <style>
 .blog-hero {
     text-align: center;
@@ -113,7 +114,7 @@
     <a href="{{ page.permalink | safe }}" class="blog-card">
         {% if page.date %}
         <time class="blog-card__date" datetime="{{ page.date | date(format='%Y-%m-%d') }}">
-            {{ page.date | date(format='%B %d, %Y') }}
+            {{ page.date | date(format='%B %d, %Y') }}{% if page.reading_time %} &middot; {{ page.reading_time }} min read{% endif %}
         </time>
         {% endif %}
         <h2 class="blog-card__title">{{ page.title }}</h2>
