@@ -299,17 +299,11 @@
             </div>
         </div>
         <div class="hero-visual">
-            <div class="hero-terminal" aria-hidden="true">
-                <div class="hero-terminal__chrome">
-                    <span class="hero-terminal__dot hero-terminal__dot--red"></span>
-                    <span class="hero-terminal__dot hero-terminal__dot--yellow"></span>
-                    <span class="hero-terminal__dot hero-terminal__dot--green"></span>
-                    <span class="hero-terminal__title">terminal</span>
-                </div>
-                <div class="hero-terminal__body" id="hero-terminal-body">
-                    <pre class="hero-terminal__output" id="hero-terminal-output"></pre>
-                </div>
-            </div>
+            <img
+                src="{{ get_url(path='img/zentinel-hero-vertical.avif') | safe }}"
+                alt="Zentinel guardian dog animation"
+                class="hero-animation"
+            />
         </div>
     </div>
 </section>
@@ -333,6 +327,28 @@
                 <span class="stat-number">6x</span>
                 <span class="stat-label">Less Memory than nginx</span>
             </a>
+        </div>
+    </div>
+</section>
+
+<section class="terminal-demo">
+    <div class="container">
+        <div class="section-header">
+            <h2>Up and Running in Seconds</h2>
+            <p>Install, configure, and start proxying — no complex setup required.</p>
+        </div>
+        <div class="terminal-demo__wrapper">
+            <div class="hero-terminal" aria-hidden="true">
+                <div class="hero-terminal__chrome">
+                    <span class="hero-terminal__dot hero-terminal__dot--red"></span>
+                    <span class="hero-terminal__dot hero-terminal__dot--yellow"></span>
+                    <span class="hero-terminal__dot hero-terminal__dot--green"></span>
+                    <span class="hero-terminal__title">terminal</span>
+                </div>
+                <div class="hero-terminal__body" id="hero-terminal-body">
+                    <pre class="hero-terminal__output" id="hero-terminal-output"></pre>
+                </div>
+            </div>
         </div>
     </div>
 </section>
