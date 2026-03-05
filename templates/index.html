@@ -777,6 +777,46 @@
     </div>
 </section>
 
+{% set blog = get_section(path="blog/_index.md") %}
+{% if blog.pages | length > 0 %}
+<section class="latest-blog">
+    <div class="container">
+        <div class="section-header">
+            <h2>Latest from the Blog</h2>
+            <p>Engineering notes from the Zentinel project</p>
+        </div>
+        <div class="latest-blog-grid">
+            {% for page in blog.pages | slice(end=3) %}
+            <a href="{{ page.permalink | safe }}" class="latest-blog-card">
+                {% if page.date %}
+                <time class="latest-blog-card__date" datetime="{{ page.date | date(format='%Y-%m-%d') }}">
+                    {{ page.date | date(format='%B %d, %Y') }}
+                </time>
+                {% endif %}
+                <h3 class="latest-blog-card__title">{{ page.title }}</h3>
+                {% if page.description %}
+                <p class="latest-blog-card__description">{{ page.description }}</p>
+                {% endif %}
+                {% if page.taxonomies.tags %}
+                <div class="latest-blog-card__tags">
+                    {% for tag in page.taxonomies.tags | slice(end=3) %}
+                    <span class="latest-blog-card__tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        <div class="latest-blog-cta">
+            <a href="/blog/" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                View All Posts
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <section class="faq-preview" id="faq">
     <div class="container">
         <div class="section-header">

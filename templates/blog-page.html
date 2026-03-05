@@ -2,6 +2,12 @@
 
 {% block title %}{{ page.title }} | Blog | {{ config.title }}{% endblock %}
 {% block description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block og_title %}{{ page.title }}{% endblock %}
+{% block og_description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block twitter_title %}{{ page.title }}{% endblock %}
+{% block twitter_description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block og_image_alt %}{{ page.title }}{% endblock %}
+{% block twitter_image_alt %}{{ page.title }}{% endblock %}
 
 {% block head %}
 <style>
