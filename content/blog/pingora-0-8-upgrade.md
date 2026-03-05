@@ -225,7 +225,7 @@ Transparency about what we *didn't* integrate from this release:
 
 ---
 
-Zentinel v0.5.12 ships with Pingora 0.8 and all adaptations described above. Grab it:
+Zentinel v0.6.0 ships with Pingora 0.8 and all adaptations described above. Grab it:
 
 ```bash
 # From source
