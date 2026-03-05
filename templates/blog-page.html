@@ -9,7 +9,27 @@
 {% block og_image_alt %}{{ page.title }}{% endblock %}
 {% block twitter_image_alt %}{{ page.title }}{% endblock %}
 
+{% block og_image_tags %}
+{% if page.extra.og_image %}
+<meta property="og:image" content="{{ get_url(path=page.extra.og_image) | safe }}">
+<meta property="og:image:width" content="{{ page.extra.og_image_width | default(value=1200) }}">
+<meta property="og:image:height" content="{{ page.extra.og_image_height | default(value=630) }}">
+{% else %}
+<meta property="og:image" content="{{ get_url(path='img/og-image.png') | safe }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+{% endif %}
+{% endblock og_image_tags %}
+{% block twitter_image_tags %}
+{% if page.extra.og_image %}
+<meta name="twitter:image" content="{{ get_url(path=page.extra.og_image) | safe }}">
+{% else %}
+<meta name="twitter:image" content="{{ get_url(path='img/og-image.png') | safe }}">
+{% endif %}
+{% endblock twitter_image_tags %}
+
 {% block head %}
+<link rel="alternate" type="application/atom+xml" title="Zentinel Blog Feed" href="{{ get_url(path='blog/atom.xml') | safe }}">
 <style>
 .blog-post-header {
     text-align: center;

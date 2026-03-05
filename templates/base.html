@@ -35,9 +35,11 @@
     <meta property="og:url" content="{{ current_url | default(value=config.base_url) | safe }}">
     <meta property="og:title" content="{% block og_title %}{{ config.title }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ config.description }}{% endblock %}">
+    {% block og_image_tags %}
     <meta property="og:image" content="{{ get_url(path='img/og-image.png') | safe }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    {% endblock og_image_tags %}
     <meta property="og:image:alt" content="{% block og_image_alt %}{{ config.title }} - {{ config.description }}{% endblock %}">
     <meta property="og:site_name" content="{{ config.title }}">
     <meta property="og:locale" content="{{ lang | default(value='en') | replace(from='-', to='_') }}">
@@ -48,9 +50,13 @@
     <meta property="article:modified_time" content="{{ page.updated | date(format='%Y-%m-%dT%H:%M:%S') }}+00:00">
     {% endif %}
     {% if page.taxonomies.tags %}
+    <meta property="article:section" content="{{ page.taxonomies.tags[0] }}">
     {% for tag in page.taxonomies.tags %}
     <meta property="article:tag" content="{{ tag }}">
     {% endfor %}
+    {% endif %}
+    {% if config.extra.author %}
+    <meta property="article:author" content="{{ config.extra.author }}">
     {% endif %}
 
     <!-- Twitter Card -->
@@ -58,7 +64,9 @@
     <meta name="twitter:url" content="{{ current_url | default(value=config.base_url) | safe }}">
     <meta name="twitter:title" content="{% block twitter_title %}{{ config.title }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}{{ config.description }}{% endblock %}">
+    {% block twitter_image_tags %}
     <meta name="twitter:image" content="{{ get_url(path='img/og-image.png') | safe }}">
+    {% endblock twitter_image_tags %}
     <meta name="twitter:image:alt" content="{% block twitter_image_alt %}{{ config.title }} - {{ config.description }}{% endblock %}">
     {% if config.extra.twitter_handle %}
     <meta name="twitter:site" content="{{ config.extra.twitter_handle }}">
