@@ -1226,6 +1226,7 @@
         ];
 
         let sceneIndex = 0;
+        const NL = String.fromCharCode(10);
 
         function typeScene(scene, onDone) {
             let lineIndex = 0;
@@ -1272,18 +1273,18 @@
 
                 const line = lines[lineIndex];
                 const plainLen = stripTags(line).length;
-                const prev = lines.slice(0, lineIndex).join('\n');
+                const prev = lines.slice(0, lineIndex).join(NL);
 
                 if (!isCommand(line)) {
                     // Output lines: print instantly
-                    el.innerHTML = (prev ? prev + '\n' : '') + line;
+                    el.innerHTML = (prev ? prev + NL : '') + line;
                     lineIndex++;
                     charIndex = 0;
                     setTimeout(tick, 30);
                 } else if (charIndex <= plainLen) {
                     const partial = getPartialHtml(line, charIndex);
                     const cursor = charIndex < plainLen ? '<span class="hero-terminal__cursor">_</span>' : '';
-                    el.innerHTML = (prev ? prev + '\n' : '') + partial + cursor;
+                    el.innerHTML = (prev ? prev + NL : '') + partial + cursor;
                     charIndex++;
                     const isComment = stripTags(line).startsWith('#');
                     setTimeout(tick, isComment ? 25 : 18);
