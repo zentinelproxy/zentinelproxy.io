@@ -1109,59 +1109,89 @@ body > .nav-dropdown__menu {
     }
 }
 
-// Hero Animation (animated AVIF)
-.hero-animation {
-    height: 100%;
-    width: auto;
-    max-width: none;
-    object-fit: cover;
-    object-position: right center;
-    // Left-side fade using CSS mask - smooth fade starting from center
-    mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        transparent 15%,
-        rgba(0, 0, 0, 0.1) 25%,
-        rgba(0, 0, 0, 0.3) 35%,
-        rgba(0, 0, 0, 0.5) 45%,
-        rgba(0, 0, 0, 0.7) 55%,
-        rgba(0, 0, 0, 0.9) 65%,
-        black 75%,
-        black 100%
-    );
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        transparent 15%,
-        rgba(0, 0, 0, 0.1) 25%,
-        rgba(0, 0, 0, 0.3) 35%,
-        rgba(0, 0, 0, 0.5) 45%,
-        rgba(0, 0, 0, 0.7) 55%,
-        rgba(0, 0, 0, 0.9) 65%,
-        black 75%,
-        black 100%
-    );
+// Hero Terminal
+.hero-terminal {
+    width: 480px;
+    max-width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: #1e1e2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+
+    &__chrome {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 14px;
+        background: #181825;
+    }
+
+    &__dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+
+        &--red { background: #f38ba8; }
+        &--yellow { background: #f9e2af; }
+        &--green { background: #a6e3a1; }
+    }
+
+    &__title {
+        flex: 1;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #6c7086;
+        font-family: var(--font-mono);
+    }
+
+    &__body {
+        padding: 16px;
+        height: 320px;
+        overflow: hidden;
+    }
+
+    &__output {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: #cdd6f4;
+        white-space: pre;
+        overflow: hidden;
+    }
+
+    &__cursor {
+        animation: terminal-blink 0.8s step-end infinite;
+        color: #f5c2e7;
+    }
 
     @media (max-width: 768px) {
-        height: auto;
         width: 100%;
-        max-width: 100%;
-        object-fit: contain;
-        // On mobile, fade from bottom
-        mask-image: linear-gradient(
-            to bottom,
-            black 0%,
-            black 60%,
-            rgba(0, 0, 0, 0.5) 80%,
-            transparent 100%
-        );
-        -webkit-mask-image: linear-gradient(
-            to bottom,
-            black 0%,
-            black 60%,
-            rgba(0, 0, 0, 0.5) 80%,
-            transparent 100%
-        );
+        max-height: 300px;
+
+        &__body {
+            height: 240px;
+        }
+    }
+}
+
+@keyframes terminal-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.hero-visual {
+    // Override for terminal
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+
+    @media (max-width: 768px) {
+        padding: var(--space-md);
     }
 }
 
