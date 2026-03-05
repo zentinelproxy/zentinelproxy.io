@@ -1,5 +1,6 @@
 #!/bin/bash
 # Fake zentinel for demo recording
+# Output matches real zentinel binary (without timestamps for readability)
 case "$1" in
     --version)
         echo "zentinel 0.5.12 (release 26.03_1, commit a1b2c3d)"
