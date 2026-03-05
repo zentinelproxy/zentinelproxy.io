@@ -1153,7 +1153,7 @@ body > .nav-dropdown__menu {
 
 // Hero Terminal
 .hero-terminal {
-    width: 480px;
+    width: 720px;
     max-width: 100%;
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -1189,7 +1189,7 @@ body > .nav-dropdown__menu {
 
     &__body {
         padding: 16px;
-        height: 320px;
+        height: 340px;
         overflow: hidden;
     }
 
@@ -1199,8 +1199,8 @@ body > .nav-dropdown__menu {
         font-size: 0.8125rem;
         line-height: 1.6;
         color: #cdd6f4;
-        white-space: pre;
-        overflow: hidden;
+        white-space: pre-wrap;
+        word-break: break-all;
     }
 
     &__cursor {
