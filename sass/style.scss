@@ -1200,8 +1200,7 @@ body > .nav-dropdown__menu {
         font-size: 0.8125rem;
         line-height: 1.6;
         color: #cdd6f4;
-        white-space: pre-wrap;
-        word-break: break-all;
+        white-space: pre;
     }
 
     &__cursor {
@@ -1215,6 +1214,10 @@ body > .nav-dropdown__menu {
 
         &__body {
             height: 240px;
+        }
+
+        &__output {
+            font-size: 0.625rem;
         }
     }
 }
