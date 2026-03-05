@@ -225,14 +225,14 @@ Transparency about what we *didn't* integrate from this release:
 
 ---
 
-Zentinel v0.6.0 ships with Pingora 0.8 and all adaptations described above. Grab it:
+Zentinel [26.03_2](https://github.com/zentinelproxy/zentinel/releases/tag/26.03_2) (cargo v0.6.1) ships with Pingora 0.8 and all adaptations described above. Grab it:
 
 ```bash
 # From source
 cargo install zentinel-proxy
 
 # Container
-docker pull ghcr.io/zentinelproxy/zentinel:26.03_1
+docker pull ghcr.io/zentinelproxy/zentinel:26.03_2
 
 # Binary
 curl -fsSL https://get.zentinelproxy.io | sh
