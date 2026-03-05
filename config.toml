@@ -63,10 +63,6 @@ discord = "https://discord.gg/jN57RsT2"
 
 # Navigation (supports dropdowns via children array)
 [[extra.nav_links]]
-name = "Features"
-url = "/features/"
-
-[[extra.nav_links]]
 name = "Get Started"
 [[extra.nav_links.children]]
 name = "Install & Configure"
@@ -78,6 +74,10 @@ external = true
 [[extra.nav_links.children]]
 name = "Playground"
 url = "/playground/"
+
+[[extra.nav_links]]
+name = "Features"
+url = "/features/"
 
 [[extra.nav_links]]
 name = "Explore"
