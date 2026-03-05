@@ -25,12 +25,19 @@
 }
 
 .blog-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-xl);
-    max-width: 720px;
+    max-width: 1100px;
     margin: var(--space-2xl) auto;
     padding: 0 var(--space-lg);
+}
+
+@media (max-width: 768px) {
+    .blog-list {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+    }
 }
 
 .blog-card {
