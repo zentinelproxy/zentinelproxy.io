@@ -737,6 +737,7 @@ body > .nav-dropdown__menu {
     position: relative;
     z-index: 10;
     min-height: 600px;
+    overflow: visible;
 
     .container {
         position: static;
@@ -1048,7 +1049,7 @@ body > .nav-dropdown__menu {
     position: absolute;
     top: 0;
     right: 0;
-    bottom: 0;
+    bottom: -80px;
     width: 55%;
     display: flex;
     align-items: center;
@@ -1434,8 +1435,12 @@ body > .nav-dropdown__menu {
 // Stats Bar
 // ============================================
 .stats-bar {
+    position: relative;
+    z-index: 11;
     padding: var(--space-xl) 0;
-    background: var(--color-bg-subtle);
+    background: color-mix(in srgb, var(--color-bg-subtle) 70%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid var(--color-border-subtle);
     border-bottom: 1px solid var(--color-border-subtle);
 }
