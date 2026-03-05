@@ -1410,6 +1410,17 @@ body > .nav-dropdown__menu {
         color: var(--color-text-muted);
         font-weight: 500;
     }
+
+    &--link {
+        text-decoration: none;
+        color: inherit;
+        border-radius: var(--radius-md);
+        transition: background 0.15s ease;
+
+        &:hover {
+            background: var(--color-bg-elevated);
+        }
+    }
 }
 
 // ============================================
