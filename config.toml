@@ -51,7 +51,7 @@ author = "raskell.io"
 github_repo = "https://github.com/zentinelproxy/zentinel"
 docs_url = "https://docs.zentinelproxy.io/"
 docs_external_url = "https://docs.zentinelproxy.io/"
-software_version = "26.02"
+software_version = "26.03_2"
 
 # SEO metadata
 keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, sleepable ops, agents"
@@ -63,10 +63,18 @@ discord = "https://discord.gg/jN57RsT2"
 
 # Navigation (supports dropdowns via children array)
 [[extra.nav_links]]
+name = "Features"
+url = "/features/"
+
+[[extra.nav_links]]
 name = "Get Started"
 [[extra.nav_links.children]]
-name = "Install"
+name = "Install & Configure"
 url = "/customize/"
+[[extra.nav_links.children]]
+name = "Documentation"
+url = "https://docs.zentinelproxy.io/"
+external = true
 [[extra.nav_links.children]]
 name = "Playground"
 url = "/playground/"
@@ -74,13 +82,10 @@ url = "/playground/"
 [[extra.nav_links]]
 name = "Explore"
 [[extra.nav_links.children]]
-name = "Features"
-url = "/features/"
-[[extra.nav_links.children]]
 name = "Benchmarks"
 url = "/benchmarks/"
 [[extra.nav_links.children]]
-name = "Agents"
+name = "Agent Registry"
 url = "https://registry.zentinelproxy.io/"
 external = true
 [[extra.nav_links.children]]

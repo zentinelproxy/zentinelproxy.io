@@ -3,7 +3,7 @@
 # Output matches real zentinel binary (without timestamps for readability)
 case "$1" in
     --version)
-        echo "zentinel 0.5.12 (release 26.03_1, commit a1b2c3d)"
+        echo "zentinel 0.6.1 (release 26.03_2, commit 5c23fe7)"
         ;;
     test)
         echo " INFO Testing configuration file: zentinel.kdl"
