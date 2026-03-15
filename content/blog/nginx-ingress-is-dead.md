@@ -2,6 +2,7 @@
 title = "NGINX Ingress Is Dead. Here's What to Do Next."
 description = "NGINX Ingress Controller maintenance halted in March 2026, with no more releases or security patches. We built a Gateway API controller for Zentinel. Here's the migration story."
 date = 2026-03-14
+updated = 2026-03-15
 [taxonomies]
 tags = ["gateway-api", "kubernetes", "nginx", "migration", "ingress"]
 +++
@@ -73,11 +74,13 @@ Here's what it handles:
 | Resource | What it does |
 |----------|-------------|
 | GatewayClass | Claims `zentinelproxy.io/gateway-controller`, sets status conditions |
-| Gateway | Translates listeners, resolves TLS certificates from K8s Secrets |
-| HTTPRoute | Path, header, method, query param matching. Header modification filters. Weighted traffic splitting. |
+| Gateway | Translates listeners, resolves TLS certificates from K8s Secrets, validates PEM content |
+| HTTPRoute | Path, header, method, query param matching. RequestRedirect, URLRewrite, and header modification filters. Weighted traffic splitting. Backend existence and cross-namespace validation. |
 | GRPCRoute | Service/method matching, forces HTTP/2, gRPC health checks |
 | TLSRoute | SNI-based passthrough routing |
+| TCPRoute | Raw TCP proxying |
 | ReferenceGrant | Cross-namespace reference validation |
+| BackendTLSPolicy | Upstream mTLS configuration |
 | Ingress (compat) | Legacy Ingress resources with `ingressClassName: zentinel` |
 
 The translation layer is where the interesting work happens. When you create an HTTPRoute, the controller reads the matches, filters, and backend refs, then builds the equivalent Zentinel `RouteConfig` and `UpstreamConfig` objects. It resolves Kubernetes service names to DNS entries (`my-service.my-namespace.svc.cluster.local`), sets up health checks appropriate to the protocol (HTTP for web backends, gRPC health protocol for gRPC services, plain TCP for TLS passthrough), and assigns weights for traffic splitting. The translated config is pushed into the proxy through an atomic swap, so there's no moment where the proxy is running with a half-applied configuration.
@@ -85,6 +88,14 @@ The translation layer is where the interesting work happens. When you create an 
 For TLS, the controller watches `kubernetes.io/tls` Secrets referenced by Gateway listeners. When it finds one, it extracts the certificate and private key, writes them to disk with 0600 permissions, and configures the listener to use them. If the Secret changes (say, cert-manager renews a certificate), the controller picks up the change and refreshes the files automatically. We also support multiple certificates per listener for SNI-based certificate selection.
 
 On the operational side, the controller supports Lease-based leader election for running multiple replicas safely, and exposes Prometheus metrics for monitoring reconciliation latency, error rates, and the number of active resources.
+
+We also built three custom policy CRDs that attach Zentinel-specific features to Gateway API resources through the [policy attachment model](https://gateway-api.sigs.k8s.io/reference/policy-attachment/):
+
+- **ZentinelRateLimitPolicy** attaches rate limiting to an HTTPRoute or Gateway, with configurable keys (client IP, header, global), burst, and custom status codes
+- **ZentinelWAFPolicy** attaches WAF inspection to a route, with detect or block mode, ruleset selection, and per-rule exclusions
+- **ZentinelAgentBinding** attaches any Zentinel agent to a route, with failure mode, timeout, and phase configuration
+
+These are `v1alpha1` CRDs under the `policy.zentinelproxy.io` group. They're optional, the controller works fine without them, but they're how you get Zentinel's agent-based features into a Gateway API workflow without inventing custom annotations.
 
 ## Migrating, step by step
 
@@ -199,26 +210,40 @@ The guide has before/after YAML for each pattern.
 
 The one area where there isn't a clean 1:1 mapping is the snippet annotations. If you were using `server-snippet` to add custom NGINX directives, there's no Gateway API equivalent because the whole point of the Gateway API is to not have that escape hatch. In Zentinel, the answer is agents. If you need to add custom headers based on request content, validate JWTs, call an external authorization service, or run any kind of request-time logic, you write a small agent that implements the behavior you need. It's more work than pasting a snippet into an annotation, but it's also the kind of work that doesn't produce CVEs.
 
-## What's not done yet
+## Conformance status
 
-We want to be upfront about where this stands. The controller handles the core Gateway API conformance profile and we're confident in the translation layer. But there are things we haven't built yet:
+We've been running the official Gateway API conformance test suite against the controller. As of the latest run, the Gateway HTTP conformance profile breaks down like this:
 
-- **RequestRedirect and URLRewrite filters** are not translated yet
-- **The official Gateway API conformance test suite** (which is Go-based) hasn't been run against this controller. We have integration test scaffolding and the conformance test runner documented, but passing the full suite is still ahead of us.
-- **BackendTLSPolicy** for upstream mTLS
-- **Custom policy CRDs** for attaching Zentinel-specific features (WAF, rate limiting, agents) to Gateway API resources through the Gateway API's policy attachment model
+- All **Gateway-level tests pass**: GatewayClass acceptance, listener status conditions, TLS certificate validation (including malformed secrets and missing ReferenceGrants), attached route counting, listener modification
+- All **HTTPRoute status condition tests pass**: backend validation (unknown kinds, nonexistent services, cross-namespace permission), parent ref validation (sectionName matching, cross-namespace rejection, hostname intersection), generation tracking
+- **HTTPRoute traffic routing tests** are still in progress. The controller correctly translates routes and writes config, but the proxy-side integration for actually forwarding requests to the conformance test backends needs more work
 
-We'll get to these. We wanted to ship the core functionality now because people need a migration path today, not in six months.
+We've [submitted our conformance report](https://github.com/kubernetes-sigs/gateway-api/pull/4687) to the upstream Gateway API project. It's honest about what passes and what doesn't. We'll keep updating it as the traffic routing tests come online.
+
+## What's still ahead
+
+The controller covers the full Gateway API surface area: GatewayClass, Gateway, HTTPRoute, GRPCRoute, TLSRoute, TCPRoute, ReferenceGrant, BackendTLSPolicy, and the Ingress compatibility shim. RequestRedirect and URLRewrite filters are translated. Custom policy CRDs are defined.
+
+The remaining work is on the proxy side: making the Zentinel proxy correctly read and act on the config that the controller generates, so that HTTP requests actually reach the backends. This is config-writer-to-KDL-parser alignment work, not missing features in the controller itself.
 
 ## Trying it out
 
-The Helm chart is the fastest way:
+The Helm chart deploys both the controller and a Zentinel proxy sidecar in a two-container pod. The controller watches Gateway API resources and writes translated config to a shared volume. The proxy reads it with auto-reload enabled.
 
 ```bash
 helm install zentinel-gateway oci://ghcr.io/zentinelproxy/charts/zentinel-gateway \
   --namespace zentinel-system --create-namespace
 ```
 
-If you hit issues, the [migration guide](https://github.com/zentinelproxy/zentinel/blob/main/crates/gateway/docs/migration-from-nginx-ingress.md) has more detail, and the [PR](https://github.com/zentinelproxy/zentinel/pull/141) has the full implementation if you want to read the code. The controller is about 5,000 lines of Rust across the reconcilers, translator, leader election, metrics, and TLS handling. It's not a small project, but it's also not doing anything magical. Most of the complexity is in correctly mapping Gateway API semantics to Zentinel's config model, and in handling all the edge cases around cross-namespace references, status condition updates, and graceful certificate rotation.
+The chart sets up RBAC for all Gateway API resources, creates the `zentinel` GatewayClass, exposes Prometheus metrics, and runs a LoadBalancer Service for proxy traffic on ports 80 and 443. If you're running in a test environment without a load balancer (like kind), you can use NodePort instead:
+
+```bash
+helm install zentinel-gateway oci://ghcr.io/zentinelproxy/charts/zentinel-gateway \
+  --namespace zentinel-system --create-namespace \
+  --set proxy.serviceType=NodePort \
+  --set proxy.httpNodePort=30080
+```
+
+If you hit issues, the [migration guide](https://github.com/zentinelproxy/zentinel/blob/main/crates/gateway/docs/migration-from-nginx-ingress.md) has more detail. The [conformance test script](https://github.com/zentinelproxy/zentinel/blob/main/scripts/conformance-test.sh) shows exactly how to set up a kind cluster and run the full suite. And the controller source is about 10,000 lines of Rust across the reconcilers, translator, policy CRDs, config writer, leader election, metrics, and TLS handling. It's not a small project, but the code is straightforward. Most of the complexity is in correctly mapping Gateway API semantics to Zentinel's config model, and in handling the edge cases around cross-namespace references, status conditions, and certificate rotation.
 
 We'd genuinely appreciate feedback, especially from people migrating real NGINX Ingress setups. What annotations are you using that we haven't mapped? What broke? What did we get wrong? Open an [issue](https://github.com/zentinelproxy/zentinel/issues) and tell us.
