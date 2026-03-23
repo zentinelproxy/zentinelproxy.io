@@ -157,7 +157,7 @@ Core operations like rate limiting and geo filtering are sub-100μs, meaning the
 
 ## WAF Engine Benchmarks (zentinel-modsec)
 
-Pure Rust ModSecurity implementation with full OWASP CRS compatibility. Benchmarks run on macOS ARM64 using Criterion.
+Pure Rust ModSecurity implementation with full OWASP CRS compatibility ([v0.1.2](https://github.com/zentinelproxy/zentinel-modsec/releases/tag/v0.1.2)). Benchmarks run on macOS ARM64 using Criterion.
 
 ### Throughput
 
