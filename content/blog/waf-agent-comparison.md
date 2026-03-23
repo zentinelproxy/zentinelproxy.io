@@ -95,7 +95,7 @@ Zentinel's [agent architecture](/agents/) allows WAF logic to run as an external
 
 **zentinel-waf** — A purpose-built Rust WAF agent with hand-tuned pattern matchers for SQLi, XSS, path traversal, command injection, and protocol violations. No ModSecurity rule language, no regex compilation at startup. Detections are compiled directly into the binary. Communicates via UDS.
 
-**zentinel-zentinelsec** — A pure Rust ModSecurity rule engine ([zentinel-modsec](https://github.com/zentinelproxy/zentinel-modsec)). Parses and evaluates ModSecurity `SecRule` directives including `@detectSQLi`, `@detectXSS`, `@contains`, and `@rx` operators. No C dependencies. Communicates via gRPC.
+**zentinel-zentinelsec** — A pure Rust ModSecurity rule engine ([zentinel-modsec v0.1.2](https://github.com/zentinelproxy/zentinel-modsec)). Parses and evaluates ModSecurity `SecRule` directives including `@detectSQLi`, `@detectXSS`, `@contains`, and `@rx` operators. No C dependencies. Communicates via gRPC.
 
 **zentinel-modsec** — A wrapper around [libmodsecurity](https://github.com/owasp-modsecurity/ModSecurity) (the C library behind ModSecurity v3). Full compatibility with OWASP CRS v4, including the libinjection-based operators. Communicates via UDS.
 
