@@ -6,11 +6,11 @@ case "$1" in
   install)
     echo ""
     echo "  ╭─────────────────────────────────────╮"
-    echo "  │       Zentinel Installer v0.6.1      │"
+    echo "  │       Zentinel Installer v0.6.4      │"
     echo "  ╰─────────────────────────────────────╯"
     echo ""
     echo "  ✓ Detected platform: aarch64-apple-darwin"
-    echo "  ✓ Downloading zentinel v0.6.1..."
+    echo "  ✓ Downloading zentinel v0.6.4..."
     echo "  ✓ Verifying signature (cosign)..."
     echo "  ✓ Installed to /usr/local/bin/zentinel"
     echo ""
@@ -18,14 +18,14 @@ case "$1" in
     echo ""
     ;;
   version)
-    echo "zentinel 0.6.1 (release 26.03_2, commit 5c23fe7)"
+    echo "zentinel 0.6.4 (release 26.04_1, commit 205ed55)"
     ;;
   validate)
     echo "  INFO Testing configuration file: zentinel.kdl"
     echo "  INFO Configuration is valid ✓"
     ;;
   start)
-    echo "  INFO Zentinel v0.6.1 starting"
+    echo "  INFO Zentinel v0.6.4 starting"
     echo "  INFO Listener http bound to 0.0.0.0:8080"
     echo "  INFO Upstream backend -> 127.0.0.1:3000 (round_robin)"
     echo "  INFO Metrics available at 0.0.0.0:9090/metrics"
