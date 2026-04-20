@@ -167,6 +167,29 @@
 
                 <div class="feature-item">
                     <div class="feature-header">
+                        <h3>Automatic Certificates (ACME)</h3>
+                        <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/proxy/src/acme/" class="source-link" target="_blank" rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            acme/
+                        </a>
+                    </div>
+                    <p class="feature-description">Automatic TLS certificate provisioning and renewal via the ACME protocol (RFC 8555). Zero-touch certificate lifecycle management.</p>
+                    <ul class="feature-list">
+                        <li><strong>HTTP-01 and DNS-01 challenges</strong> - Including wildcard certificates</li>
+                        <li><strong>Multiple DNS providers</strong> - Cloudflare, Hetzner, generic webhook</li>
+                        <li><strong>Custom ACME servers</strong> - Let's Encrypt, ZeroSSL, Step-ca, any ACME CA</li>
+                        <li><strong>External Account Binding (EAB)</strong> - For CAs that require it</li>
+                        <li><strong>Configurable key types</strong> - ECDSA P-256 or P-384</li>
+                        <li>Automatic renewal with hot-reload</li>
+                    </ul>
+                    <div class="feature-code-ref">
+                        <strong>Modules:</strong> <code>AcmeClient</code>, <code>RenewalScheduler</code>, <code>CertificateStorage</code>
+                        <br><a href="https://docs.zentinelproxy.io/configuration/listeners/#acme-automatic-certificate-management" style="font-size: 0.9em;">View configuration guide &rarr;</a>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
                         <h3>mTLS to Upstreams</h3>
                         <a href="https://github.com/zentinelproxy/zentinel/blob/main/crates/proxy/src/upstream/mod.rs" class="source-link" target="_blank" rel="noopener">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
