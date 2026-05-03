@@ -351,6 +351,9 @@ curl -fsSL https://get.zentinelproxy.io | sh
 
 # Select agents above to include them in the installation</code></pre>
                 </div>
+                <p class="section-description" style="margin-top: var(--space-md);">
+                    On Linux with systemd, the installer also drops a unit at <code>/etc/systemd/system/zentinel.service</code>, a sysusers snippet, and a starter config at <code>/etc/zentinel/zentinel.kdl</code>. Pass <code>-s -- --enable-service</code> to enable and start the service in one step. See the <a href="https://docs.zentinelproxy.io/getting-started/installation/">installation docs</a> for details.
+                </p>
             </div>
 
             <!-- Example Configuration -->
