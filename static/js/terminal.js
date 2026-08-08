@@ -40,7 +40,7 @@
         {
             lines: [
                 c(text, '$ ') + 'zentinel --version',
-                'zentinel 0.6.4 (release 26.04_1, commit 205ed55)',
+                'zentinel 0.6.24 (release 26.08_1, commit 4736285)',
             ],
             pause: 1800
         },
