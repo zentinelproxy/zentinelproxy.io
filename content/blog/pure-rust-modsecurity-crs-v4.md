@@ -70,3 +70,36 @@ We load 666 of roughly 688 rules in the v4.7 bundle. A handful of directives and
 All of this shipped in **zentinel-modsec 0.1.3**. If you ran an earlier version against CRS v4 and concluded it was unusable, you were right, and it isn't anymore.
 
 The natural next step is to put it back under [wafworth](https://github.com/zentinelproxy/wafworth), our open-source WAF test harness, and measure detection and false-positive rates with the full rule set live rather than the reduced baseline. That's a separate post with real confusion matrices — and this time the rules will actually be running.
+
+## Postscript: one of these fixes had a second layer
+
+Two months after this was written, a CRS compatibility review turned up
+something uncomfortable. Look again at fix five above — "register
+`MULTIPART_PART_HEADERS`."
+
+That fixed the *loading* failure. `REQUEST-922-MULTIPART-ATTACK.conf` stopped
+being rejected, the rules compiled, the bundle loaded. What it did not do was
+populate the collection. Nothing ever wrote to it, so every multipart rule in
+CRS evaluated against an empty variable and matched nothing, quietly, on every
+request.
+
+Which is this post's thesis one level further down. We fixed a variable that
+parsed but did not run, by making it parse — and stopped there. A loaded
+ruleset and a rule counter both looked healthy, exactly as before.
+
+The collection is now populated from the multipart parser, keyed by part name,
+in [zentinel-modsec #17](https://github.com/zentinelproxy/zentinel-modsec/pull/17).
+Part *content* is deliberately excluded, with a test to keep it that way: an
+uploaded text file containing a line like `Content-Type: application/x-httpd-php`
+should not trip a multipart rule.
+
+The same review found chained rules firing their disruptive action on a partial
+match — a chain starter blocking before the rest of the chain was evaluated —
+which is its own false-positive story, fixed in
+[#18](https://github.com/zentinelproxy/zentinel-modsec/pull/18).
+
+If there is a lesson beyond the obvious one, it is that "the rules load now" and
+"the rules run now" need separate evidence, and that the second is much easier
+to assume than to check. The benchmark we were quoting at the time turned out to
+have the same problem, but that is
+[a different story](https://github.com/zentinelproxy/zentinel-modsec/issues/15).
