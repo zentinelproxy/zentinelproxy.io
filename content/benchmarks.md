@@ -157,23 +157,35 @@ Core operations like rate limiting and geo filtering are sub-100μs, meaning the
 
 ## WAF Engine Benchmarks (zentinel-modsec)
 
-Pure Rust ModSecurity implementation with full OWASP CRS compatibility ([v0.1.2](https://github.com/zentinelproxy/zentinel-modsec/releases/tag/v0.1.2)). Benchmarks run on macOS ARM64 using Criterion.
+Pure Rust ModSecurity implementation with full OWASP CRS compatibility ([v0.1.4](https://github.com/zentinelproxy/zentinel-modsec/releases/tag/v0.1.4)). Benchmarks run on macOS ARM64 using Criterion.
+
+<div class="highlight-box" style="background: var(--color-surface); border-left: 4px solid var(--color-warning, #b8860b); padding: var(--space-md); margin: var(--space-lg) 0;">
+    <strong>These figures were revised downward in August 2026.</strong> The previous
+    transaction and throughput numbers came from a benchmark whose measured section never
+    executed the detection rules — the rule under test was <code>phase:2</code>, but the
+    benchmark stopped after phase 1, and the attack payloads did not match its pattern.
+    libmodsecurity was doing real work in the same comparison, so every ratio was inflated.
+    Reported as <a href="https://github.com/zentinelproxy/zentinel-modsec/issues/15">zentinel-modsec#15</a>
+    and corrected in <a href="https://github.com/zentinelproxy/zentinel-modsec/pull/16">#16</a>,
+    which also added assertions so an empty hot path now fails the benchmark. Operator,
+    transformation and rule-parsing figures were unaffected.
+</div>
 
 ### Throughput
 
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-value">912K</div>
+        <div class="stat-value">406K</div>
         <div class="stat-label">Requests/sec</div>
         <div class="stat-detail">Clean traffic</div>
     </div>
     <div class="stat-card">
-        <div class="stat-value">869K</div>
+        <div class="stat-value">501K</div>
         <div class="stat-label">Requests/sec</div>
         <div class="stat-detail">Attack traffic</div>
     </div>
     <div class="stat-card">
-        <div class="stat-value">1.03μs</div>
+        <div class="stat-value">2.35μs</div>
         <div class="stat-label">Per Request</div>
         <div class="stat-detail">Transaction processing</div>
     </div>
@@ -181,9 +193,9 @@ Pure Rust ModSecurity implementation with full OWASP CRS compatibility ([v0.1.2]
 
 | Traffic Type | Time/Request | Throughput |
 |--------------|--------------|------------|
-| Clean traffic | 1.10 µs | **912K req/s** |
-| Attack traffic | 1.15 µs | **869K req/s** |
-| Mixed (80/20) | 1.07 µs | **935K req/s** |
+| Clean traffic | 2.46 µs | **406K req/s** |
+| Attack traffic | 2.00 µs | **501K req/s** |
+| Mixed (80/20) | 2.35 µs | **426K req/s** |
 
 ### Detection Operators
 
@@ -248,7 +260,7 @@ Optimized with lazy regex compilation for fast rule loading.
 | Chain rule | 2.45 µs |
 | Complex rule (transforms) | **2.75 µs** |
 
-Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
+Rule parsing is now **4.0x faster** than libmodsecurity for complex rules.
 
 ### Transformations
 
@@ -281,30 +293,30 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
 ### Rust vs C++: zentinel-modsec vs libmodsecurity
 
 <div class="highlight-box" style="background: linear-gradient(135deg, var(--color-success-bg) 0%, var(--color-primary-bg) 100%); border: 2px solid var(--color-success); border-radius: 8px; padding: var(--space-lg); margin: var(--space-lg) 0;">
-    <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: var(--space-sm);">Pure Rust outperforms C++ by 10-30x</div>
-    <div style="color: var(--color-text-muted);">Direct benchmark comparison against libmodsecurity 3.0.14, the reference C++ ModSecurity implementation used by nginx and Apache.</div>
+    <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: var(--space-sm);">Pure Rust outperforms C++ by 4-13x</div>
+    <div style="color: var(--color-text-muted);">Direct benchmark comparison against libmodsecurity 3.0.16, the reference C++ ModSecurity implementation used by nginx and Apache.</div>
 </div>
 
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-value stat-value--success">30x</div>
+        <div class="stat-value stat-value--success">4.4x</div>
         <div class="stat-label">Faster</div>
         <div class="stat-detail">Clean requests</div>
     </div>
     <div class="stat-card">
-        <div class="stat-value stat-value--success">18x</div>
+        <div class="stat-value stat-value--success">12.9x</div>
         <div class="stat-label">Faster</div>
         <div class="stat-detail">Attack detection</div>
     </div>
     <div class="stat-card">
-        <div class="stat-value stat-value--success">10x</div>
+        <div class="stat-value stat-value--success">9.4x</div>
         <div class="stat-label">Faster</div>
         <div class="stat-detail">Body processing</div>
     </div>
     <div class="stat-card">
-        <div class="stat-value stat-value--success">6.2M</div>
+        <div class="stat-value stat-value--success">797K</div>
         <div class="stat-label">Requests/sec</div>
-        <div class="stat-detail">vs 207K for libmodsec</div>
+        <div class="stat-detail">vs 177K for libmodsec</div>
     </div>
 </div>
 
@@ -314,53 +326,53 @@ Rule parsing is now **3.6x faster** than libmodsecurity for complex rules.
         <div class="bar-item">
             <span class="bar-label">zentinel (clean)</span>
             <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 3.3%;"></div>
+                <div class="bar-fill bar-fill--success" style="width: 8.1%;"></div>
             </div>
-            <span class="bar-value">161 ns</span>
+            <span class="bar-value">1.20 µs</span>
         </div>
         <div class="bar-item">
             <span class="bar-label">libmodsec (clean)</span>
             <div class="bar-track">
-                <div class="bar-fill bar-fill--secondary" style="width: 100%;"></div>
+                <div class="bar-fill bar-fill--secondary" style="width: 35.6%;"></div>
             </div>
-            <span class="bar-value">4,831 ns</span>
+            <span class="bar-value">5.31 µs</span>
         </div>
         <div class="bar-item">
             <span class="bar-label">zentinel (SQLi)</span>
             <div class="bar-track">
-                <div class="bar-fill bar-fill--success" style="width: 5.3%;"></div>
+                <div class="bar-fill bar-fill--success" style="width: 7.7%;"></div>
             </div>
-            <span class="bar-value">295 ns</span>
+            <span class="bar-value">1.15 µs</span>
         </div>
         <div class="bar-item">
             <span class="bar-label">libmodsec (SQLi)</span>
             <div class="bar-track">
                 <div class="bar-fill bar-fill--secondary" style="width: 100%;"></div>
             </div>
-            <span class="bar-value">5,545 ns</span>
+            <span class="bar-value">14.90 µs</span>
         </div>
     </div>
 </div>
 
 | Benchmark | zentinel-modsec | libmodsecurity | Speedup |
 |-----------|-----------------|----------------|---------|
-| **Clean request** | 161 ns | 4,831 ns | **30x faster** |
-| **SQLi attack request** | 295 ns | 5,545 ns | **18.8x faster** |
-| **POST body with SQLi** | 1.24 µs | 12.93 µs | **10.4x faster** |
-| **Clean traffic throughput** | 203 ns | 4,937 ns | **24.3x faster** |
-| **Attack traffic throughput** | 316 ns | 5,678 ns | **18x faster** |
+| **Clean request** | 1.20 µs | 5.31 µs | **4.4x faster** |
+| **SQLi attack request** | 1.15 µs | 14.90 µs | **12.9x faster** |
+| **POST body with SQLi** | 1.29 µs | 12.11 µs | **9.4x faster** |
+| **Clean traffic throughput** | 1.26 µs | 5.67 µs | **4.5x faster** |
+| **Attack traffic throughput** | 1.19 µs | 15.17 µs | **12.7x faster** |
 
 | Metric | zentinel-modsec | libmodsecurity |
 |--------|-----------------|----------------|
-| **Clean request throughput** | 6.2M req/s | 207K req/s |
-| **Attack detection throughput** | 3.2M req/s | 176K req/s |
+| **Clean request throughput** | 797K req/s | 177K req/s |
+| **Attack detection throughput** | 840K req/s | 66K req/s |
 
 #### Rule Parsing Comparison
 
 | Rule Type | zentinel-modsec | libmodsecurity | Speedup |
 |-----------|-----------------|----------------|---------|
-| **Simple rule** | 1.21 µs | 3.28 µs | **2.7x faster** |
-| **Complex rule** | 2.75 µs | 10.07 µs | **3.6x faster** |
+| **Simple rule** | 1.19 µs | 3.51 µs | **2.9x faster** |
+| **Complex rule** | 2.58 µs | 10.20 µs | **4.0x faster** |
 
 <div class="highlight-box" style="background: var(--color-surface); border-left: 4px solid var(--color-success); padding: var(--space-md); margin: var(--space-lg) 0;">
 <strong>Why is the Rust implementation faster?</strong>
