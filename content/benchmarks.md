@@ -164,7 +164,9 @@ Pure Rust ModSecurity implementation with full OWASP CRS compatibility ([v0.1.4]
     transaction and throughput numbers came from a benchmark whose measured section never
     executed the detection rules — the rule under test was <code>phase:2</code>, but the
     benchmark stopped after phase 1, and the attack payloads did not match its pattern.
-    libmodsecurity was doing real work in the same comparison, so every ratio was inflated.
+    That was true of <em>both</em> engines, so the comparison measured transaction setup
+    overhead rather than rule evaluation, and reported it as throughput. Body-processing
+    and rule-parsing figures were unaffected — those always ran the rule.
     Reported as <a href="https://github.com/zentinelproxy/zentinel-modsec/issues/15">zentinel-modsec#15</a>
     and corrected in <a href="https://github.com/zentinelproxy/zentinel-modsec/pull/16">#16</a>,
     which also added assertions so an empty hot path now fails the benchmark. Operator,
