@@ -59,7 +59,10 @@ keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, 
 
 # Social links
 github = "https://github.com/zentinelproxy/zentinel"
-discord = "https://discord.gg/jN57RsT2"
+# discord = ""  # The previous invite (jN57RsT2) expired — Discord returns
+# "Unknown Invite" (code 10006). Every template guards on this key, so the
+# Discord links are simply hidden while it is unset. Restore by setting a
+# permanent invite (Server Settings -> Invites -> expiry Never).
 
 # Navigation (supports dropdowns via children array)
 [[extra.nav_links]]
