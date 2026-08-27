@@ -2,9 +2,12 @@
 title = "Header Says Read, Body Says Delete"
 description = "MCP's Streamable HTTP transport mirrors the tool name into an HTTP header so that gateways can route without parsing the body. Read that header and enforce policy on it, and you have built an allowlist that allows everything. Here's the desync, the version-downgrade that defeats the obvious fix, and what Zentinel does instead."
 date = 2026-08-23
+updated = 2026-08-25
 [taxonomies]
 tags = ["mcp", "security", "agentic", "proxy", "engineering"]
 +++
+
+> **Correction — 25 August 2026.** When this was published, the enforcement described below **did not run**. The configuration parsed and the policy engine was correct; nothing in the request path ever called it. It was fixed in Zentinel 0.6.28, released the next day. The original text is left intact; the full account is [at the end](#the-correction).
 
 A protocol that tells intermediaries "you can trust this header instead of reading the body" is doing something genuinely useful and quietly dangerous. Useful, because parsing a JSON body on every request to make a routing decision is real cost a gateway would rather not pay. Dangerous, because the moment there are two sources of truth for what a request does, an attacker gets to pick which one you read.
 
@@ -173,3 +176,49 @@ Zentinel now understands MCP and A2A natively — method and tool policy, resolv
 None of this makes MCP a bad protocol. The specification documented its own hazard and warned intermediaries about it, which is more than most protocols manage. But a `SHOULD` in a specification is a prediction about implementer behaviour, and this one predicts that some gateways will read the header, trust it, and call it a security control.
 
 If you operate one, the question worth asking is not whether it parses MCP. It is which field it believes when they disagree.
+
+---
+
+## The correction
+
+This was published on 23 August 2026, alongside Zentinel 0.6.27. The section above says Zentinel "now understands MCP and A2A natively", with policy resolved from the body and header agreement enforced rather than assumed.
+
+That was not true when we wrote it.
+
+The KDL parsed. It validated. It rejected unknown keys with a helpful message. The evaluator existed, and as far as we can tell it was correct. **Nothing in the request path ever called it.** A route declaring
+
+```kdl
+mcp {
+    tools { allow "get_weather" }
+}
+```
+
+permitted every tool there is — an allowlist that allows everything, which is the thing this post is about, arrived at from the other direction.
+
+It was found two days later, when someone asked how good the support actually was and the honest way to answer was to go read the call sites. There were none. `RouteConfig::mcp` and `RouteConfig::a2a` were populated by the config layer and consumed by no one. Fixed in 0.6.28.
+
+### The part that stings
+
+The section immediately above this one is about tests that pass against implementations that do nothing. It closes by saying: *"Seventy-three tests, every configuration setting asserted against a value that differs from its default."*
+
+Every one of those seventy-three built a policy object by hand and called `evaluate()` on it. Every one passed. Not one of them could have failed, because the evaluator was never what was broken — production simply never reached it.
+
+**A test that constructs the object under test cannot notice that nothing constructs it in production.**
+
+That is the same defect this post catalogues in `accepts_valid_auth_token`, which asserted a control existed but never that it worked. We described the shape, in detail, in a post announcing a feature that had it.
+
+For what it is worth, it is a common shape rather than an exotic one. In the same codebase, in the same month: a lint rule keyed on a struct field no configuration could set, whose tests set the field directly. A traffic simulator modelling a per-route circuit breaker the proxy has never had, whose test built the breaker by hand instead of from config. Each passed for months.
+
+### What changed
+
+Policy is now a function of the route configuration rather than of an already-built policy object, and the tests start from KDL and end at a decision — parse, convert, evaluate — because the gap was between configuration and enforcement, so that is the boundary worth crossing in a test.
+
+One gap remains, and we would rather name it than let you assume otherwise: nothing automatically proves the request path still calls the policy engine. We expected Rust's dead-code lint to catch the call being deleted, so we tried it. It does not fire. Closing that properly needs a test issuing a real request through a running proxy, which we do not have a harness for yet.
+
+### What to take from this
+
+The advice in this post is unchanged, and the last two days argue for it more strongly rather than less. Asking a gateway which field it believes when the header and the body disagree is the right question.
+
+It is just not a sufficient one, because a gateway can believe entirely the right field in a module that never runs.
+
+So there is a question underneath it, and it generalises past MCP to any security control you rely on: **what would fail if this were switched off?** If the honest answer is "nothing you would notice", then it is worth finding that out on purpose — by turning it off, or by sending the request it is supposed to refuse — rather than two releases later, when someone asks.
