@@ -15,7 +15,7 @@ Zentinel has supported that split for a long time through the `include` directiv
 The directive takes a glob pattern:
 
 ```kdl
-# zentinel.kdl
+// zentinel.kdl
 schema-version "1.0"
 
 system {
@@ -49,7 +49,7 @@ Because includes were inlined and *then* parsed, two files that each declared a 
 So this looked completely reasonable:
 
 ```kdl
-# vhosts/api.kdl
+// vhosts/api.kdl
 upstreams {
     upstream "api-backend" { target "127.0.0.1:3000" }
 }
@@ -62,7 +62,7 @@ routes {
 ```
 
 ```kdl
-# vhosts/web.kdl
+// vhosts/web.kdl
 upstreams {
     upstream "web-backend" { target "127.0.0.1:3001" }
 }
