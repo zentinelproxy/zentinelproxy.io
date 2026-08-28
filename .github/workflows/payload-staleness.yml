@@ -1,0 +1,76 @@
+# Report when the deployed playground payload falls behind zentinel.
+#
+# The payload is a build artifact of another repository, copied here by hand.
+# Nothing links the two, so every zentinel release silently leaves this one
+# behind -- which is exactly what happened between 0.6.31 and 0.6.32, where the
+# playground kept passing configs the CLI had started reporting.
+#
+# This does not fail pull requests: a stale payload is not a reason to block
+# unrelated work. It opens an issue instead, so the drift is visible rather than
+# discovered by someone wondering why the playground disagrees with the proxy.
+name: Playground payload staleness
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare deployed payload against the latest zentinel release
+        id: check
+        run: |
+          deployed=$(cat static/wasm/PAYLOAD_VERSION | tr -d '[:space:]')
+          latest=$(curl -sf -H 'User-Agent: zentinelproxy-io-staleness' \
+            https://crates.io/api/v1/crates/zentinel-proxy \
+            | python3 -c 'import sys,json; print(json.load(sys.stdin)["crate"]["max_version"])')
+          echo "deployed=$deployed" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest"     >> "$GITHUB_OUTPUT"
+          if [ "$deployed" = "$latest" ]; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+            echo "Payload is current ($deployed)."
+          else
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "Payload is $deployed; zentinel is $latest."
+          fi
+
+      - name: Open or update the tracking issue
+        if: steps.check.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYED: ${{ steps.check.outputs.deployed }}
+          LATEST: ${{ steps.check.outputs.latest }}
+        run: |
+          title="Playground payload is behind zentinel ($DEPLOYED -> $LATEST)"
+          existing=$(gh issue list --state open --search "in:title Playground payload is behind" \
+            --json number --jq '.[0].number // empty')
+          body=$(printf '%s\n' \
+            "The playground WASM payload deployed here was built from zentinel \`$DEPLOYED\`." \
+            "The current release is \`$LATEST\`." \
+            "" \
+            "Configuration checks added since \`$DEPLOYED\` do not run in the browser, so the" \
+            "playground can pass a configuration that \`zentinel lint\` reports." \
+            "" \
+            "To refresh, from a zentinel checkout at the release tag:" \
+            "" \
+            '```bash' \
+            "wasm-pack build --target web crates/playground-wasm" \
+            "cp crates/playground-wasm/pkg/zentinel_playground_wasm{.js,_bg.wasm} \\" \
+            "   ../zentinelproxy.io/static/wasm/" \
+            "echo $LATEST > ../zentinelproxy.io/static/wasm/PAYLOAD_VERSION" \
+            '```' \
+            "" \
+            "The docs site carries its own copy in the tanuki theme and needs the same refresh.")
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --title "$title" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
