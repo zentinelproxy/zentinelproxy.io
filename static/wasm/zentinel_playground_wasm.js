@@ -59,6 +59,76 @@ export function init_panic_hook() {
 }
 
 /**
+ * Inspect a configuration and return its topology graph with heuristic warnings
+ *
+ * Returns a JSON object with the full topology:
+ * ```json
+ * {
+ *     "listeners": [...],
+ *     "routes": [...],
+ *     "filters": [...],
+ *     "agents": [...],
+ *     "upstreams": [...],
+ *     "edges": [...],
+ *     "warnings": [...]
+ * }
+ * ```
+ * @param {string} config_kdl
+ * @returns {any}
+ */
+export function inspect_topology(config_kdl) {
+    const ptr0 = passStringToWasm0(config_kdl, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.inspect_topology(ptr0, len0);
+    return ret;
+}
+
+/**
+ * Lint a configuration and return only warnings
+ *
+ * Returns an object with:
+ * ```json
+ * {
+ *     "warnings": [...],
+ *     "has_errors": false
+ * }
+ * ```
+ * @param {string} config_kdl
+ * @returns {any}
+ */
+export function lint_config(config_kdl) {
+    const ptr0 = passStringToWasm0(config_kdl, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.lint_config(ptr0, len0);
+    return ret;
+}
+
+/**
+ * Render the topology in a specific format
+ *
+ * Supported formats: "text", "mermaid", "json", "dot"
+ *
+ * Returns an object with:
+ * ```json
+ * {
+ *     "format": "mermaid",
+ *     "output": "flowchart LR\n..."
+ * }
+ * ```
+ * @param {string} config_kdl
+ * @param {string} format
+ * @returns {any}
+ */
+export function render_topology(config_kdl, format) {
+    const ptr0 = passStringToWasm0(config_kdl, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(format, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.render_topology(ptr0, len0, ptr1, len1);
+    return ret;
+}
+
+/**
  * Simulate routing a request through the configuration
  *
  * Takes:
