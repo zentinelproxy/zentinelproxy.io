@@ -36,7 +36,7 @@ We built wafworth because we needed to make a data-driven decision about our own
 
 ## Why not an existing tool?
 
-Existing tools each solve part of the problem. [go-ftw](https://github.com/coreruleset/go-ftw) is great for CRS regression testing but assumes ModSecurity output. [GoTestWAF](https://github.com/wallarm/gotestwaf) covers broad attack categories but doesn't measure false-positive rates. [WAFBench](https://github.com/nicholasgasior/WAFBench) focuses on throughput, not detection accuracy.
+Existing tools each solve part of the problem. [go-ftw](https://github.com/coreruleset/go-ftw) is great for CRS regression testing but assumes ModSecurity output. [GoTestWAF](https://github.com/wallarm/gotestwaf) covers broad attack categories but doesn't measure false-positive rates. WAFBench focuses on throughput, not detection accuracy.
 
 None of them combine detection accuracy + false-positive rate + latency measurement + per-category confusion matrices + encoding auto-generation + multi-WAF comparison in a single package. We needed all of these to make an informed decision about our own agents, so we built it.
 

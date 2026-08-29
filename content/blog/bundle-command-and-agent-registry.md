@@ -59,7 +59,6 @@ GET /v1/agents/waf/
     "download_urls": {
       "linux-x86_64": "https://github.com/zentinelproxy/zentinel-agent-waf/releases/download/v0.3.0/zentinel-waf-agent-0.3.0-linux-x86_64.tar.gz",
       "linux-aarch64": "https://github.com/zentinelproxy/zentinel-agent-waf/releases/download/v0.3.0/zentinel-waf-agent-0.3.0-linux-aarch64.tar.gz",
-      "darwin-x86_64": "https://github.com/zentinelproxy/zentinel-agent-waf/releases/download/v0.3.0/zentinel-waf-agent-0.3.0-darwin-x86_64.tar.gz",
       "darwin-aarch64": "https://github.com/zentinelproxy/zentinel-agent-waf/releases/download/v0.3.0/zentinel-waf-agent-0.3.0-darwin-aarch64.tar.gz"
     },
     "checksums": {}
