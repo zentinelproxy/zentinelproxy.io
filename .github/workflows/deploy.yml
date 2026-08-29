@@ -30,6 +30,9 @@ jobs:
       - name: Install tools via mise
         run: mise install
 
+      - name: Check internal links
+        run: python3 scripts/check_links.py content
+
       - name: Build the site
         run: mise run build
 
