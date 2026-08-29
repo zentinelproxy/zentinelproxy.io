@@ -53,7 +53,7 @@ Two of our benchmark groups were never affected, and the reason is diagnostic. `
 
 ## Finding it
 
-We did not find this ourselves. [Laurin](https://github.com/lbrndnr) opened [an issue](https://github.com/zentinelproxy/zentinel-modsec/issues/15) with a four-sentence observation:
+We did not find this ourselves. Laurin opened [an issue](https://github.com/zentinelproxy/zentinel-modsec/issues/15) with a four-sentence observation:
 
 > When comparing throughput, the `COMPLEX_RULE` is used. It corresponds to phase 2. However, when the benchmark is performed, only phase 1 rules are executed. As far as I understand, the result is that no rule is executed during the benchmark.
 
