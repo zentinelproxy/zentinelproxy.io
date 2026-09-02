@@ -1,6 +1,6 @@
 +++
 title = "A Gateway for Agentic Protocols"
-description = "Zentinel now does for MCP what a reverse proxy has always done for HTTP: per-tool metrics, per-tool rate limits, a tool list cut to what the route permits, and a health check that speaks the protocol. Here is what shipped, what it caught, and the one thing we have not built yet."
+description = "Zentinel now does for MCP what a reverse proxy has always done for HTTP: per-tool metrics, per-tool rate limits, a tool list cut to what the route permits, and a health check that speaks the protocol. Here is what shipped, two things it caught that had been silently broken for months, and an honest outlook on the harder question — whether a proxy should also be an MCP server."
 date = 2026-09-02
 [taxonomies]
 tags = ["mcp", "agentic", "a2a", "proxy", "observability", "engineering"]
@@ -162,38 +162,138 @@ which balances on queued work rather than connection count), token budgets, and
 health checks that verify the models you depend on are actually loaded rather
 than that the server is up.
 
-## What we have not built
+## Where this goes: Zentinel as an MCP origin
 
-Zentinel is a **gateway** for these protocols. It sits in front of an MCP server
-and enforces, meters and observes. It is not an MCP server itself.
+Everything above is Zentinel as a **gateway**. It sits in front of an MCP server
+and enforces, meters and observes. It is not an MCP server itself, and today it
+cannot be one.
 
-The obvious next question — asked internally and by users — is whether it should
-be. Most MCP-worthy context is not an HTTP API: it is object storage, a
-filesystem, a SQL database, a search index, internal documentation. Standing up
-an MCP server for each is bespoke work that gets rewritten per organisation, and
-the result is usually an unguarded process holding broad credentials, which is
-precisely the thing a proxy exists to sit in front of. A config-declared MCP
-server whose tools come from a curated set of sources, policy-enforced from the
-first request because the engine is already here, is a genuinely attractive
-shape.
+The question we keep being asked — and keep asking ourselves — is whether it
+should be. Here is our current thinking, offered as an outlook rather than a
+roadmap, because none of it is built and some of it may not survive contact with
+the design.
 
-**It does not exist today.** It is tracked in
-[#443](https://github.com/zentinelproxy/zentinel/issues/443) along with the
-reasons we are being careful: generating a tool per OpenAPI operation is
-implicit behaviour of the worst kind, since your tool surface then changes when
-someone edits a spec elsewhere; a real API becomes hundreds of tools and MCP
-clients degrade badly past a few dozen; and every `DELETE` endpoint becomes
-callable unless allowlisting is the default rather than an option.
+### The gap
 
-The same issue tracks the other half of the gateway story we have not finished:
-presenting several MCP servers as one endpoint, with their tools namespaced
-apart. That one is blocked on a design question rather than effort — MCP has
-sessions, a reverse proxy is comfortably stateless, and where session state
-lives when one endpoint fronts several upstreams decides the shape of everything
-built on top. We would rather settle that before writing code than during.
+Most MCP-worthy context is not an HTTP API. It is object storage, a filesystem,
+a SQL database, a search index, a pile of internal documentation. MCP is how a
+model reaches all of it, and today reaching any of it means writing a server.
 
-If you are running MCP behind a proxy, or want to, the issue is a good place to
-tell us which half matters more to you.
+That work gets rewritten per organisation, and the artifact it produces is
+usually a process holding broad credentials with no policy in front of it —
+precisely the thing a proxy exists to sit in front of. The pitch is not
+"REST → MCP"; several tools do that already. It is that a server declared in
+Zentinel's config would be **policy-enforced from its first request**, because
+the engine described in the rest of this post is already here. The allowlists,
+the per-tool metrics, the rate limits, the audit trail — none of that would need
+building again.
+
+### The shape it would take
+
+Tools and resources come from a **closed, curated set of sources**, declared in
+configuration:
+
+| Source | Exposes as |
+|---|---|
+| `http` / OpenAPI | tools, from operations you name |
+| `filesystem` / object store | resources |
+| `sql` | tools, from named parameterised read-only queries |
+| `search` index | tools |
+| an existing Zentinel `agent` | tools |
+
+Sketching it — **this is illustrative, not a spec, and no part of it works
+today**:
+
+```kdl
+mcp-server "internal" {
+    source "docs" {
+        type "search"
+        tool "search_runbooks" {
+            description "Search operational runbooks by keyword"
+        }
+    }
+    source "reporting" {
+        type "sql"
+        read-only #true
+        tool "revenue_by_month" {
+            description "Monthly revenue for a given year"
+            query "SELECT month, total FROM revenue WHERE year = $1"
+        }
+    }
+}
+```
+
+Two properties of that sketch matter more than the syntax.
+
+**Every tool is named by a human.** There is no mode where pointing at an
+OpenAPI spec generates two hundred tools. Whole-spec generation is at most a
+scaffolding command that emits config for you to review, edit and commit —
+never a live binding. A tool surface that changes because someone edited a spec
+in another repository is implicit behaviour of the worst kind, and it is the
+single thing we are most determined not to ship.
+
+**The source list is closed.** "A place to embed arbitrary logic because it
+might be useful" is how a bounded system stops being one. No scripting in
+config, no shell-command source. If your case needs one, an
+[agent](https://docs.zentinelproxy.io/agents/) is the extension point and always
+has been.
+
+### What we would get wrong if we hurried
+
+Four problems we would rather solve on paper first.
+
+**Tool-count explosion.** A real API becomes hundreds of tools, and MCP clients
+degrade badly past a few dozen because the tool list eats the model's context
+window. This is the strongest argument that *curation is the product* — the
+valuable artifact is a short, well-described tool list, not a complete one. It
+also means the tool-list filtering shipped in this release is not a side feature
+of the gateway; it is the same insight arriving early.
+
+**Names and descriptions dominate quality.** Model tool-selection depends on them
+far more than on schema correctness, and names auto-derived from `operationId`
+are reliably poor. This cuts the same way: a generator that produces
+`getUserByIdV2` for two hundred endpoints has produced something worse than
+nothing.
+
+**Side effects.** Every `DELETE` endpoint becomes callable the moment it becomes
+a tool. Allowlist-by-default is not a setting here, it is the only defensible
+default — along with read-only by default for `sql` and `filesystem`.
+
+**Session state.** MCP has sessions; a reverse proxy is comfortably stateless.
+This is the one genuinely blocking question, and it blocks the *gateway* half
+too — presenting several MCP servers as one endpoint with their tools namespaced
+apart needs an answer to where a session lives and what happens when one
+upstream dies mid-session. Whatever we decide shapes everything built on top, so
+we would rather settle it before writing code than during.
+
+### Where it would live
+
+Not in the proxy hot path. Serving MCP inverts what the proxy is — it stops
+forwarding and starts originating — so this belongs in an agent or a distinct
+`serve` mode. Agents can already short-circuit with a response, which makes it
+feasible without touching request forwarding, and keeping it out of the hot path
+keeps the gateway work shippable on its own. Which is exactly what happened this
+release.
+
+### Honestly
+
+Zentinel is a proxy. The gateway work in this post is unambiguously proxy work:
+it is what a reverse proxy does, applied to a protocol that did not exist when
+most reverse proxies were written. Originating MCP is a different claim, and
+"our proxy is also an application server" is a sentence that has ended badly for
+other projects.
+
+We think there is a real version of it — narrow, declarative, curated, and
+policy-enforced from the first request — and we would rather build that one
+slowly than a general one quickly. The scope discipline we have written down for
+ourselves is to prove it with exactly two sources, `http` and one non-API, before
+adding a third.
+
+It is all tracked in
+[#443](https://github.com/zentinelproxy/zentinel/issues/443). If you are running
+MCP behind a proxy, or want to, that issue is the right place to tell us which
+half matters more to you — and which two sources you would actually use. That
+answer would change what we build first.
 
 ---
 
