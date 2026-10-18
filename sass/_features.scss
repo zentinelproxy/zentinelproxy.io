@@ -343,20 +343,20 @@
     flex-direction: column;
     gap: var(--space-xs);
 
+    // Block (not flex) items so mixed text, <strong> and <code> flow as one line
     li {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--space-sm);
+        position: relative;
+        padding-left: 1.5em;
         font-size: 0.875rem;
         color: var(--color-text-muted);
         line-height: 1.6;
 
         &::before {
             content: '→';
+            position: absolute;
+            left: 0;
             color: var(--color-primary);
             font-weight: 600;
-            flex-shrink: 0;
-            margin-top: 0.125rem;
         }
     }
 }
