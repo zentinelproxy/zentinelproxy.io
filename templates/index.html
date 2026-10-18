@@ -827,22 +827,6 @@
         }, 2000);
     }
 
-    // Copy button for the install snippet (copies commands only, no comments or prompts)
-    document.querySelectorAll("[data-copy-target]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const pre = document.getElementById(btn.dataset.copyTarget);
-            const cmds = pre.textContent
-                .split("\n")
-                .filter((l) => l.startsWith("$ "))
-                .map((l) => l.slice(2))
-                .join("\n");
-            navigator.clipboard.writeText(cmds);
-            const label = btn.querySelector(".code-snippet__copy-label");
-            label.textContent = "Copied";
-            setTimeout(() => { label.textContent = "Copy"; }, 2000);
-        });
-    });
-
     // Close dropdown when clicking outside
     document.addEventListener("click", (e) => {
         const dropdown = document.getElementById("install-dropdown");
@@ -854,4 +838,5 @@
 
 
 </script>
+<script src="{{ get_url(path='js/copy-snippet.js') | safe }}" defer></script>
 {% endblock %}
