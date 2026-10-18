@@ -16,7 +16,7 @@
 
             <div class="features-stats">
                 <div class="stat-card">
-                    <div class="stat-number">57+</div>
+                    <div class="stat-number">35</div>
                     <div class="stat-label">Major Features</div>
                 </div>
                 <div class="stat-card">
@@ -85,11 +85,14 @@
                             upstream/mod.rs
                         </a>
                     </div>
-                    <p class="feature-description">14 load balancing algorithms with health-aware target selection.</p>
+                    <p class="feature-description">15 load balancing algorithms with health-aware target selection.</p>
                     <ul class="feature-list">
                         <li><strong>Round-robin</strong> - Equal distribution across backends</li>
                         <li><strong>Weighted</strong> - Proportional distribution by weight</li>
                         <li><strong>Least Connections</strong> - Fewest active connections</li>
+                        <li><strong>Random</strong> - Uniform random selection</li>
+                        <li><strong>IP Hash</strong> - Client-IP affinity</li>
+                        <li><strong>Sticky Sessions</strong> - Cookie-based affinity with fallback algorithm (<code>sticky_session.rs</code>)</li>
                         <li><strong>Weighted Least Conn</strong> - Connection/weight ratio (<code>weighted_least_conn.rs</code>)</li>
                         <li><strong>Maglev</strong> - Google's consistent hashing, O(1) lookup (<code>maglev.rs</code>)</li>
                         <li><strong>Peak EWMA</strong> - Latency-based selection (<code>peak_ewma.rs</code>)</li>

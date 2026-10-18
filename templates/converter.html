@@ -157,7 +157,7 @@
             </div>
             <div class="cli-install-content">
                 <p class="cli-install-description">
-                    For batch conversions, CI/CD pipelines, or offline use, install the <strong>zentinel-convert</strong> command-line tool.
+                    For batch conversions, CI/CD pipelines, or offline use, install the <strong>zentinel-convert</strong> command-line tool from <a href="https://github.com/zentinelproxy/zentinel-convert" target="_blank" rel="noopener">its repository</a> (it is not published on crates.io).
                 </p>
                 <div class="cli-install-widget">
                     <div class="cli-install-tabs">
@@ -171,7 +171,7 @@
                         </button>
                     </div>
                     <div class="cli-install-cmd-wrapper">
-                        <code class="cli-install-cmd" id="cli-install-cmd">cargo install zentinel-convert</code>
+                        <code class="cli-install-cmd" id="cli-install-cmd">cargo install --locked --git https://github.com/zentinelproxy/zentinel-convert zentinel-convert</code>
                         <button type="button" class="panel-action-btn" id="cli-copy-btn" title="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                         </button>
@@ -182,8 +182,8 @@
                         <span class="cli-code-label">Usage</span>
                     </div>
                     <pre><code><span class="cli-prompt">$</span> zentinel-convert convert nginx.conf -o zentinel.kdl
-<span class="cli-prompt">$</span> zentinel-convert convert haproxy.cfg --format haproxy
-<span class="cli-prompt">$</span> zentinel-convert analyze traefik.yaml --suggest-agents</code></pre>
+<span class="cli-prompt">$</span> zentinel-convert convert --format haproxy haproxy.cfg
+<span class="cli-prompt">$</span> zentinel-convert analyze traefik.yaml</code></pre>
                 </div>
             </div>
         </div>
@@ -209,32 +209,13 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                         <span>Run Locally</span>
                     </div>
-                    <p class="version-dropdown-desc">Take the converter home. Run batch conversions locally with any WASI-compatible runtime.</p>
-                    <div class="version-dropdown-actions">
-                        <a href="/wasm/zentinel_convert_wasm_bg.wasm" download="zentinel_convert.wasm" class="btn btn-primary btn-small">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                            Download WASM
-                            <span class="wasm-size">(~3.2 MB)</span>
-                        </a>
-                    </div>
+                    <p class="version-dropdown-desc">This page runs a browser build of the converter (a wasm-bindgen module), which does not run outside the browser. To convert files locally, install the command-line tool:</p>
                     <div class="version-dropdown-code">
-                        <p class="code-label">Run with <a href="https://wasmtime.dev/" target="_blank" rel="noopener">Wasmtime</a>:</p>
-                        <pre><code><span class="code-comment"># Install wasmtime</span>
-curl https://wasmtime.dev/install.sh -sSf | bash
+                        <pre><code><span class="code-comment"># Install zentinel-convert</span>
+cargo install --locked --git https://github.com/zentinelproxy/zentinel-convert zentinel-convert
 
 <span class="code-comment"># Convert nginx config</span>
-wasmtime zentinel_convert.wasm nginx.conf -o zentinel.kdl
-
-<span class="code-comment"># Convert with format hint</span>
-wasmtime zentinel_convert.wasm config.txt --format haproxy</code></pre>
-                    </div>
-                    <div class="version-dropdown-runtimes">
-                        <span class="runtimes-label">Also works with:</span>
-                        <a href="https://wasmer.io/" target="_blank" rel="noopener">Wasmer</a>
-                        <span class="separator">·</span>
-                        <a href="https://wazero.io/" target="_blank" rel="noopener">wazero</a>
-                        <span class="separator">·</span>
-                        <a href="https://github.com/aspect-build/rules_esbuild" target="_blank" rel="noopener">Node.js</a>
+zentinel-convert convert nginx.conf -o zentinel.kdl</code></pre>
                     </div>
                 </div>
             </div>

@@ -6,8 +6,18 @@
     <meta name="color-scheme" content="dark light">
 
     <!-- Primary Meta Tags -->
-    <title>{% block title %}{{ config.title }}{% endblock %}</title>
-    <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+    {#- Per-page meta: page/section title and description, falling back to the site values. -#}
+    {%- set meta_title = config.title -%}
+    {%- set meta_description = config.description -%}
+    {%- if page -%}
+        {%- if page.title -%}{%- set meta_title = page.title -%}{%- endif -%}
+        {%- if page.description -%}{%- set meta_description = page.description -%}{%- endif -%}
+    {%- elif section -%}
+        {%- if section.title -%}{%- set meta_title = section.title -%}{%- endif -%}
+        {%- if section.description -%}{%- set meta_description = section.description -%}{%- endif -%}
+    {%- endif %}
+    <title>{% block title %}{{ meta_title }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ meta_description }}{% endblock %}">
     {% if page.taxonomies.tags %}
     <meta name="keywords" content="{{ page.taxonomies.tags | join(sep=', ') }}">
     {% elif section.extra.keywords %}
@@ -33,8 +43,8 @@
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="{% if page %}article{% else %}website{% endif %}">
     <meta property="og:url" content="{{ current_url | default(value=config.base_url) | safe }}">
-    <meta property="og:title" content="{% block og_title %}{{ config.title }}{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}{{ config.description }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ meta_title }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ meta_description }}{% endblock %}">
     {% block og_image_tags %}
     <meta property="og:image" content="{{ get_url(path='img/og-image.png') | safe }}">
     <meta property="og:image:width" content="1200">
@@ -62,8 +72,8 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ current_url | default(value=config.base_url) | safe }}">
-    <meta name="twitter:title" content="{% block twitter_title %}{{ config.title }}{% endblock %}">
-    <meta name="twitter:description" content="{% block twitter_description %}{{ config.description }}{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ meta_title }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ meta_description }}{% endblock %}">
     {% block twitter_image_tags %}
     <meta name="twitter:image" content="{{ get_url(path='img/og-image.png') | safe }}">
     {% endblock twitter_image_tags %}
@@ -132,7 +142,7 @@
                 "url": "{{ config.base_url | safe }}",
                 "applicationCategory": "DeveloperApplication",
                 "operatingSystem": "Linux, macOS",
-                "softwareVersion": "{{ config.extra.software_version | default(value='26.08_1') }}",
+                "softwareVersion": "{{ config.extra.software_version | default(value='26.10_3') }}",
                 "downloadUrl": "https://github.com/zentinelproxy/zentinel/releases",
                 "installUrl": "https://docs.zentinelproxy.io/getting-started/installation/",
                 "screenshot": "{{ get_url(path='img/og-image.png') | safe }}",

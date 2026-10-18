@@ -46,8 +46,8 @@ const cliInstallTabs = document.querySelectorAll('.cli-install-tab');
 
 // Install commands for each method
 const INSTALL_COMMANDS = {
-    cargo: 'cargo install zentinel-convert',
-    source: 'git clone https://github.com/zentinelproxy/zentinel && cd zentinel && cargo install --path crates/zentinel-convert'
+    cargo: 'cargo install --locked --git https://github.com/zentinelproxy/zentinel-convert zentinel-convert',
+    source: 'git clone https://github.com/zentinelproxy/zentinel-convert && cd zentinel-convert && cargo build --release'
 };
 
 // Sample configurations

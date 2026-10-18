@@ -7,12 +7,26 @@
 # served at the root of that host, so a /docs/... path resolves against THIS
 # host and 404s -- which is what these rules used to do.
 
-/install     https://docs.zentinelproxy.io/getting-started/installation/  301
-/download    https://docs.zentinelproxy.io/getting-started/installation/  301
-/quickstart  https://docs.zentinelproxy.io/getting-started/quick-start/   301
-/config      https://docs.zentinelproxy.io/configuration/                 301
-/examples    https://docs.zentinelproxy.io/examples/                      301
-/faq         https://docs.zentinelproxy.io/appendix/faq/                  301
+# Both slash forms are listed: the old stub pages (content/install.md etc.)
+# served /install/ with a meta refresh to /customize/ while /install went to
+# the docs. The stubs are gone; each path now has exactly one destination.
+/install      https://docs.zentinelproxy.io/getting-started/installation/  301
+/install/     https://docs.zentinelproxy.io/getting-started/installation/  301
+/download     https://docs.zentinelproxy.io/getting-started/installation/  301
+/download/    https://docs.zentinelproxy.io/getting-started/installation/  301
+/quickstart   https://docs.zentinelproxy.io/getting-started/quick-start/   301
+/quickstart/  https://docs.zentinelproxy.io/getting-started/quick-start/   301
+/config       https://docs.zentinelproxy.io/configuration/                 301
+/config/      https://docs.zentinelproxy.io/configuration/                 301
+/examples     https://docs.zentinelproxy.io/examples/                      301
+/examples/    https://docs.zentinelproxy.io/examples/                      301
+/faq          https://docs.zentinelproxy.io/appendix/faq/                  301
+/faq/         https://docs.zentinelproxy.io/appendix/faq/                  301
+
+# Old /docs/... links (the docs used to live under this host). The docs are
+# served at the root of docs.zentinelproxy.io, so the path carries over.
+/docs         https://docs.zentinelproxy.io/         301
+/docs/*       https://docs.zentinelproxy.io/:splat   301
 
 # Agent registry moved to registry.zentinelproxy.io
 /agents/*    https://registry.zentinelproxy.io/:splat  301

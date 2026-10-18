@@ -2,7 +2,7 @@
 title = "Benchmarks"
 description = "Performance, soak testing, and chaos engineering results for Zentinel reverse proxy"
 template = "benchmarks.html"
-updated = 2026-03-04
+updated = 2026-10-18
 +++
 
 Zentinel includes a comprehensive testing framework validating performance, stability, and resilience. All results below are from actual test runs.
@@ -42,6 +42,11 @@ Zentinel includes a comprehensive testing framework validating performance, stab
 ---
 
 ## Proxy Comparison Benchmarks
+
+<div class="highlight-box" style="background: var(--color-surface); border-left: 4px solid var(--color-warning, #b8860b); padding: var(--space-md); margin: var(--space-lg) 0;">
+    <strong>Measured 2026-01-29 with Zentinel 0.4.4 on an Apple M4 laptop, rate-limited to 10,000 req/s; not re-run since.</strong>
+    At a fixed 10,000 req/s every proxy keeps up, so this compares latency and resource use at that load, not maximum throughput.
+</div>
 
 Five reverse proxies benchmarked head-to-head on the same hardware, same backend, same load. Native binaries only — no Docker overhead.
 
@@ -179,6 +184,8 @@ Pure Rust ModSecurity implementation with full OWASP CRS compatibility ([v0.1.4]
 </div>
 
 ### Throughput
+
+These figures come from zentinel-modsec's own Criterion `throughput` group (`benches/modsec_bench.rs`), which runs that benchmark's ruleset on zentinel-modsec alone. The 676K/701K req/s figures in the [Rust vs C++ comparison](#rust-vs-c-zentinel-modsec-vs-libmodsecurity) below come from a different benchmark (`benches/libmodsec_compare.rs`, `throughput_comparison`) with a different ruleset, run identically on both engines. The two sets of numbers are not comparable with each other.
 
 <div class="stats-grid">
     <div class="stat-card">
@@ -933,5 +940,5 @@ We're actively working on:
 ---
 
 <p style="text-align: center; color: var(--color-text-muted); margin-top: var(--space-2xl);">
-Last updated: March 2026 | Zentinel v0.4.2
+Proxy comparison: measured 2026-01-29, Zentinel 0.4.4 | WAF engine figures: re-measured August 2026 (zentinel-modsec) | Page last edited October 2026
 </p>
