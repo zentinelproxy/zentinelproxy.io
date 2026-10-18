@@ -2,9 +2,12 @@
 title = "How zentinel bundle Works: A Static API, a Lock File, and 26 Agents"
 description = "The zentinel bundle command installs agents from a static JSON API served by Zola. No database, no package manager runtime, no registry service to operate. Here's how api.zentinelproxy.io generates the metadata and how the CLI consumes it."
 date = 2026-02-23
+updated = 2026-10-18
 [taxonomies]
 tags = ["architecture", "agents", "bundle", "registry"]
 +++
+
+> **Update — 18 October 2026.** The root/user auto-detection described under *Installation paths* did not work until 26.09_5 (crate 0.6.42). The writability check asked whether *anyone* could write to `/usr/local/bin` rather than whether the current user could, so every non-root user was sent down the system-wide path and failed creating `/etc/zentinel/agents`. It now uses `access(2)` on every directory the install creates, and the user-local paths in the table below work as described. See the [26.09_5 changelog entry](https://github.com/zentinelproxy/zentinel/blob/main/CHANGELOG.md#26095---2026-09-04).
 
 Zentinel ships 26 agents — WAF, bot management, rate limiting, GraphQL security, SPIFFE, and more. Each agent is a separate binary, built from its own repository, released on its own schedule. Getting all 26 installed, version-compatible, and configured is the kind of problem that usually ends with someone building a package manager.
 

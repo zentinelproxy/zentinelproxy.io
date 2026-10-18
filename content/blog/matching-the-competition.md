@@ -2,9 +2,12 @@
 title = "Benchmarking Zentinel Against the Established Proxies"
 description = "We put Zentinel head-to-head with Envoy, HAProxy, nginx, and Caddy — then used the results to find and fix the per-request allocations that were costing us CPU. Three rounds of optimization later, Zentinel matches or beats every proxy we tested on tail latency."
 date = 2026-01-28
+updated = 2026-10-18
 [taxonomies]
 tags = ["performance", "rust", "benchmarks"]
 +++
+
+> **Update — 18 October 2026.** These numbers are from January 2026 and Zentinel 0.4.x (release 26.01_11). They were measured on a single Apple M4 machine (macOS, 10 cores, 16 GB) with the load generator on the same host, at a fixed rate of 10,000 requests/second — a latency comparison at a capped rate, not a measure of maximum throughput. Zentinel has changed a great deal since (Pingora 0.9, crate 0.6.x), and these results have not been re-run against it. Treat them as a historical snapshot; the current methodology and published results are on the [benchmarks page](/benchmarks/).
 
 We set out to answer a simple question: how does Zentinel stack up against the established reverse proxies?
 

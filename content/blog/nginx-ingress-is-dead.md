@@ -2,10 +2,12 @@
 title = "NGINX Ingress Is Dead. Here's What to Do Next."
 description = "NGINX Ingress Controller maintenance halted in March 2026, with no more releases or security patches. We built a Gateway API controller for Zentinel. Here's the migration story."
 date = 2026-03-14
-updated = 2026-03-15
+updated = 2026-10-18
 [taxonomies]
 tags = ["gateway-api", "kubernetes", "nginx", "migration", "ingress"]
 +++
+
+> **Update — 18 October 2026.** The health checks the controller generates (HTTP, gRPC, TCP — described below) did not run on Zentinel releases before 26.09_2 (crate 0.6.39): the proxy's active health checker never registered its backends, so no probe was sent, no backend was ever marked unhealthy, and failover between endpoints did not happen, with no error reported. From 26.09_2 the same configuration probes as described, which means backends that had been failing quietly may be taken out of rotation for the first time after upgrading. See the [26.09_2 changelog entry](https://github.com/zentinelproxy/zentinel/blob/main/CHANGELOG.md#26092---2026-09-02).
 
 We've been watching the NGINX Ingress situation for a while. When Kubernetes [announced the retirement](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/) back in November, the writing was on the wall, but there was still time. That time is up. As of March 2026, NGINX Ingress Controller is no longer maintained. No releases, no bugfixes, no security patches. The repositories are moving to `kubernetes-retired/`.
 
