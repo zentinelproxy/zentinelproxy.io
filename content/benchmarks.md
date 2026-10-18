@@ -91,12 +91,7 @@ Five reverse proxies benchmarked head-to-head on the same hardware, same backend
 
 ### Throughput
 
-<div class="benchmark-charts">
-<div class="chart-canvas-container">
-    <div class="chart-canvas-title">Requests per Second (Higher is Better)</div>
-    <canvas id="chart-rps"></canvas>
-</div>
-</div>
+The load generator held every proxy to the same target rate (see Target RPS above), and all of them sustained it, so throughput is equal by design and not charted. The comparison that matters at a fixed rate is latency and resource use, below.
 
 ### Latency Distribution
 
