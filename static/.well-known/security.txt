@@ -1,0 +1,8 @@
+# Security contact for Zentinel (https://github.com/zentinelproxy/zentinel).
+# Please report vulnerabilities privately; do not open public issues.
+Contact: https://github.com/zentinelproxy/zentinel/security/advisories/new
+Contact: https://github.com/raffaelschneider
+Expires: 2027-10-17T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://zentinelproxy.io/.well-known/security.txt
+Policy: https://zentinelproxy.io/security/
