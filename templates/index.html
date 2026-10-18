@@ -299,11 +299,20 @@
             </div>
         </div>
         <div class="hero-visual">
-            <img
-                src="{{ get_url(path='img/zentinel-hero-vertical.avif') | safe }}"
-                alt="Zentinel guardian dog animation"
-                class="hero-animation"
-            />
+            <picture>
+                <source media="(prefers-reduced-motion: reduce) and (max-width: 768px)" srcset="{{ get_url(path='img/zentinel-hero-still-768.avif') | safe }}" type="image/avif">
+                <source media="(prefers-reduced-motion: reduce)" srcset="{{ get_url(path='img/zentinel-hero-still.avif') | safe }}" type="image/avif">
+                <source media="(max-width: 768px)" srcset="{{ get_url(path='img/zentinel-hero-768.avif') | safe }}" type="image/avif">
+                <img
+                    src="{{ get_url(path='img/zentinel-hero-1280.avif') | safe }}"
+                    alt="Zentinel's shisa guardian dog mascot"
+                    class="hero-animation"
+                    width="1280"
+                    height="720"
+                    fetchpriority="high"
+                    decoding="async"
+                />
+            </picture>
         </div>
     </div>
 </section>

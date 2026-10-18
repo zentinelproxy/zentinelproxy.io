@@ -1059,6 +1059,10 @@ body > .nav-dropdown__menu {
     pointer-events: none;
     z-index: 1;
 
+    picture {
+        display: contents;
+    }
+
     @media (max-width: 768px) {
         position: relative;
         width: 100vw;
