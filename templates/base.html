@@ -607,9 +607,10 @@
     </script>
 
     {% if config.build_search_index %}
-    <script src="{{ get_url(path='elasticlunr.min.js') | safe }}"></script>
-    <script src="{{ get_url(path='search_index.en.js') | safe }}"></script>
-    <script src="{{ get_url(path='js/search-raskell.js') | safe }}" defer></script>
+    <!-- The search index (~1 MB) loads on first use of search, not with every page -->
+    <script src="{{ get_url(path='js/search-raskell.js') | safe }}" defer
+        data-lunr-src="{{ get_url(path='elasticlunr.min.js') | safe }}"
+        data-index-src="{{ get_url(path='search_index.en.js') | safe }}"></script>
     {% endif %}
 
     {% block scripts %}{% endblock %}

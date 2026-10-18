@@ -6,6 +6,8 @@
   'use strict';
 
   let searchIndex = null;
+  let indexLoading = null;
+  const thisScript = document.currentScript;
   let searchOverlay = null;
   let searchInput = null;
   let searchResults = null;
@@ -20,16 +22,46 @@
 
     setupListeners();
 
-    // Load search index
+    // Search index is loaded lazily (see loadIndex); use it if a page already provides it
     if (typeof window.searchIndex !== 'undefined' && typeof elasticlunr !== 'undefined') {
       searchIndex = elasticlunr.Index.load(window.searchIndex);
     }
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  // Fetch elasticlunr and the (large) search index on first use only
+  function loadIndex() {
+    if (searchIndex) return Promise.resolve();
+    if (indexLoading) return indexLoading;
+    const lunrSrc = thisScript && thisScript.dataset.lunrSrc;
+    const indexSrc = thisScript && thisScript.dataset.indexSrc;
+    if (!lunrSrc || !indexSrc) return Promise.resolve();
+    indexLoading = loadScript(lunrSrc)
+      .then(() => loadScript(indexSrc))
+      .then(() => {
+        searchIndex = elasticlunr.Index.load(window.searchIndex);
+        if (searchInput && searchInput.value.trim()) performSearch();
+      })
+      .catch(() => { indexLoading = null; });
+    return indexLoading;
   }
 
   function setupListeners() {
     // Search toggle buttons
     document.querySelectorAll('.search-toggle').forEach(btn => {
       btn.addEventListener('click', openSearch);
+      // Start fetching the index when the user is about to search
+      btn.addEventListener('pointerenter', loadIndex, { once: true });
+      btn.addEventListener('focus', loadIndex, { once: true });
     });
 
     // Close button
@@ -76,6 +108,7 @@
       }
     }
 
+    loadIndex();
     searchOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
     // Delay focus to ensure visibility transition has completed
