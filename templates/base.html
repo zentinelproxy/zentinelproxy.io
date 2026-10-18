@@ -484,6 +484,15 @@
             document.body.style.overflow = '';
         }
 
+        // Wrap content tables so wide ones scroll inside their own box on narrow screens
+        document.querySelectorAll('main table').forEach(t => {
+            if (t.closest('.table-scroll')) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'table-scroll';
+            t.parentNode.insertBefore(wrap, t);
+            wrap.appendChild(t);
+        });
+
         // Close mobile menu when clicking a link
         document.querySelectorAll('.mobile-menu-link').forEach(link => {
             link.addEventListener('click', closeMobileMenu);

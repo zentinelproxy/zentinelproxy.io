@@ -284,6 +284,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-md);
+    flex-wrap: wrap;
     margin-bottom: var(--space-md);
 
     h3 {
@@ -310,6 +311,9 @@
     white-space: nowrap;
     transition: all var(--transition-fast);
     flex-shrink: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     svg {
         width: 14px;

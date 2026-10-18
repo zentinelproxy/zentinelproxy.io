@@ -184,6 +184,29 @@ code {
     font-size: 0.9em;
 }
 
+// Long identifiers (file names, metric names) wrap instead of widening the page
+:not(pre) > code {
+    overflow-wrap: anywhere;
+}
+
+pre {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+// Tables are wrapped in .table-scroll by a small script in base.html
+.table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: var(--space-lg) 0;
+    -webkit-overflow-scrolling: touch;
+
+    > table {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
 img {
     max-width: 100%;
     height: auto;

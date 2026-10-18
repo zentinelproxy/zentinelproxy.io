@@ -537,7 +537,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 /* Features grid */
 .cp-features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
     gap: 1.5rem;
 }
 
@@ -670,7 +670,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 /* API */
 .cp-api-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 1.5rem;
 }
 
@@ -694,7 +694,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 /* Tech Stack */
 .cp-stack-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
     gap: 1rem;
 }
 
@@ -763,15 +763,15 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 /* Responsive */
 @media (max-width: 768px) {
     .cp-features-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .cp-api-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .cp-stack-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .cp-flow-diagram {
