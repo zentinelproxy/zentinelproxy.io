@@ -28,7 +28,7 @@
 /* Stats cards */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-lg);
     margin: var(--space-2xl) 0;
 }
@@ -37,7 +37,8 @@
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    padding: var(--space-xl);
+    padding: var(--space-lg) var(--space-md);
+    min-width: 0;
     text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -53,7 +54,7 @@
 }
 
 .stat-value {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--color-primary);
     line-height: 1.2;
@@ -425,7 +426,7 @@
 /* Benchmark metadata cards */
 .bench-meta-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-md);
     margin: var(--space-lg) 0;
 }
@@ -493,7 +494,16 @@
     }
 
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-md);
+    }
+
+    .stat-card {
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
     }
 
     .gauge-container {

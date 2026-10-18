@@ -82,10 +82,8 @@
     <meta name="twitter:site" content="{{ config.extra.twitter_handle }}">
     {% endif %}
 
-    <!-- Preload fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Self-hosted fonts (Geist, SIL OFL 1.1) -->
+    <link rel="preload" href="{{ get_url(path='fonts/geist-latin-wght-normal.woff2') | safe }}" as="font" type="font/woff2" crossorigin>
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ get_url(path='style.css') | safe }}">
@@ -250,7 +248,7 @@
             <div class="container">
                 <nav class="nav" role="navigation" aria-label="Main navigation">
                     <a href="{{ get_url(path='/') }}" class="logo" aria-label="Zentinel Home">
-                        <img src="{{ get_url(path='img/zentinel-mascot.avif') | safe }}" alt="Zentinel" class="logo-img">
+                        <img src="{{ get_url(path='img/zentinel-logo-64.avif') | safe }}" alt="" class="logo-img" width="32" height="32">
                         <span class="logo-text">Zentinel</span>
                     </a>
                     <div class="nav-links">
@@ -366,11 +364,11 @@
                     <div class="footer-brand">
                         <div class="footer-mascot-wrapper" aria-hidden="true">
                             <div class="footer-mascot-glow"></div>
-                            <img src="{{ get_url(path='img/zentinel-mascot.avif') | safe }}" alt="" class="footer-mascot">
+                            <img src="{{ get_url(path='img/zentinel-mascot-160.avif') | safe }}" alt="" class="footer-mascot" width="80" height="80" loading="lazy">
                         </div>
                         <div class="footer-tagline">
                             <p class="footer-title">Security-first reverse proxy<br>built to guard the free web</p>
-                            <p class="footer-description">A high-performance, security-focused reverse proxy built on Cloudflare's Pingora framework. Sleepable ops at the edge with extensible agent architecture.</p>
+                            <p class="footer-description">Explicit configuration, bounded resources and isolated security agents, built on Cloudflare's Pingora.</p>
                         </div>
                     </div>
                     <nav class="footer-links" role="navigation" aria-label="Footer navigation">
@@ -486,6 +484,15 @@
             document.body.style.overflow = '';
         }
 
+        // Wrap content tables so wide ones scroll inside their own box on narrow screens
+        document.querySelectorAll('main table').forEach(t => {
+            if (t.closest('.table-scroll')) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'table-scroll';
+            t.parentNode.insertBefore(wrap, t);
+            wrap.appendChild(t);
+        });
+
         // Close mobile menu when clicking a link
         document.querySelectorAll('.mobile-menu-link').forEach(link => {
             link.addEventListener('click', closeMobileMenu);
@@ -600,9 +607,10 @@
     </script>
 
     {% if config.build_search_index %}
-    <script src="{{ get_url(path='elasticlunr.min.js') | safe }}"></script>
-    <script src="{{ get_url(path='search_index.en.js') | safe }}"></script>
-    <script src="{{ get_url(path='js/search-raskell.js') | safe }}" defer></script>
+    <!-- The search index (~1 MB) loads on first use of search, not with every page -->
+    <script src="{{ get_url(path='js/search-raskell.js') | safe }}" defer
+        data-lunr-src="{{ get_url(path='elasticlunr.min.js') | safe }}"
+        data-index-src="{{ get_url(path='search_index.en.js') | safe }}"></script>
     {% endif %}
 
     {% block scripts %}{% endblock %}

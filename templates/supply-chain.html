@@ -244,7 +244,7 @@ sha256sum target/release/zentinel</code></pre>
 
 .builds-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
 }
@@ -370,7 +370,7 @@ sha256sum target/release/zentinel</code></pre>
 
 @media (max-width: 768px) {
     .builds-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 </style>
