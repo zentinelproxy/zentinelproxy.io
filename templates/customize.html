@@ -436,7 +436,7 @@ zentinel --config zentinel.kdl</code></pre>
                 </div>
                 <p class="section-note" id="startup-note" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                    <span>Start agents before running Zentinel. Each agent runs as a separate process and communicates via Unix socket. Install agents with <code>zentinel bundle install</code> or <code>cargo install &lt;agent-crate&gt;</code>.</span>
+                    <span>Start agents before running Zentinel. Each agent runs as a separate process and communicates via Unix socket. Install agents with <code>zentinel bundle install &lt;agent&gt;</code>.</span>
                 </p>
             </div>
 
@@ -558,7 +558,8 @@ Prism.languages.kdl = {
 const agentConfigs = {
     auth: {
         crate: 'zentinel-agent-auth',
-        bin: 'zentinel-agent-auth',
+        bin: 'zentinel-auth-agent',
+        prebuilt: false,
         socket: '/var/run/zentinel/auth.sock',
         config: `agent "auth" {
         type "custom"
@@ -655,6 +656,7 @@ const agentConfigs = {
     'ai-gateway': {
         crate: 'zentinel-agent-ai-gateway',
         bin: 'zentinel-ai-gateway-agent',
+        prebuilt: false,
         socket: '/var/run/zentinel/ai-gateway.sock',
         config: `agent "ai-gateway" {
         type "custom"
@@ -732,41 +734,50 @@ function updateOutput() {
         .map(cb => cb.value);
     const installMethod = document.querySelector('input[name="install-method"]:checked').value;
 
-    // Update install commands based on selected method
+    // Update install commands based on selected method.
+    // Agents are installed with `zentinel bundle install <agent>` (prebuilt
+    // binaries pinned by the bundle lock). Agents without a prebuilt release
+    // are built from their source repository with cargo.
+    const bundled = selectedAgents.filter(a => agentConfigs[a].prebuilt !== false);
+    const fromSource = selectedAgents.filter(a => agentConfigs[a].prebuilt === false);
+    let agentInstall = '';
+    if (bundled.length > 0) {
+        agentInstall += `
+
+# Install selected agents (prebuilt binaries)
+` + bundled.map(a => `zentinel bundle install ${a}`).join(`
+`);
+    }
+    if (fromSource.length > 0) {
+        agentInstall += `
+
+# No prebuilt release for these agents yet: build from source
+` + fromSource.map(a => `cargo install --locked --git https://github.com/zentinelproxy/${agentConfigs[a].crate}`).join(`
+`);
+    }
+    const noAgentsHint = `
+
+# Select agents above to include them in the installation`;
     let installCode = '';
 
     if (installMethod === 'script') {
-        if (selectedAgents.length > 0) {
-            const agentList = selectedAgents.join(',');
-            installCode = `# Install Zentinel proxy + selected agents
-curl -fsSL https://get.zentinelproxy.io | sh -s -- --agents ${agentList}`;
-        } else {
-            installCode = `# Install Zentinel proxy
-curl -fsSL https://get.zentinelproxy.io | sh
-
-# Select agents above to include them in the installation`;
-        }
+        installCode = `# Install Zentinel proxy
+curl -fsSL https://get.zentinelproxy.io | sh` + (selectedAgents.length > 0 ? agentInstall : noAgentsHint);
     } else if (installMethod === 'cargo') {
-        if (selectedAgents.length > 0) {
-            const crates = ['zentinel-proxy', ...selectedAgents.map(a => agentConfigs[a].crate)].join(' ');
-            installCode = `# Install Zentinel proxy + selected agents
-cargo install ${crates}`;
-        } else {
-            installCode = `# Install Zentinel proxy
-cargo install zentinel-proxy
-
-# Select agents above to include them in the installation`;
-        }
+        installCode = `# Install Zentinel proxy (provides the \`zentinel\` binary; needs Rust 1.96+)
+cargo install --locked zentinel-proxy` + (selectedAgents.length > 0 ? agentInstall : noAgentsHint);
     } else if (installMethod === 'oci') {
+        installCode = `# Pull Zentinel proxy image
+docker pull ghcr.io/zentinelproxy/zentinel:{{ config.extra.software_version }}`;
         if (selectedAgents.length > 0) {
-            const images = ['ghcr.io/zentinelproxy/zentinel:latest', ...selectedAgents.map(a => `ghcr.io/zentinelproxy/${agentConfigs[a].crate}:latest`)];
-            installCode = `# Pull Zentinel proxy + selected agent images
-docker pull ${images.join(' \\\n    ')}`;
-        } else {
-            installCode = `# Pull Zentinel proxy image
-docker pull ghcr.io/zentinelproxy/zentinel:latest
+            installCode += `
 
-# Select agents above to include them in the installation`;
+# Agent container images are not published. Run agents on the host
+# and share the socket directory with the container. The bundle
+# installer ships in the zentinel binary:
+curl -fsSL https://get.zentinelproxy.io | sh -s -- --binary-only` + agentInstall;
+        } else {
+            installCode += noAgentsHint;
         }
     }
 
@@ -798,7 +809,7 @@ routes {
         upstream "backend"`;
 
     if (selectedAgents.length > 0) {
-        configCode += `\n        agents [${selectedAgents.map(a => `"${a}"`).join(' ')}]`;
+        configCode += `\n        filters ${selectedAgents.map(a => `"${a}"`).join(' ')}`;
     }
 
     configCode += `
@@ -825,6 +836,17 @@ agents {`;
     ` + agentConfigs[agent].config;
         });
         configCode += `
+}
+
+filters {`;
+        selectedAgents.forEach(agent => {
+            configCode += `
+    filter "${agent}" {
+        type "agent"
+        agent "${agent}"
+    }`;
+        });
+        configCode += `
 }`;
     } else {
         configCode += `
@@ -842,35 +864,35 @@ agents {`;
 
     if (installMethod === 'oci') {
         if (selectedAgents.length > 0) {
-            startupCode = `# Start agents (each in a separate terminal)
+            startupCode = `# Start agents on the host (socket directory is shared with the container)
+sudo mkdir -p /var/run/zentinel && sudo chown "$(id -u)" /var/run/zentinel
 `;
             selectedAgents.forEach(agent => {
-                startupCode += `docker run -d --name ${agent} \\
-    -v /var/run/zentinel:/var/run/zentinel \\
-    ghcr.io/zentinelproxy/${agentConfigs[agent].crate}:latest \\
-    --socket ${agentConfigs[agent].socket}
+                startupCode += `${agentConfigs[agent].bin} --socket ${agentConfigs[agent].socket} &
 `;
             });
             startupCode += `
-# Start Zentinel
+# Start Zentinel (same user as the agents, so it can open their sockets)
 docker run -d --name zentinel \\
+    --user "$(id -u):$(id -g)" \\
     -p 8080:8080 -p 9090:9090 \\
     -v $(pwd)/zentinel.kdl:/etc/zentinel/zentinel.kdl:ro \\
     -v /var/run/zentinel:/var/run/zentinel \\
-    ghcr.io/zentinelproxy/zentinel:latest`;
+    ghcr.io/zentinelproxy/zentinel:{{ config.extra.software_version }}`;
             startupNote.style.display = 'flex';
         } else {
             startupCode = `# Start Zentinel
 docker run -d --name zentinel \\
     -p 8080:8080 -p 9090:9090 \\
     -v $(pwd)/zentinel.kdl:/etc/zentinel/zentinel.kdl:ro \\
-    ghcr.io/zentinelproxy/zentinel:latest`;
+    ghcr.io/zentinelproxy/zentinel:{{ config.extra.software_version }}`;
             startupNote.style.display = 'none';
         }
     } else {
         // script or cargo
         if (selectedAgents.length > 0) {
             startupCode = `# Start agents (each in a separate terminal or as background processes)
+sudo mkdir -p /var/run/zentinel && sudo chown "$(id -u)" /var/run/zentinel
 `;
             selectedAgents.forEach(agent => {
                 startupCode += `${agentConfigs[agent].bin} --socket ${agentConfigs[agent].socket} &

@@ -27,20 +27,20 @@
                 '',
                 c(blue, 'info') + ': Detected platform: darwin-arm64',
                 c(blue, 'info') + ': Fetching latest release...',
-                c(blue, 'info') + ': Latest version: 26.03_2',
-                c(blue, 'info') + ': Downloading zentinel-26.03_2-darwin-arm64.tar.gz...',
+                c(blue, 'info') + ': Latest version: 26.10_3',
+                c(blue, 'info') + ': Downloading zentinel-26.10_3-darwin-arm64.tar.gz...',
                 c(blue, 'info') + ': Verifying checksum...',
                 c(blue, 'info') + ': Extracting...',
                 c(blue, 'info') + ': Installing to /usr/local/bin/zentinel...',
                 '',
-                c(green, 'success') + ': Zentinel 26.03_2 installed successfully!',
+                c(green, 'success') + ': Zentinel 26.10_3 installed successfully!',
             ],
             pause: 2500
         },
         {
             lines: [
                 c(text, '$ ') + 'zentinel --version',
-                'zentinel 0.6.24 (release 26.08_1, commit 4736285)',
+                'zentinel 0.6.45 (release 26.10_3, commit 07c2f6d)',
             ],
             pause: 1800
         },
