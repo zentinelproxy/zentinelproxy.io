@@ -292,33 +292,13 @@ Host: example.com</textarea>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                         <span>Run Locally</span>
                     </div>
-                    <p class="version-dropdown-desc">Take the same engine home. Run configs locally with any WASI-compatible runtime.</p>
-                    <div class="version-dropdown-actions">
-                        <a href="/wasm/zentinel_playground_wasm_bg.wasm" download="zentinel_playground.wasm" class="btn btn-primary btn-small">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                            Download WASM
-                            <span class="wasm-size">(~2.2 MB)</span>
-                        </a>
-                    </div>
+                    <p class="version-dropdown-desc">This page runs a browser build of the engine (a wasm-bindgen module), which does not run outside the browser. To check a config locally, use the <code>zentinel</code> binary:</p>
                     <div class="version-dropdown-code">
-                        <p class="code-label">Run with <a href="https://wasmtime.dev/" target="_blank" rel="noopener">Wasmtime</a>:</p>
-                        <pre><code><span class="code-comment"># Install wasmtime</span>
-curl https://wasmtime.dev/install.sh -sSf | bash
+                        <pre><code><span class="code-comment"># Parse and validate a config file</span>
+zentinel test -c config.kdl
 
-<span class="code-comment"># Validate a config file</span>
-wasmtime zentinel_playground.wasm validate config.kdl
-
-<span class="code-comment"># Simulate a request</span>
-wasmtime zentinel_playground.wasm simulate config.kdl \
-  --method GET --path /api/users --host example.com</code></pre>
-                    </div>
-                    <div class="version-dropdown-runtimes">
-                        <span class="runtimes-label">Also works with:</span>
-                        <a href="https://wasmer.io/" target="_blank" rel="noopener">Wasmer</a>
-                        <span class="separator">·</span>
-                        <a href="https://wazero.io/" target="_blank" rel="noopener">wazero</a>
-                        <span class="separator">·</span>
-                        <a href="https://github.com/aspect-build/rules_esbuild" target="_blank" rel="noopener">Node.js</a>
+<span class="code-comment"># Also check upstream, agent and certificate reachability</span>
+zentinel validate -c config.kdl</code></pre>
                     </div>
                 </div>
             </div>
