@@ -698,7 +698,8 @@ body > .nav-dropdown__menu {
 }
 
 [data-theme="light"] .btn-gradient {
-    background: linear-gradient(135deg, $ctp-latte-peach 0%, $ctp-latte-mauve 100%);
+    // Peach darkened so white label text meets WCAG AA (4.5:1) across the gradient
+    background: linear-gradient(135deg, darken($ctp-latte-peach, 12%) 0%, $ctp-latte-mauve 100%);
     background-size: 200% 200%;
     background-position: 0% 50%;
     color: white;
@@ -862,9 +863,11 @@ body > .nav-dropdown__menu {
 .hero-subtitle {
     font-size: 1.125rem;
     color: var(--color-text-muted);
-    max-width: 500px;
+    max-width: 440px;
     line-height: 1.7;
     text-wrap: pretty;
+    // Halo keeps the copy legible where the mascot image fades in behind it
+    text-shadow: 0 0 2px var(--color-bg), 0 0 12px var(--color-bg), 0 0 24px var(--color-bg);
 
     @media (max-width: 768px) {
         margin: 0 auto;
@@ -1540,7 +1543,14 @@ body > .nav-dropdown__menu {
     }
 }
 
+// The teaser always sits on a darkened photo, so its text stays light in both themes
 .manifesto-teaser .manifesto-content {
+    color: $ctp-mocha-text;
+
+    p {
+        color: $ctp-mocha-subtext1;
+    }
+
     .btn-light {
         margin-top: var(--space-lg);
     }
