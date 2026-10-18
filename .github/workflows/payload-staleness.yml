@@ -1,13 +1,23 @@
-# Report when the deployed playground payload falls behind zentinel.
+# Refresh the playground payload when it falls behind zentinel.
 #
-# The payload is a build artifact of another repository, copied here by hand.
-# Nothing links the two, so every zentinel release silently leaves this one
-# behind -- which is exactly what happened between 0.6.31 and 0.6.32, where the
-# playground kept passing configs the CLI had started reporting.
+# The payload is a build artifact of another repository. Nothing links the two,
+# so every zentinel release silently leaves this one behind -- which is exactly
+# what happened between 0.6.31 and 0.6.32, where the playground kept passing
+# configs the CLI had started reporting.
 #
-# This does not fail pull requests: a stale payload is not a reason to block
-# unrelated work. It opens an issue instead, so the drift is visible rather than
-# discovered by someone wondering why the playground disagrees with the proxy.
+# When `static/wasm/PAYLOAD_VERSION` is behind the current release on crates.io,
+# this builds the payload from the matching zentinel release tag, checks that
+# the module reports the expected version and validates a config, and opens a
+# pull request with the result.
+#
+# If the build fails, or the repository does not let Actions create pull
+# requests (Settings > Actions > General > "Allow GitHub Actions to create and
+# approve pull requests"), it opens or updates a tracking issue instead, as it
+# always has. When the build itself succeeded, the issue points at the pushed
+# branch and at the payload attached to the run as an artifact.
+#
+# This never fails pull requests: a stale payload is not a reason to block
+# unrelated work.
 name: Playground payload staleness
 
 on:
@@ -16,8 +26,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
+
+env:
+  ZENTINEL_REPO: zentinelproxy/zentinel
+  WASM_PACK_VERSION: 0.13.1
+  BRANCH_PREFIX: automation/playground-payload-
 
 jobs:
   check:
@@ -27,6 +43,8 @@ jobs:
 
       - name: Compare deployed payload against the latest zentinel release
         id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           deployed=$(cat static/wasm/PAYLOAD_VERSION | tr -d '[:space:]')
           latest=$(curl -sf -H 'User-Agent: zentinelproxy-io-staleness' \
@@ -37,18 +55,136 @@ jobs:
           if [ "$deployed" = "$latest" ]; then
             echo "stale=false" >> "$GITHUB_OUTPUT"
             echo "Payload is current ($deployed)."
-          else
-            echo "stale=true" >> "$GITHUB_OUTPUT"
-            echo "Payload is $deployed; zentinel is $latest."
+            exit 0
           fi
+          echo "stale=true" >> "$GITHUB_OUTPUT"
+          echo "Payload is $deployed; zentinel is $latest."
+          pr=$(gh pr list --state open --search "in:title refresh playground payload to zentinel $latest" \
+            --json url --jq '.[0].url // empty')
+          echo "open_pr=$pr" >> "$GITHUB_OUTPUT"
+          [ -z "$pr" ] || echo "A pull request for $latest is already open: $pr"
 
-      - name: Open or update the tracking issue
-        if: steps.check.outputs.stale == 'true'
+      # Everything from here to the pull request may fail without failing the
+      # job: the issue step below is the fallback.
+      - name: Build the payload from the matching zentinel release
+        id: build
+        if: steps.check.outputs.stale == 'true' && steps.check.outputs.open_pr == ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LATEST: ${{ steps.check.outputs.latest }}
+        run: |
+          set -euo pipefail
+          # Release notes carry the published crate version as
+          # "**Cargo version:** `0.6.46`"; the tag is CalVer (26.10_3).
+          tag=$(gh api "repos/$ZENTINEL_REPO/releases?per_page=30" \
+            --jq "[.[] | select((.body // \"\") | contains(\"Cargo version:** \`$LATEST\`\"))][0].tag_name // empty")
+          if [ -z "$tag" ]; then
+            echo "::error::No zentinel release names cargo version $LATEST"; exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          git clone --quiet --depth 1 --branch "$tag" "https://github.com/$ZENTINEL_REPO" "$RUNNER_TEMP/zentinel"
+          cd "$RUNNER_TEMP/zentinel"
+
+          # The tag carries the previous version; the release workflow bumps it
+          # only when publishing. Apply the same bump so get_version() matches.
+          current=$(grep -m1 '^version = "' Cargo.toml | sed 's/.*"\(.*\)".*/\1/')
+          sed -i "s/^version = \"$current\"/version = \"$LATEST\"/" Cargo.toml
+          find crates -name Cargo.toml -exec sed -i "s/version = \"$current\"/version = \"$LATEST\"/g" {} \;
+
+          # rust-toolchain.toml in the checkout selects the toolchain.
+          rustup toolchain install
+          rustup target add wasm32-unknown-unknown
+          curl -sSfL "https://github.com/wasm-bindgen/wasm-pack/releases/download/v$WASM_PACK_VERSION/wasm-pack-v$WASM_PACK_VERSION-x86_64-unknown-linux-musl.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/wasm-pack-v$WASM_PACK_VERSION-x86_64-unknown-linux-musl/wasm-pack" \
+            build --target web crates/playground-wasm
+
+          pkg="$RUNNER_TEMP/zentinel/crates/playground-wasm/pkg"
+          PKG="$pkg" node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            const pkg = process.env.PKG;
+            const m = await import(pkg + "/zentinel_playground_wasm.js");
+            m.initSync({ module: readFileSync(pkg + "/zentinel_playground_wasm_bg.wasm") });
+            const v = m.get_version();
+            if (v !== process.env.LATEST) throw new Error(`get_version() is ${v}, expected ${process.env.LATEST}`);
+            const ok = m.validate(`system { worker-threads 1; }
+          listeners { listener "http" { address "0.0.0.0:8080"; protocol "http"; } }
+          routes { route "default" { matches { path-prefix "/"; }; upstream "backend"; } }
+          upstreams { upstream "backend" { target "127.0.0.1:8081"; } }`);
+            if (!ok.valid) throw new Error("sample config did not validate: " + JSON.stringify(ok.errors));
+            if (m.validate("routes {").valid) throw new Error("broken config validated");
+            console.log(`get_version() == ${v}; sample config validates`);
+          '
+
+          cd "$GITHUB_WORKSPACE"
+          cp "$pkg"/zentinel_playground_wasm.js "$pkg"/zentinel_playground_wasm_bg.wasm static/wasm/
+          echo "$LATEST" > static/wasm/PAYLOAD_VERSION
+          git status --short static/wasm
+
+      - name: Attach the payload to the run
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playground-payload-${{ steps.check.outputs.latest }}
+          path: |
+            static/wasm/PAYLOAD_VERSION
+            static/wasm/zentinel_playground_wasm.js
+            static/wasm/zentinel_playground_wasm_bg.wasm
+
+      - name: Open a pull request
+        id: pr
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           DEPLOYED: ${{ steps.check.outputs.deployed }}
           LATEST: ${{ steps.check.outputs.latest }}
+          TAG: ${{ steps.build.outputs.tag }}
+          BASE: ${{ github.event.repository.default_branch }}
         run: |
+          set -euo pipefail
+          branch="$BRANCH_PREFIX$LATEST"
+          title="chore: refresh playground payload to zentinel $LATEST"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git add static/wasm
+          git commit -m "$title" -m "Built from the $TAG release tag; the module reports get_version() == $LATEST."
+          git push --force origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+          issue=$(gh issue list --state open --search "in:title Playground payload is behind" \
+            --json number --jq '.[0].number // empty')
+          body=$(printf '%s\n' \
+            "Built by the payload-staleness workflow from the zentinel \`$TAG\` release tag" \
+            "([run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))." \
+            "The module reports \`get_version() == $LATEST\` and validates a sample config." \
+            "" \
+            "Moves the payload from \`$DEPLOYED\` to \`$LATEST\`.")
+          [ -z "$issue" ] || body="$body"$'\n\n'"Closes #$issue"
+          url=$(gh pr create --base "$BASE" --head "$branch" \
+            --title "$title" --body "$body")
+          echo "Opened $url"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the tracking issue
+        if: steps.check.outputs.stale == 'true' && steps.check.outputs.open_pr == '' && steps.pr.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYED: ${{ steps.check.outputs.deployed }}
+          LATEST: ${{ steps.check.outputs.latest }}
+          BUILD: ${{ steps.build.outcome }}
+          BRANCH: ${{ steps.pr.outputs.branch }}
+        run: |
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ "$BUILD" != success ]; then
+            automation="The automatic rebuild failed; see [the run]($run_url)."
+          elif [ -n "$BRANCH" ]; then
+            automation="A refreshed payload was built and verified, and pushed to \`$BRANCH\`, but the pull request could not be opened (Actions may not be allowed to create pull requests in this repository). [Open it from the branch]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/$BRANCH?expand=1), or download the \`playground-payload-$LATEST\` artifact from [the run]($run_url)."
+          else
+            automation="A refreshed payload was built and verified, but could not be pushed; download the \`playground-payload-$LATEST\` artifact from [the run]($run_url)."
+          fi
           title="Playground payload is behind zentinel ($DEPLOYED -> $LATEST)"
           existing=$(gh issue list --state open --search "in:title Playground payload is behind" \
             --json number --jq '.[0].number // empty')
@@ -59,7 +195,10 @@ jobs:
             "Configuration checks added since \`$DEPLOYED\` do not run in the browser, so the" \
             "playground can pass a configuration that \`zentinel lint\` reports." \
             "" \
-            "To refresh, from a zentinel checkout at the release tag:" \
+            "$automation" \
+            "" \
+            "To refresh by hand, from a zentinel checkout at the release tag with the" \
+            "workspace version bumped to \`$LATEST\` (the tag still carries the previous one):" \
             "" \
             '```bash' \
             "wasm-pack build --target web crates/playground-wasm" \
@@ -68,7 +207,7 @@ jobs:
             "echo $LATEST > ../zentinelproxy.io/static/wasm/PAYLOAD_VERSION" \
             '```' \
             "" \
-            "The docs site carries its own copy in the tanuki theme and needs the same refresh.")
+            "The docs site carries its own copy and needs the same refresh.")
           if [ -n "$existing" ]; then
             gh issue edit "$existing" --title "$title" --body "$body"
           else
