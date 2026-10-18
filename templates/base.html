@@ -82,10 +82,8 @@
     <meta name="twitter:site" content="{{ config.extra.twitter_handle }}">
     {% endif %}
 
-    <!-- Preload fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Self-hosted fonts (Geist, SIL OFL 1.1) -->
+    <link rel="preload" href="{{ get_url(path='fonts/geist-latin-wght-normal.woff2') | safe }}" as="font" type="font/woff2" crossorigin>
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ get_url(path='style.css') | safe }}">
