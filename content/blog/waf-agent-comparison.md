@@ -2,9 +2,12 @@
 title = "598 Attack Payloads, Three WAF Engines, One Verdict"
 description = "We built wafworth, an open-source WAF testing framework with 598 tests across 18 OWASP-aligned categories, and used it to benchmark Zentinel's three WAF agent implementations against each other. No engine won everywhere. Here's what the confusion matrices actually say."
 date = 2026-03-04
+updated = 2026-10-18
 [taxonomies]
 tags = ["security", "waf", "agents", "benchmarks", "modsecurity"]
 +++
+
+> **Update — 18 October 2026.** The detection and latency figures below come from wafworth runs through the proxy and were not affected by the [August 2026 benchmark correction](@/blog/benchmarks-should-be-able-to-fail.md), which concerned zentinel-modsec's Criterion throughput benchmarks. They do predate later engine fixes: zentinel-zentinelsec was tested on zentinel-modsec v0.1.2, before the CRS v4 execution fixes in [0.1.3](@/blog/pure-rust-modsecurity-crs-v4.md) and the chain-semantics and multipart fixes ([#17](https://github.com/zentinelproxy/zentinel-modsec/pull/17), [#18](https://github.com/zentinelproxy/zentinel-modsec/pull/18)), so its numbers would likely differ today. Current engine throughput figures, revised downward in August 2026, are on the [benchmarks page](/benchmarks/).
 
 WAF marketing pages love to claim "99.9% detection" without disclosing the false-positive rate, the test corpus, or whether the tests include anything beyond `<script>alert(1)</script>`. We wanted real numbers for Zentinel's WAF agents — numbers attached to a reproducible test suite that anyone can run.
 

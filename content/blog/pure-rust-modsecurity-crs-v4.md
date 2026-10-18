@@ -2,9 +2,12 @@
 title = "Parsing Isn't Running: Making Pure-Rust ModSecurity Pass Stock OWASP CRS v4"
 description = "Our pure-Rust ModSecurity engine loaded 666 OWASP CRS v4 rules without complaint — and then blocked every single request, including GET /. A precise community bug report traced it to six SecLang semantics that parsed fine but executed wrong. Here's the anatomy of the fix, shipped in zentinel-modsec 0.1.3."
 date = 2026-06-16
+updated = 2026-10-18
 [taxonomies]
 tags = ["security", "waf", "modsecurity", "owasp", "rust"]
 +++
+
+> **Update — 18 October 2026.** The benchmark referred to at the end of this post was corrected in August 2026: its measured section never executed the detection rules, so the throughput it reported was transaction setup overhead. The full account is in [Benchmarks Should Be Able to Fail](@/blog/benchmarks-should-be-able-to-fail.md); current, lower figures are on the [benchmarks page](/benchmarks/). Throughput figures quoted elsewhere before August 2026 should not be relied on.
 
 A rule engine that loads your rules is not the same as a rule engine that runs them.
 

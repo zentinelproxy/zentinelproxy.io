@@ -2,9 +2,12 @@
 title = "Introducing the Zentinel Control Plane: Fleet Management Built on Elixir"
 description = "The Zentinel Control Plane is a fleet management system for Zentinel reverse proxies — built with Elixir/Phoenix and LiveView. It handles configuration distribution, deployment orchestration, and real-time node monitoring. Here's what we built, why we chose Elixir, and how the internals work."
 date = 2026-02-16
+updated = 2026-10-18
 [taxonomies]
 tags = ["control-plane", "elixir", "fleet-management", "release"]
 +++
+
+> **Update — 18 October 2026.** The rollout health gates described below are evaluated from node heartbeats and were not affected, but the upstream `health-check` blocks in the bundles a control plane distributes were: on proxy releases before 26.09_2 (crate 0.6.39) they never sent a probe, so a node could report healthy while routing to a dead backend. Run 26.09_2 or later on managed nodes; existing `health-check` blocks start probing without a configuration change. See the [26.09_2 changelog entry](https://github.com/zentinelproxy/zentinel/blob/main/CHANGELOG.md#26092---2026-09-02).
 
 Managing one Zentinel proxy is straightforward. A KDL config file, a binary, a `systemd` unit. But as deployments grow — multiple regions, staging environments, dozens of nodes — the operational questions multiply. How do you push a config change to 30 nodes without taking everything down at once? How do you know which nodes are actually running which configuration? How do you roll back when a bad config makes it past review?
 
