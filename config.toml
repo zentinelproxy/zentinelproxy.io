@@ -3,7 +3,7 @@
 
 base_url = "https://zentinelproxy.io"
 title = "Zentinel"
-description = "A security-first reverse proxy based on Pingora built to guard the free web. Sleepable ops at the edge."
+description = "A security-first reverse proxy built on Pingora: explicit configuration, bounded resources, and WAF and auth in isolated agents."
 default_language = "en"
 
 # Compile Sass/SCSS
