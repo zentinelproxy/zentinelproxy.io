@@ -280,9 +280,8 @@ corrections.
 ## What is still open
 
 This class is not closed, and it would undercut the point of this post to
-pretend otherwise. As of 26.10_3, these are accepted without a lint warning:
-
-<!-- TODO: file issues for each of these and link them before publishing. All four reproduced 2026-10-19 against the 0.6.46 playground WASM (validate + lint_config). -->
+pretend otherwise. As of 26.10_3, these are accepted without a lint warning
+(tracked in [#521](https://github.com/zentinelproxy/zentinel/issues/521)):
 
 - `method "GET" "POST"` in a route's `matches` keeps only the first method.
 - `load-balancing "least-connections"`, with a hyphen, falls back to round
@@ -291,7 +290,12 @@ pretend otherwise. As of 26.10_3, these are accepted without a lint warning:
 - A run-together line inside `matches` is not reported, and the conditions
   after the first are dropped.
 
-The docs checker already treats the first two as traps. And `zentinel lint`
+The docs checker already treats the first two as traps. A route's
+`max-body-size` and `rate-limits { default-rps }` are parsed and never
+enforced ([#517](https://github.com/zentinelproxy/zentinel/issues/517),
+[#518](https://github.com/zentinelproxy/zentinel/issues/518)), and
+`zentinel test` does not report ignored keys at all; only `lint` does
+([#523](https://github.com/zentinelproxy/zentinel/issues/523)). And `zentinel lint`
 exits 0 on warnings, so a CI step that wants to fail on ignored keys has to
 look for them, as the docs job does.
 
