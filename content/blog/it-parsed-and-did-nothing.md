@@ -1,8 +1,7 @@
 +++
 title = "It Parsed, and Did Nothing"
 description = "Between August and October we fixed more than a dozen Zentinel features that were accepted, validated and logged as running, and had no effect. Timeouts, failure modes, TLS settings, health checks, agents, WAF rules. None of them produced an error, because none of them failed. Here is the shape they share, why ordinary testing cannot see it, and the checks that catch it now."
-date = 2026-10-20
-draft = true
+date = 2026-10-19
 [taxonomies]
 tags = ["engineering", "configuration", "testing", "kdl", "waf"]
 +++
@@ -150,7 +149,6 @@ shape people deploy (blocking, paranoia 1) and it went from 19.9% to 54.4%.
 All four are fixed in zentinel-modsec
 [0.4.0](https://github.com/zentinelproxy/zentinel-modsec/releases/tag/v0.4.0),
 released 31 August; 0.3.0 has been yanked from crates.io.
-<!-- TODO: confirm whether a tagged zentinel-agent-zentinelsec release carrying modsec 0.4.0 exists before publishing; as of 2026-10-19 the latest tag is v0.3.0 (Feb 2026) and only main depends on 0.4.0. -->
 The ZentinelSec agent depends on 0.4.0 on its main branch; a tagged agent
 release that includes it has not been cut yet.
 
@@ -254,7 +252,15 @@ fails the build if any of them uses a key nothing reads. On its first run, that
 test found `verify #true` in an example config's upstream TLS block, where the
 real key is `insecure-skip-verify`.
 
-<!-- TODO: confirm playground lint PR merged, then add: "The [playground](/playground/) now flags unknown keys as you type." -->
+The [playground](/playground/) now runs the same check as you type. Until
+this week it did not. It called the parser and nothing else, so a typo'd key
+showed as "Valid", and so did a route pointing at an upstream that doesn't
+exist, which the proxy refuses to start with. Looking into that turned up one
+more of our own: `service-type` was on the route's list of known keys, so lint
+passed it, but the parser never read it, and `service-type "api"` (used
+throughout our getting-started guide) left the route as `web`. Both are fixed
+on main ([#514](https://github.com/zentinelproxy/zentinel/pull/514)) and ship
+in the next release.
 
 ### Validate every snippet in the docs
 
