@@ -71,6 +71,13 @@
             background: var(--color-text-muted);
         }
     }
+
+    // On phones only a few templates fit; fade the right edge so it is clear
+    // the row scrolls.
+    @media (max-width: 768px) {
+        -webkit-mask-image: linear-gradient(to right, #000 80%, transparent);
+        mask-image: linear-gradient(to right, #000 80%, transparent);
+    }
 }
 
 .template-card {

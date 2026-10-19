@@ -297,6 +297,9 @@ Host: example.com</textarea>
                         <pre><code><span class="code-comment"># Parse and validate a config file</span>
 zentinel test -c config.kdl
 
+<span class="code-comment"># Report settings that would be ignored (typos, misplaced keys)</span>
+zentinel lint -c config.kdl
+
 <span class="code-comment"># Also check upstream, agent and certificate reachability</span>
 zentinel validate -c config.kdl</code></pre>
                     </div>

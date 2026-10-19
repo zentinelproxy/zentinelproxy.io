@@ -71,6 +71,29 @@
     font-weight: 500;
 }
 
+// On phones the three stats sit in one compact row rather than filling the
+// first screen with a full-width card each.
+@media (max-width: 640px) {
+    .features-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-sm);
+        margin: var(--space-lg) 0;
+    }
+
+    .stat-card {
+        padding: var(--space-md) var(--space-xs);
+    }
+
+    .stat-number,
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+}
+
 // Search & Filter
 .features-search {
     display: flex;
@@ -500,10 +523,6 @@
 
 // Responsive adjustments
 @media (max-width: 768px) {
-    .features-stats {
-        grid-template-columns: 1fr;
-    }
-
     .feature-section-header {
         flex-direction: column;
         align-items: flex-start;

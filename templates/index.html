@@ -112,8 +112,8 @@
                 <span class="gradient-text">built to guard the free web</span>
             </h1>
             <p class="hero-subtitle">
-                Explicit configuration with no hidden defaults, bounded memory
-                and timeouts, and WAF, auth and rate limiting in isolated agents
+                Explicit configuration you can check before it runs, bounded
+                memory and timeouts, and WAF, auth and rate limiting in isolated agents
                 that can't take the proxy down. Built on Cloudflare's Pingora for
                 teams who want an edge they can reason about.
             </p>
@@ -360,9 +360,9 @@
                 <p>
                     Every significant behavior is declared in
                     <a href="https://kdl.dev/" target="_blank" rel="noopener">KDL</a>
-                    and validated before it loads. No silent defaults, no hidden
-                    policy layers: <code>zentinel test</code> tells you what the
-                    proxy will do before traffic does.
+                    and checked before it loads: <code>zentinel test</code> refuses
+                    a configuration the proxy can't run, and <code>zentinel lint</code>
+                    names any setting that would be ignored. No hidden policy layers.
                 </p>
             </article>
             <article class="pillar-card">
@@ -523,6 +523,7 @@
 
 <span class="c"># Check the config before it touches traffic</span>
 <span class="p">$ </span>zentinel test -c zentinel.kdl
+<span class="p">$ </span>zentinel lint -c zentinel.kdl
 
 <span class="c"># Run</span>
 <span class="p">$ </span>zentinel run -c zentinel.kdl</pre>
