@@ -5,6 +5,7 @@
 
 import init, {
     validate,
+    lint_config,
     simulate,
     simulate_with_agents,
     create_sample_request,
@@ -165,9 +166,6 @@ routes {
             timeout-secs 30
             max-body-size "5MB"
         }
-        error-pages {
-            default-format "json"
-        }
     }
 
     // API v1 (legacy, read-only)
@@ -181,9 +179,6 @@ routes {
         policies {
             timeout-secs 30
             max-body-size "1MB"
-        }
-        error-pages {
-            default-format "json"
         }
     }
 
@@ -385,15 +380,6 @@ routes {
                 brotli #true
             }
         }
-        error-pages {
-            default-format "html"
-            pages {
-                "404" {
-                    format "html"
-                    message "Page not found"
-                }
-            }
-        }
     }
 }`,
 
@@ -423,7 +409,6 @@ routes {
         matches {
             path-prefix "/ws/chat"
         }
-        service-type "websocket"
         upstream "chat-backend"
         policies {
             timeout-secs 3600
@@ -436,7 +421,6 @@ routes {
         matches {
             path-prefix "/ws/notifications"
         }
-        service-type "websocket"
         upstream "notifications-backend"
         policies {
             timeout-secs 3600
@@ -453,9 +437,6 @@ routes {
         upstream "api-backend"
         policies {
             timeout-secs 30
-        }
-        error-pages {
-            default-format "json"
         }
     }
 
@@ -557,9 +538,6 @@ routes {
                 }
                 remove "Server" "X-Powered-By"
             }
-        }
-        error-pages {
-            default-format "json"
         }
     }
 
@@ -762,7 +740,6 @@ routes {
         matches {
             path-prefix "/user.UserService/"
         }
-        service-type "grpc"
         upstream "user-grpc"
         policies {
             timeout-secs 30
@@ -775,7 +752,6 @@ routes {
         matches {
             path-prefix "/order.OrderService/"
         }
-        service-type "grpc"
         upstream "order-grpc"
         policies {
             timeout-secs 45
@@ -788,7 +764,6 @@ routes {
         matches {
             path-prefix "/inventory.InventoryService/"
         }
-        service-type "grpc"
         upstream "inventory-grpc"
         policies {
             timeout-secs 30
@@ -1137,6 +1112,38 @@ function setStatus(type, text) {
     statusIcon.className = 'status-icon status-' + type;
 }
 
+// Run the checks `zentinel validate` and `zentinel lint` would.
+//
+// `validate` alone used to be the whole check, and it does not look for
+// settings nothing reads: a typo'd key parsed, was dropped, and the page said
+// "Valid". `lint_config` finds those from the KDL text, so its unknown-key
+// findings are shown as warnings. Its best-practice advice (no retry policy,
+// a single target, ...) is left out: every template would carry it.
+//
+// A route naming an upstream that does not exist stops the proxy from
+// starting, but payloads up to 0.6.46 report it only as a warning. Treat it
+// as the error it is; newer payloads already fail validation for it.
+const FATAL_WARNINGS = new Set(['UNDEFINED_UPSTREAM']);
+
+function checkConfig(config) {
+    const result = validate(config);
+    if (!result.valid) return result;
+
+    const fatal = (result.warnings || []).filter(w => FATAL_WARNINGS.has(w.code));
+    if (fatal.length > 0) {
+        const messages = [...new Set(fatal.map(w => w.message))];
+        return {
+            ...result,
+            valid: false,
+            errors: messages.map(message => ({ message, severity: 'error' })),
+        };
+    }
+
+    const lint = lint_config(config);
+    const ignored = (lint && lint.warnings || []).filter(w => w.code === 'unknown-key');
+    return { ...result, warnings: [...(result.warnings || []), ...ignored] };
+}
+
 // Validate configuration
 function validateConfig() {
     console.log('validateConfig called, wasmReady:', wasmReady);
@@ -1145,7 +1152,7 @@ function validateConfig() {
     const config = configEditor.value;
     console.log('Validating config length:', config.length);
     try {
-        lastValidation = validate(config);
+        lastValidation = checkConfig(config);
 
         if (lastValidation.valid) {
             if (lastValidation.warnings && lastValidation.warnings.length > 0) {
