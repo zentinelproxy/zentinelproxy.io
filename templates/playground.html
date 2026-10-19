@@ -93,7 +93,6 @@
                         <pre class="editor-highlight" id="editor-highlight" aria-hidden="true"><code id="highlight-code"></code></pre>
                         <textarea id="config-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -116,7 +115,7 @@ routes {
         }
     }
     route "static" {
-        priority "medium"
+        priority "normal"
         matches {
             path-prefix "/static"
         }
