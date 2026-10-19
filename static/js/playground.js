@@ -26,7 +26,6 @@ const TEMPLATES = {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -49,7 +48,7 @@ routes {
         }
     }
     route "static" {
-        priority "medium"
+        priority "normal"
         matches {
             path-prefix "/static"
         }
@@ -77,7 +76,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 // Listener for the inference API
@@ -139,7 +137,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -208,7 +205,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -297,7 +293,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -388,7 +383,6 @@ routes {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -476,7 +470,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -583,7 +576,6 @@ observability {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -636,7 +628,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -723,7 +714,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {
@@ -794,7 +784,6 @@ upstreams {
 
 system {
     worker-threads 4
-    max-connections 10000
 }
 
 listeners {

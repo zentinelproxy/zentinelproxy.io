@@ -511,7 +511,6 @@ From [`tests/soak/soak-config.kdl`](https://github.com/zentinelproxy/zentinel/bl
 ```kdl
 system {
     worker-threads 2
-    max-connections 10000
     graceful-shutdown-timeout-secs 30
 }
 ```
