@@ -16,6 +16,11 @@
 # always has. When the build itself succeeded, the issue points at the pushed
 # branch and at the payload attached to the run as an artifact.
 #
+# After merging the payload pull request, check that the live site serves
+# the new PAYLOAD_VERSION. When it was merged within a minute of another merge,
+# Cloudflare Pages has been seen to build only the earlier commit (0.6.48, on
+# 2026-10-19), leaving the old payload live until the next push to main.
+#
 # This never fails pull requests: a stale payload is not a reason to block
 # unrelated work.
 name: Playground payload staleness
