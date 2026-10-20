@@ -2,10 +2,12 @@
 title = "Zentinel Upgrades to Pingora 0.8: Keepalive Limits, Stricter HTTP Framing, and a Leaner Builder API"
 description = "Pingora 0.8.0 brings connection reuse limits, stricter HTTP/1 validation, upload write-pending diagnostics, and a new builder pattern for proxy services. Here's what changed in Zentinel and what operators should know."
 date = 2026-03-05
-updated = 2026-10-18
+updated = 2026-10-20
 [taxonomies]
 tags = ["infrastructure", "pingora", "security", "rust"]
 +++
+
+> **Update — 20 October 2026.** The fork described under *The fork lives on* did not go away at 0.8.1 or 0.9.0, as this post said it would. Since August 2026 it has carried three small feature patches rather than security fixes, and its modified crates are published on crates.io as `zentinel-pingora-*`. Why, and what it costs: [Why Zentinel Runs on a Fork of Pingora](@/blog/why-we-fork-pingora.md).
 
 > **Update — 18 October 2026.** Zentinel has since moved on from Pingora 0.8: 26.06_2 took the 0.8.1 security release, and 26.09_6 (crate 0.6.43) upgraded to **Pingora 0.9.0**, which adds request-target and authority hardening, strips hop-by-hop request headers before the upstream (WebSocket upgrades still work; other HTTP/1 upgrades such as `h2c` are no longer forwarded), and never reuses an HTTP/1 upstream connection after an incomplete response. The 0.8 changes described below still apply. See the [26.09_6 changelog entry](https://github.com/zentinelproxy/zentinel/blob/main/CHANGELOG.md#26096---2026-09-15) and the [26.09–26.10 summary](@/blog/zentinel-26-09-26-10.md).
 

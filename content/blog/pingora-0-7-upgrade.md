@@ -2,9 +2,12 @@
 title = "Zentinel Upgrades to Pingora 0.7: Dropping the Fork, Gaining New Capabilities"
 description = "Cloudflare's Pingora 0.7 ships connection-level filtering, extensible TLS context, and the security fixes we were carrying in a fork. Zentinel now runs on upstream Pingora with zero patches — here's what changed and what it unlocks."
 date = 2026-02-02
+updated = 2026-10-20
 [taxonomies]
 tags = ["infrastructure", "pingora", "security", "rust"]
 +++
+
+> **Update — 20 October 2026.** Zentinel no longer runs on upstream Pingora with zero patches. A one-commit fork came back for 0.8 (see the [0.8 post](@/blog/pingora-0-8-upgrade.md)), and since August 2026 the fork has carried three small feature patches rather than security fixes: a caller-supplied rustls configuration, retries on an upstream response, and a per-request retry buffer. Its modified crates are published on crates.io as `zentinel-pingora-*`. Why, and what it costs: [Why Zentinel Runs on a Fork of Pingora](@/blog/why-we-fork-pingora.md).
 
 Zentinel exists because of [Pingora](https://github.com/cloudflare/pingora). Cloudflare open-sourced their proxy framework in 2024, and it gave us what would have taken years to build: async I/O, connection pooling, HTTP/1.1 and HTTP/2 handling, TLS termination — all in Rust, all battle-tested at Cloudflare's scale. Zentinel is the security and routing layer on top; Pingora is the engine underneath.
 
