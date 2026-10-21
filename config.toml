@@ -68,55 +68,54 @@ github = "https://github.com/zentinelproxy/zentinel"
 # Discord links are simply hidden while it is unset. Restore by setting a
 # permanent invite (Server Settings -> Invites -> expiry Never).
 
-# Navigation (supports dropdowns via children array)
-[[extra.nav_links]]
-name = "Get Started"
-[[extra.nav_links.children]]
-name = "Install & Configure"
-url = "/customize/"
-[[extra.nav_links.children]]
-name = "Documentation"
-url = "https://docs.zentinelproxy.io/"
-external = true
-[[extra.nav_links.children]]
-name = "Playground"
-url = "/playground/"
-
-[[extra.nav_links]]
-name = "Features"
-url = "/features/"
-
+# Navigation (templates/base.html). Entries with children render as
+# dropdowns (Explore, Learn), the rest as direct links. The GitHub link is the
+# icon next to search, and "Install" is the call to action on the right.
 [[extra.nav_links]]
 name = "Explore"
+[[extra.nav_links.children]]
+name = "Features"
+url = "/features/"
+[[extra.nav_links.children]]
+name = "Config Converter"
+url = "/converter/"
 [[extra.nav_links.children]]
 name = "Benchmarks"
 url = "/benchmarks/"
 [[extra.nav_links.children]]
-name = "Agent Registry"
-url = "https://registry.zentinelproxy.io/"
-external = true
-[[extra.nav_links.children]]
-name = "Converter"
-url = "/converter/"
-[[extra.nav_links.children]]
-name = "Supply Chain"
-url = "/supply-chain/"
+name = "Compare"
+url = "/compare/"
 [[extra.nav_links.children]]
 name = "Control Plane"
 url = "/control-plane/"
 [[extra.nav_links.children]]
-name = "Manifesto"
-url = "/manifesto/"
+name = "Agent Registry"
+url = "https://registry.zentinelproxy.io/"
+external = true
 
 [[extra.nav_links]]
+name = "Learn"
+[[extra.nav_links.children]]
+name = "Install & Configure"
+url = "/customize/"
+[[extra.nav_links.children]]
 name = "Blog"
 url = "/blog/"
+[[extra.nav_links.children]]
+name = "Manifesto"
+url = "/manifesto/"
+[[extra.nav_links.children]]
+name = "Supply Chain"
+url = "/supply-chain/"
+[[extra.nav_links.children]]
+name = "Security"
+url = "/security/"
+
+[[extra.nav_links]]
+name = "Playground"
+url = "/playground/"
 
 [[extra.nav_links]]
 name = "Docs"
 url = "https://docs.zentinelproxy.io/"
-
-[[extra.nav_links]]
-name = "GitHub"
-url = "https://github.com/zentinelproxy/zentinel"
 external = true

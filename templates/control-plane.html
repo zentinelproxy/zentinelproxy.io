@@ -412,7 +412,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 
 .cp-subtitle {
     font-size: 1.25rem;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     max-width: 680px;
     margin: 0 auto;
     line-height: 1.6;
@@ -432,12 +432,12 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-section .section-heading svg {
-    color: var(--color-primary);
+    color: var(--z-accent-text);
     flex-shrink: 0;
 }
 
 .cp-section .section-description {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     font-size: 1.1rem;
     line-height: 1.6;
     margin-bottom: 1.5rem;
@@ -450,11 +450,11 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
     text-align: center;
     font-size: 1.1rem;
     line-height: 1.7;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
 }
 
 .cp-intro a {
-    color: var(--color-accent, #60a5fa);
+    color: var(--z-accent-2-text);
     text-decoration: underline;
     text-underline-offset: 2px;
 }
@@ -474,8 +474,8 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-flow-step {
-    background: var(--color-surface, var(--color-bg-elevated));
-    border: 1px solid var(--color-border);
+    background: var(--z-surface);
+    border: 1px solid var(--z-border);
     border-radius: 8px;
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
@@ -483,7 +483,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-flow-arrow {
-    color: var(--color-primary);
+    color: var(--z-accent-text);
     display: flex;
     align-items: center;
 }
@@ -495,14 +495,14 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     line-height: 1.6;
 }
 
 .cp-steps code {
-    font-family: 'Geist Mono', monospace;
+    font-family: var(--z-font-mono);
     font-size: 0.85rem;
-    background: var(--color-code-bg, #1a1a2e);
+    background: var(--z-code-bg);
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
 }
@@ -510,14 +510,14 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 .cp-note {
     text-align: center;
     margin-top: 1.5rem;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     font-style: italic;
 }
 
 /* Architecture */
 .cp-architecture {
     overflow-x: auto;
-    background: var(--color-code-bg, #1a1a2e);
+    background: var(--z-code-bg);
     border-radius: 12px;
     padding: 1.5rem;
 }
@@ -528,10 +528,10 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-architecture code {
-    font-family: 'Geist Mono', monospace;
+    font-family: var(--z-font-mono);
     font-size: 0.8rem;
     line-height: 1.5;
-    color: var(--color-code-text, #e0e0e0);
+    color: var(--z-code-fg);
 }
 
 /* Features grid */
@@ -542,15 +542,15 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-feature-card {
-    background: var(--color-surface, var(--color-bg-elevated));
-    border: 1px solid var(--color-border);
+    background: var(--z-surface);
+    border: 1px solid var(--z-border);
     border-radius: 12px;
     padding: 2rem;
     transition: border-color 0.2s;
 }
 
 .cp-feature-card:hover {
-    border-color: var(--color-border-hover, var(--color-border));
+    border-color: var(--z-border-strong);
 }
 
 .cp-feature-icon {
@@ -559,10 +559,10 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-surface-elevated, var(--color-bg-elevated));
+    background: var(--z-surface-raised);
     border-radius: 10px;
     margin-bottom: 1rem;
-    color: var(--color-accent, #60a5fa);
+    color: var(--z-accent-2-text);
 }
 
 .cp-feature-card h3 {
@@ -581,7 +581,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-feature-card li {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     line-height: 1.5;
     font-size: 0.95rem;
     padding-left: 1rem;
@@ -596,17 +596,17 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--z-accent);
 }
 
 .cp-feature-card li strong {
-    color: var(--color-text, var(--color-text-primary));
+    color: var(--z-text);
 }
 
 .cp-feature-card code {
-    font-family: 'Geist Mono', monospace;
+    font-family: var(--z-font-mono);
     font-size: 0.8rem;
-    background: var(--color-code-bg, #1a1a2e);
+    background: var(--z-code-bg);
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
 }
@@ -620,7 +620,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-quickstart-block p {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     margin-bottom: 0.75rem;
     font-size: 1rem;
 }
@@ -631,7 +631,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-quickstart-note a {
-    color: var(--color-accent, #60a5fa);
+    color: var(--z-accent-2-text);
     text-decoration: underline;
     text-underline-offset: 2px;
 }
@@ -652,19 +652,19 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 .cp-table-wrapper td {
     text-align: left;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--z-border);
 }
 
 .cp-table-wrapper th {
     font-weight: 600;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .cp-table-wrapper td {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
 }
 
 /* API */
@@ -682,11 +682,11 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 
 .cp-api-note {
     margin-top: 1.5rem;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
 }
 
 .cp-api-note a {
-    color: var(--color-accent, #60a5fa);
+    color: var(--z-accent-2-text);
     text-decoration: underline;
     text-underline-offset: 2px;
 }
@@ -699,8 +699,8 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-stack-item {
-    background: var(--color-surface, var(--color-bg-elevated));
-    border: 1px solid var(--color-border);
+    background: var(--z-surface);
+    border: 1px solid var(--z-border);
     border-radius: 8px;
     padding: 1rem 1.25rem;
     display: flex;
@@ -713,7 +713,7 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-stack-item span {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     font-size: 0.85rem;
 }
 
@@ -735,14 +735,14 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-cta .cta-content p {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     margin-bottom: 1.5rem;
     line-height: 1.6;
 }
 
 /* Shared command blocks (reuse supply-chain pattern) */
 .cp-page .verify-command {
-    background: var(--color-code-bg, #1a1a2e);
+    background: var(--z-code-bg);
     border-radius: 8px;
     padding: 1rem;
     overflow-x: auto;
@@ -754,10 +754,10 @@ POST /api/v1/graphql                           # GraphQL endpoint</code></pre>
 }
 
 .cp-page .verify-command code {
-    font-family: 'Geist Mono', monospace;
+    font-family: var(--z-font-mono);
     font-size: 0.8rem;
     line-height: 1.5;
-    color: var(--color-code-text, #e0e0e0);
+    color: var(--z-code-fg);
 }
 
 /* Responsive */

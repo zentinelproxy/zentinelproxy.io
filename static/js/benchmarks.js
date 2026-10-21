@@ -4,14 +4,37 @@
 (function () {
   'use strict';
 
-  // Color palette - Zentinel uses primary/mauve, others muted
-  const PROXY_COLORS = {
-    zentinel: { bg: 'rgba(203, 166, 247, 0.8)', border: 'rgb(203, 166, 247)' },
-    envoy:    { bg: 'rgba(137, 180, 250, 0.6)', border: 'rgb(137, 180, 250)' },
-    haproxy:  { bg: 'rgba(166, 227, 161, 0.6)', border: 'rgb(166, 227, 161)' },
-    nginx:    { bg: 'rgba(249, 226, 175, 0.6)', border: 'rgb(249, 226, 175)' },
-    caddy:    { bg: 'rgba(245, 194, 231, 0.6)', border: 'rgb(245, 194, 231)' },
-  };
+  // Colours come from the design tokens (--z-* custom properties), read at
+  // render time so the charts follow the current theme.
+  function token(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue('--z-' + name).trim();
+  }
+
+  function withAlpha(hex, a) {
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join('');
+    var n = parseInt(h, 16);
+    return 'rgba(' + ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + a + ')';
+  }
+
+  function swatch(role, a) {
+    var c = token(role);
+    return { bg: withAlpha(c, a), border: c };
+  }
+
+  // Zentinel takes the accent; the others take the status hues.
+  var PROXY_COLORS = {};
+  function refreshPalette() {
+    PROXY_COLORS = {
+      zentinel: swatch('accent', 0.85),
+      envoy: swatch('info', 0.6),
+      haproxy: swatch('success', 0.6),
+      nginx: swatch('warn', 0.6),
+      caddy: swatch('accent-2-text', 0.6),
+    };
+  }
+
+  var CHART_FONT = "'Atkinson Hyperlegible Mono', ui-monospace, monospace";
 
   const PROXY_LABELS = {
     zentinel: 'Zentinel',
@@ -21,19 +44,12 @@
     caddy: 'Caddy',
   };
 
-  function isDarkMode() {
-    return document.documentElement.getAttribute('data-theme') === 'dark' ||
-      getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim().startsWith('#1') ||
-      getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim().startsWith('#2') ||
-      window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-
   function getTextColor() {
-    return isDarkMode() ? 'rgba(205, 214, 244, 0.8)' : 'rgba(30, 30, 46, 0.8)';
+    return token('muted');
   }
 
   function getGridColor() {
-    return isDarkMode() ? 'rgba(108, 112, 134, 0.2)' : 'rgba(108, 112, 134, 0.15)';
+    return withAlpha(token('border-strong'), 0.25);
   }
 
   function chartDefaults() {
@@ -42,27 +58,27 @@
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          labels: { color: getTextColor(), font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          labels: { color: getTextColor(), font: { family: CHART_FONT, size: 12 } },
         },
         tooltip: {
-          backgroundColor: isDarkMode() ? 'rgba(30, 30, 46, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-          titleColor: isDarkMode() ? '#cdd6f4' : '#1e1e2e',
-          bodyColor: isDarkMode() ? '#bac2de' : '#313244',
-          borderColor: isDarkMode() ? 'rgba(108, 112, 134, 0.3)' : 'rgba(108, 112, 134, 0.2)',
+          backgroundColor: token('surface-raised'),
+          titleColor: token('heading'),
+          bodyColor: token('text'),
+          borderColor: token('border-strong'),
           borderWidth: 1,
           cornerRadius: 8,
           padding: 12,
-          bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
-          titleFont: { family: "'JetBrains Mono', monospace", size: 13, weight: 'bold' },
+          bodyFont: { family: CHART_FONT, size: 12 },
+          titleFont: { family: CHART_FONT, size: 13, weight: 'bold' },
         },
       },
       scales: {
         x: {
-          ticks: { color: getTextColor(), font: { family: "'JetBrains Mono', monospace", size: 11 } },
+          ticks: { color: getTextColor(), font: { family: CHART_FONT, size: 11 } },
           grid: { color: getGridColor() },
         },
         y: {
-          ticks: { color: getTextColor(), font: { family: "'JetBrains Mono', monospace", size: 11 } },
+          ticks: { color: getTextColor(), font: { family: CHART_FONT, size: 11 } },
           grid: { color: getGridColor() },
         },
       },
@@ -260,24 +276,24 @@
           {
             label: 'Initial',
             data: initialData,
-            backgroundColor: 'rgba(166, 227, 161, 0.6)',
-            borderColor: 'rgb(166, 227, 161)',
+            backgroundColor: swatch('success', 0.6).bg,
+            borderColor: swatch('success', 0.6).border,
             borderWidth: 2,
             borderRadius: 4,
           },
           {
             label: 'Peak',
             data: peakData,
-            backgroundColor: 'rgba(249, 226, 175, 0.6)',
-            borderColor: 'rgb(249, 226, 175)',
+            backgroundColor: swatch('warn', 0.6).bg,
+            borderColor: swatch('warn', 0.6).border,
             borderWidth: 2,
             borderRadius: 4,
           },
           {
             label: 'Final',
             data: finalData,
-            backgroundColor: 'rgba(137, 180, 250, 0.6)',
-            borderColor: 'rgb(137, 180, 250)',
+            backgroundColor: swatch('info', 0.6).bg,
+            borderColor: swatch('info', 0.6).border,
             borderWidth: 2,
             borderRadius: 4,
           },
@@ -336,6 +352,18 @@
   // -------------------------------------------------------------------------
   // Init
   // -------------------------------------------------------------------------
+  function renderCharts(data) {
+    if (window.Chart && Chart.instances) {
+      Object.keys(Chart.instances).forEach(function (k) { Chart.instances[k].destroy(); });
+    }
+    refreshPalette();
+    renderRpsChart(data);
+    renderLatencyChart(data);
+    renderMemoryTimelineChart(data);
+    renderCpuTimelineChart(data);
+    renderMemoryFootprintChart(data);
+  }
+
   function init() {
     fetch('/data/benchmark-results.json')
       .then(function (res) {
@@ -344,17 +372,21 @@
       })
       .then(function (data) {
         populateMetadata(data);
-        renderRpsChart(data);
-        renderLatencyChart(data);
-        renderMemoryTimelineChart(data);
-        renderCpuTimelineChart(data);
-        renderMemoryFootprintChart(data);
+        renderCharts(data);
+        // Redraw in the new colours when the theme changes (footer switch or OS)
+        document.addEventListener('zentinel:themechange', function () { renderCharts(data); });
+        if (window.matchMedia) {
+          var mq = window.matchMedia('(prefers-color-scheme: light)');
+          var onChange = function () { renderCharts(data); };
+          if (mq.addEventListener) mq.addEventListener('change', onChange);
+          else if (mq.addListener) mq.addListener(onChange);
+        }
       })
       .catch(function (err) {
         console.error('Benchmark chart error:', err);
         var container = document.querySelector('.benchmark-charts');
         if (container) {
-          container.innerHTML = '<p style="color: var(--color-text-muted); text-align: center;">Benchmark data not available.</p>';
+          container.innerHTML = '<p style="color: var(--z-muted); text-align: center;">Benchmark data not available.</p>';
         }
       });
   }

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ lang | default(value='en') }}" prefix="og: https://ogp.me/ns#" data-theme="auto">
+<html lang="{{ lang | default(value='en') }}" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#160d15" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#faf6fa" media="(prefers-color-scheme: light)">
 
     <!-- Primary Meta Tags -->
     {#- Per-page meta: page/section title and description, falling back to the site values. -#}
@@ -82,8 +84,9 @@
     <meta name="twitter:site" content="{{ config.extra.twitter_handle }}">
     {% endif %}
 
-    <!-- Self-hosted fonts (Geist, SIL OFL 1.1) -->
-    <link rel="preload" href="{{ get_url(path='fonts/geist-latin-wght-normal.woff2') | safe }}" as="font" type="font/woff2" crossorigin>
+    <!-- Self-hosted fonts (Unbounded, Atkinson Hyperlegible Next/Mono; SIL OFL 1.1) -->
+    <link rel="preload" href="{{ get_url(path='fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2') | safe }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ get_url(path='fonts/unbounded-latin-wght-normal.woff2') | safe }}" as="font" type="font/woff2" crossorigin>
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ get_url(path='style.css') | safe }}">
@@ -95,13 +98,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ get_url(path='apple-touch-icon.png') | safe }}">
     <link rel="manifest" href="{{ get_url(path='site.webmanifest') | safe }}">
 
-    <!-- Theme detection script - runs before paint -->
+    <!-- Theme: applied before first paint. A stored "light" or "dark" sets
+         data-theme on <html>; no stored value (System) leaves it unset so the
+         tokens follow prefers-color-scheme. The switch is in the footer. -->
     <script>
-        (function() {
-            const stored = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = stored || (prefersDark ? 'dark' : 'light');
-            document.documentElement.dataset.theme = theme;
+        (function () {
+            try {
+                var t = localStorage.getItem('theme');
+                if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
         })();
     </script>
 
@@ -122,15 +127,7 @@
                 "publisher": {
                     "@id": "{{ config.base_url | safe }}/#organization"
                 },
-                "inLanguage": "{{ lang | default(value='en') }}",
-                "potentialAction": {
-                    "@type": "SearchAction",
-                    "target": {
-                        "@type": "EntryPoint",
-                        "urlTemplate": "{{ config.base_url | safe }}/?q={search_term_string}"
-                    },
-                    "query-input": "required name=search_term_string"
-                }
+                "inLanguage": "{{ lang | default(value='en') }}"
             },
             {
                 "@type": "SoftwareApplication",
@@ -175,10 +172,11 @@
                 "url": "{{ config.base_url | safe }}",
                 "logo": {
                     "@type": "ImageObject",
-                    "url": "{{ get_url(path='img/og-image.png') | safe }}",
-                    "width": 1200,
-                    "height": 630
-                }
+                    "url": "{{ get_url(path='icon-192.png') | safe }}",
+                    "width": 192,
+                    "height": 192
+                },
+                "sameAs": ["https://github.com/zentinelproxy"]
             },
             {
                 "@type": "WebPage",
@@ -233,6 +231,8 @@
             }
             {% endif %}
             {% block jsonld_breadcrumb %}{% endblock %}
+            {#- Extra graph nodes from child templates; each starts with a comma. -#}
+            {% block jsonld_nodes %}{% endblock %}
         ]
     }
     </script>
@@ -242,115 +242,99 @@
 <body>
     <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <p id="z-announce" class="sr-only" aria-live="polite"></p>
 
     <div class="layout">
         <header class="header" role="banner">
             <div class="container">
-                <nav class="nav" role="navigation" aria-label="Main navigation">
-                    <a href="{{ get_url(path='/') }}" class="logo" aria-label="Zentinel Home">
-                        <img src="{{ get_url(path='img/zentinel-logo-64.avif') | safe }}" alt="" class="logo-img" width="32" height="32">
-                        <span class="logo-text">Zentinel</span>
+                <nav class="nav" aria-label="Main">
+                    <a href="{{ get_url(path='/') }}" class="brand" aria-label="Zentinel home">
+                        <picture>
+                            <source type="image/avif" srcset="{{ get_url(path='img/zentinel-mark-disc-64.avif') | safe }} 1x, {{ get_url(path='img/zentinel-mark-disc-128.avif') | safe }} 2x">
+                            <img src="{{ get_url(path='img/zentinel-mark-disc-128.png') | safe }}" alt="" class="brand__mark" width="32" height="32">
+                        </picture>
+                        {% include "partials/wordmark.html" %}
                     </a>
-                    <div class="nav-links">
-                        {% if config.build_search_index %}
-                        <button class="search-toggle" type="button" aria-label="Search" title="Search (/)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="m21 21-4.3-4.3"/>
-                            </svg>
-                        </button>
-                        {% endif %}
+                    <ul class="nav-links">
                         {% for link in config.extra.nav_links %}
-                        {% if link.name == "GitHub" %}
-                        <a href="{{ link.url }}" target="_blank" rel="noopener" class="nav-icon-link" aria-label="GitHub repository">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                        </a>
-                        {% if config.extra.discord %}
-                        <a href="{{ config.extra.discord }}" target="_blank" rel="noopener" class="nav-icon-link" aria-label="Discord server">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.59 5.89a16.55 16.55 0 0 0-4.07-1.26.06.06 0 0 0-.07.03c-.18.31-.38.72-.52 1.05a15.3 15.3 0 0 0-4.57 0 10.7 10.7 0 0 0-.53-1.05.06.06 0 0 0-.07-.03 16.5 16.5 0 0 0-4.07 1.26.06.06 0 0 0-.03.02C2.4 9.36 1.63 12.7 2.01 16a.07.07 0 0 0 .03.05 16.6 16.6 0 0 0 5 2.53.06.06 0 0 0 .07-.02c.39-.53.73-1.09 1.03-1.67a.06.06 0 0 0-.03-.09 10.9 10.9 0 0 1-1.57-.75.06.06 0 0 1-.01-.1c.11-.08.21-.16.31-.25a.06.06 0 0 1 .06-.01c3.3 1.5 6.87 1.5 10.13 0a.06.06 0 0 1 .07.01c.1.09.21.17.31.25a.06.06 0 0 1 0 .1c-.5.29-1.02.54-1.57.75a.06.06 0 0 0-.04.09c.3.58.65 1.14 1.03 1.67a.06.06 0 0 0 .07.02 16.56 16.56 0 0 0 5.01-2.53.06.06 0 0 0 .03-.05c.44-4.54-.74-8.49-3.12-11.99a.05.05 0 0 0-.02-.02zM9.02 14.09c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg>
-                        </a>
-                        {% endif %}
-                        {% elif link.children %}
-                        <div class="nav-dropdown">
-                            <button class="nav-dropdown__trigger" type="button" aria-expanded="false" aria-haspopup="true">
+                        {% if link.children %}
+                        <li class="nav-dropdown">
+                            <button class="nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="nav-menu-{{ loop.index }}">
                                 {{ link.name }}
                                 <svg class="nav-dropdown__chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
-                            <div class="nav-dropdown__menu" role="menu">
+                            <ul class="nav-dropdown__menu z-menu" id="nav-menu-{{ loop.index }}">
                                 {% for child in link.children %}
-                                <a href="{{ child.url }}" role="menuitem"{% if child.external %} target="_blank" rel="noopener"{% endif %}>
-                                    {{ child.name }}
-                                </a>
+                                <li><a class="z-menu__item" href="{{ child.url }}"{% if child.external %} target="_blank" rel="noopener"{% elif current_path and current_path == child.url %} aria-current="page"{% endif %}>{{ child.name }}{% if child.external %}<svg class="nav-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg><span class="sr-only"> (opens in a new tab)</span>{% endif %}</a></li>
                                 {% endfor %}
-                            </div>
-                        </div>
+                            </ul>
+                        </li>
                         {% else %}
-                        <a href="{{ link.url }}" {% if link.url is starting_with("http") %}target="_blank" rel="noopener"{% endif %}>
-                            {{ link.name }}
-                        </a>
+                        <li><a class="nav-link" href="{{ link.url }}"{% if link.external %} target="_blank" rel="noopener"{% elif current_path and current_path == link.url %} aria-current="page"{% endif %}>{{ link.name }}{% if link.external %}<svg class="nav-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg><span class="sr-only"> (opens in a new tab)</span>{% endif %}</a></li>
                         {% endif %}
                         {% endfor %}
-                        <button class="theme-toggle" aria-label="Toggle theme" aria-live="polite" onclick="toggleTheme()">
-                            <svg class="icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                            <svg class="icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                            <span class="sr-only" id="theme-status">Theme: auto</span>
+                    </ul>
+                    <div class="nav-tools">
+                        {% if config.build_search_index %}
+                        <button class="nav-icon-link search-toggle" type="button" aria-label="Search" title="Search (/)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </button>
+                        {% endif %}
+                        <a href="{{ config.extra.github }}" target="_blank" rel="noopener" class="nav-icon-link nav-icon-link--desktop" aria-label="GitHub repository (opens in a new tab)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                        </a>
+                        {% if config.extra.discord %}
+                        <a href="{{ config.extra.discord }}" target="_blank" rel="noopener" class="nav-icon-link nav-icon-link--desktop" aria-label="Discord server (opens in a new tab)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.59 5.89a16.55 16.55 0 0 0-4.07-1.26.06.06 0 0 0-.07.03c-.18.31-.38.72-.52 1.05a15.3 15.3 0 0 0-4.57 0 10.7 10.7 0 0 0-.53-1.05.06.06 0 0 0-.07-.03 16.5 16.5 0 0 0-4.07 1.26.06.06 0 0 0-.03.02C2.4 9.36 1.63 12.7 2.01 16a.07.07 0 0 0 .03.05 16.6 16.6 0 0 0 5 2.53.06.06 0 0 0 .07-.02c.39-.53.73-1.09 1.03-1.67a.06.06 0 0 0-.03-.09 10.9 10.9 0 0 1-1.57-.75.06.06 0 0 1-.01-.1c.11-.08.21-.16.31-.25a.06.06 0 0 1 .06-.01c3.3 1.5 6.87 1.5 10.13 0a.06.06 0 0 1 .07.01c.1.09.21.17.31.25a.06.06 0 0 1 0 .1c-.5.29-1.02.54-1.57.75a.06.06 0 0 0-.04.09c.3.58.65 1.14 1.03 1.67a.06.06 0 0 0 .07.02 16.56 16.56 0 0 0 5.01-2.53.06.06 0 0 0 .03-.05c.44-4.54-.74-8.49-3.12-11.99a.05.05 0 0 0-.02-.02zM9.02 14.09c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg>
+                        </a>
+                        {% endif %}
+                        <a href="{{ get_url(path='customize/') }}" class="z-btn z-btn--sm nav-cta">Install</a>
+                        <button class="mobile-menu-btn" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileMenu">
+                            <svg class="icon-menu" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                         </button>
                     </div>
-                    <button class="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileMenu" onclick="toggleMobileMenu()">
-                        <svg class="icon-menu" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                        <svg class="icon-close" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
                 </nav>
             </div>
         </header>
 
-        <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu-overlay" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" aria-hidden="true">
-            <button class="mobile-menu-close" aria-label="Close navigation menu" onclick="closeMobileMenu()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-            <nav class="mobile-menu-content" role="navigation" aria-label="Mobile navigation">
+        <!-- Mobile menu: a modal sheet with the same groups and links -->
+        <div class="mobile-menu-overlay" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" hidden>
+            <div class="mobile-menu-top">
+                <a href="{{ get_url(path='/') }}" class="brand" aria-label="Zentinel home">
+                    <picture>
+                            <source type="image/avif" srcset="{{ get_url(path='img/zentinel-mark-disc-64.avif') | safe }} 1x, {{ get_url(path='img/zentinel-mark-disc-128.avif') | safe }} 2x">
+                            <img src="{{ get_url(path='img/zentinel-mark-disc-128.png') | safe }}" alt="" class="brand__mark" width="32" height="32">
+                        </picture>
+                    <svg class="brand__wordmark" viewBox="0 0 499.3 84.1" aria-hidden="true" focusable="false"><use href="#zentinel-wordmark"/></svg>
+                </a>
+                <button class="mobile-menu-close" type="button" aria-label="Close navigation menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <nav class="mobile-menu-content" aria-label="Main">
                 {% for link in config.extra.nav_links %}
-                {% if link.name == "GitHub" %}
-                <a href="{{ link.url }}" class="mobile-menu-link mobile-menu-link--icon" target="_blank" rel="noopener">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                    GitHub
-                </a>
-                {% if config.extra.discord %}
-                <a href="{{ config.extra.discord }}" class="mobile-menu-link mobile-menu-link--icon" target="_blank" rel="noopener">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.59 5.89a16.55 16.55 0 0 0-4.07-1.26.06.06 0 0 0-.07.03c-.18.31-.38.72-.52 1.05a15.3 15.3 0 0 0-4.57 0 10.7 10.7 0 0 0-.53-1.05.06.06 0 0 0-.07-.03 16.5 16.5 0 0 0-4.07 1.26.06.06 0 0 0-.03.02C2.4 9.36 1.63 12.7 2.01 16a.07.07 0 0 0 .03.05 16.6 16.6 0 0 0 5 2.53.06.06 0 0 0 .07-.02c.39-.53.73-1.09 1.03-1.67a.06.06 0 0 0-.03-.09 10.9 10.9 0 0 1-1.57-.75.06.06 0 0 1-.01-.1c.11-.08.21-.16.31-.25a.06.06 0 0 1 .06-.01c3.3 1.5 6.87 1.5 10.13 0a.06.06 0 0 1 .07.01c.1.09.21.17.31.25a.06.06 0 0 1 0 .1c-.5.29-1.02.54-1.57.75a.06.06 0 0 0-.04.09c.3.58.65 1.14 1.03 1.67a.06.06 0 0 0 .07.02 16.56 16.56 0 0 0 5.01-2.53.06.06 0 0 0 .03-.05c.44-4.54-.74-8.49-3.12-11.99a.05.05 0 0 0-.02-.02zM9.02 14.09c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg>
-                    Discord
-                </a>
-                {% endif %}
-                {% elif link.children %}
+                {% if link.children %}
                 <div class="mobile-nav-group">
-                    <span class="mobile-nav-group__label">{{ link.name }}</span>
+                    <h2 class="mobile-nav-group__label">{{ link.name }}</h2>
                     {% for child in link.children %}
-                    <a href="{{ child.url }}" class="mobile-menu-link" {% if child.external %}target="_blank" rel="noopener"{% endif %}>
-                        {{ child.name }}
-                    </a>
+                    <a href="{{ child.url }}" class="mobile-menu-link"{% if child.external %} target="_blank" rel="noopener"{% endif %}>{{ child.name }}{% if child.external %}<svg class="nav-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>{% endif %}</a>
                     {% endfor %}
                 </div>
-                {% else %}
-                <a href="{{ link.url }}" class="mobile-menu-link" {% if link.url is starting_with("http") %}target="_blank" rel="noopener"{% endif %}>
-                    {{ link.name }}
-                </a>
                 {% endif %}
                 {% endfor %}
-                {% if config.build_search_index %}
-                <button class="mobile-menu-link search-toggle" type="button" aria-label="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <span>Search</span>
-                </button>
-                {% endif %}
-                <button class="mobile-theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
-                    <svg class="icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                    <svg class="icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    <span>Toggle Theme</span>
-                </button>
+                <div class="mobile-nav-group">
+                    <h2 class="mobile-nav-group__label">More</h2>
+                    {% for link in config.extra.nav_links %}
+                    {% if not link.children %}
+                    <a href="{{ link.url }}" class="mobile-menu-link"{% if link.external %} target="_blank" rel="noopener"{% endif %}>{{ link.name }}{% if link.external %}<svg class="nav-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>{% endif %}</a>
+                    {% endif %}
+                    {% endfor %}
+                    <a href="{{ config.extra.github }}" class="mobile-menu-link" target="_blank" rel="noopener">GitHub<svg class="nav-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+                    {% if config.extra.discord %}
+                    <a href="{{ config.extra.discord }}" class="mobile-menu-link" target="_blank" rel="noopener">Discord<svg class="nav-external" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+                    {% endif %}
+                </div>
+                <a href="{{ get_url(path='customize/') }}" class="z-btn z-btn--lg mobile-menu-cta">Install Zentinel</a>
             </nav>
         </div>
 
@@ -360,74 +344,93 @@
 
         <footer class="footer" role="contentinfo">
             <div class="container">
-                <div class="footer-content">
+                <div class="footer-top">
                     <div class="footer-brand">
-                        <div class="footer-mascot-wrapper" aria-hidden="true">
-                            <div class="footer-mascot-glow"></div>
-                            <img src="{{ get_url(path='img/zentinel-mascot-160.avif') | safe }}" alt="" class="footer-mascot" width="80" height="80" loading="lazy">
-                        </div>
-                        <div class="footer-tagline">
-                            <p class="footer-title">Security-first reverse proxy<br>built to guard the free web</p>
-                            <p class="footer-description">Explicit configuration, bounded resources and isolated security agents, built on Cloudflare's Pingora.</p>
+                        <a href="{{ get_url(path='/') }}" class="brand brand--footer" aria-label="Zentinel home">
+                            <picture>
+                                <source type="image/avif" srcset="{{ get_url(path='img/zentinel-mark-disc-64.avif') | safe }} 1x, {{ get_url(path='img/zentinel-mark-disc-128.avif') | safe }} 2x">
+                                <img src="{{ get_url(path='img/zentinel-mark-disc-128.png') | safe }}" alt="" class="brand__mark" width="44" height="44" loading="lazy">
+                            </picture>
+                            <svg class="brand__wordmark" viewBox="0 0 499.3 84.1" aria-hidden="true" focusable="false"><use href="#zentinel-wordmark"/></svg>
+                        </a>
+                        <p class="footer-title">A security-first reverse proxy, built to guard the free web.</p>
+                        <p class="footer-description">Explicit configuration, bounded resources and isolated security agents, on Cloudflare's Pingora. Open source under Apache 2.0.</p>
+                        <div class="footer-theme">
+                            <span class="footer-theme__label" aria-hidden="true">Theme</span>
+                            <fieldset class="theme-switch z-segmented">
+                        <legend class="sr-only">Colour theme</legend>
+                        <label title="Follow the system setting">
+                            <input type="radio" name="theme" value="system" checked>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                            <span>System</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="theme" value="light">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                            <span>Light</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="theme" value="dark">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            <span>Dark</span>
+                        </label>
+                    </fieldset>
                         </div>
                     </div>
-                    <nav class="footer-links" role="navigation" aria-label="Footer navigation">
+                    <nav class="footer-links" aria-label="Footer">
                         <div class="footer-col">
-                            <h4>Product</h4>
-                            <a href="/features/">Features</a>
-                            <a href="https://registry.zentinelproxy.io/" target="_blank" rel="noopener">Agent Registry</a>
-                            <a href="/playground/">Playground</a>
-                            <a href="/converter/">Converter</a>
-                            <a href="/customize/">Install</a>
+                            <h2 class="footer-heading">Product</h2>
+                            <ul>
+                                <li><a href="/features/">Features</a></li>
+                                <li><a href="/playground/">Playground</a></li>
+                                <li><a href="/converter/">Config Converter</a></li>
+                                <li><a href="/benchmarks/">Benchmarks</a></li>
+                                <li><a href="/compare/">Compare</a></li>
+                                <li><a href="/control-plane/">Control Plane</a></li>
+                                <li><a href="https://registry.zentinelproxy.io/" target="_blank" rel="noopener">Agent Registry<span class="sr-only"> (opens in a new tab)</span></a></li>
+                            </ul>
                         </div>
                         <div class="footer-col">
-                            <h4>Learn</h4>
-                            <a href="https://docs.zentinelproxy.io/">Documentation</a>
-                            <a href="https://docs.zentinelproxy.io/getting-started/">Getting Started</a>
-                            <a href="https://docs.zentinelproxy.io/configuration/">Configuration</a>
-                            <a href="https://docs.zentinelproxy.io/examples/">Examples</a>
-                            <a href="https://docs.zentinelproxy.io/reference/">Reference</a>
+                            <h2 class="footer-heading">Learn</h2>
+                            <ul>
+                                <li><a href="/customize/">Install &amp; Configure</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/">Documentation</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/getting-started/">Getting Started</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/configuration/">Configuration</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/examples/">Examples</a></li>
+                                <li><a href="/blog/">Blog</a></li>
+                                <li><a href="/manifesto/">Manifesto</a></li>
+                            </ul>
                         </div>
                         <div class="footer-col">
-                            <h4>About</h4>
-                            <a href="/manifesto/">Manifesto</a>
-                            <a href="/supply-chain/">Supply Chain</a>
-                            <a href="/support/">Support</a>
-                            <a href="/benchmarks/">Benchmarks</a>
-                            <a href="/blog/">Blog</a>
-                            <a href="https://docs.zentinelproxy.io/appendix/changelog/">Changelog</a>
-                            <a href="https://docs.zentinelproxy.io/appendix/faq/">FAQ</a>
-                            <a href="{{ config.extra.github }}/blob/main/LICENSE">License</a>
+                            <h2 class="footer-heading">Community</h2>
+                            <ul>
+                                <li><a href="{{ config.extra.github }}">GitHub</a></li>
+                                <li><a href="{{ config.extra.github }}/discussions">Discussions</a></li>
+                                <li><a href="{{ config.extra.github }}/issues">Issues</a></li>
+                                <li><a href="/contributing/">Contributing</a></li>
+                                {% if config.extra.discord %}
+                                <li><a href="{{ config.extra.discord }}" target="_blank" rel="noopener">Discord<span class="sr-only"> (opens in a new tab)</span></a></li>
+                                {% endif %}
+                                <li><a href="/support/">Support</a></li>
+                            </ul>
                         </div>
                         <div class="footer-col">
-                            <h4>Community</h4>
-                            <a href="{{ config.extra.github }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                                GitHub
-                            </a>
-                            <a href="{{ config.extra.github }}/issues">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
-                                Issues
-                            </a>
-                            <a href="{{ config.extra.github }}/discussions">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
-                                Discussions
-                            </a>
-                            {% if config.extra.discord %}
-                            <a href="{{ config.extra.discord }}" target="_blank" rel="noopener">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.59 5.89a16.55 16.55 0 0 0-4.07-1.26.06.06 0 0 0-.07.03c-.18.31-.38.72-.52 1.05a15.3 15.3 0 0 0-4.57 0 10.7 10.7 0 0 0-.53-1.05.06.06 0 0 0-.07-.03 16.5 16.5 0 0 0-4.07 1.26.06.06 0 0 0-.03.02C2.4 9.36 1.63 12.7 2.01 16a.07.07 0 0 0 .03.05 16.6 16.6 0 0 0 5 2.53.06.06 0 0 0 .07-.02c.39-.53.73-1.09 1.03-1.67a.06.06 0 0 0-.03-.09 10.9 10.9 0 0 1-1.57-.75.06.06 0 0 1-.01-.1c.11-.08.21-.16.31-.25a.06.06 0 0 1 .06-.01c3.3 1.5 6.87 1.5 10.13 0a.06.06 0 0 1 .07.01c.1.09.21.17.31.25a.06.06 0 0 1 0 .1c-.5.29-1.02.54-1.57.75a.06.06 0 0 0-.04.09c.3.58.65 1.14 1.03 1.67a.06.06 0 0 0 .07.02 16.56 16.56 0 0 0 5.01-2.53.06.06 0 0 0 .03-.05c.44-4.54-.74-8.49-3.12-11.99a.05.05 0 0 0-.02-.02zM9.02 14.09c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.04 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg>
-                                Discord
-                            </a>
-                            {% endif %}
-                            <a href="{{ config.extra.github }}/blob/main/CONTRIBUTING.md">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-                                Contributing
-                            </a>
+                            <h2 class="footer-heading">Trust</h2>
+                            <ul>
+                                <li><a href="/security/">Security</a></li>
+                                <li><a href="/supply-chain/">Supply Chain</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/appendix/changelog/">Changelog</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/appendix/faq/">FAQ</a></li>
+                                <li><a href="{{ config.extra.github }}/blob/main/LICENSE">Licence</a></li>
+                            </ul>
                         </div>
                     </nav>
                 </div>
                 <div class="footer-bottom">
-                    <p>Zentinel is licensed under <a href="https://github.com/zentinelproxy/zentinel/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>. Website &copy; {{ now() | date(format='%Y') }} <a href="https://raskell.io">raskell.io</a>.</p>
+                    <p class="footer-legal">Zentinel is licensed under <a href="{{ config.extra.github }}/blob/main/LICENSE">Apache 2.0</a>.</p>
+                    <p class="footer-version"><a href="{{ config.extra.github }}/releases/tag/{{ config.extra.software_version }}">Zentinel {{ config.extra.software_version }}</a></p>
+                    <p class="footer-family">Website &copy; {{ now() | date(format='%Y') }}, part of <a href="https://raskell.io">raskell.io</a></p>
                 </div>
             </div>
             <a href="https://learn-you-the-web.raskell.io/" target="_blank" rel="noopener" class="page-peel" aria-label="Learn You The Web - An e-book about how the web works">
@@ -444,45 +447,55 @@
     </div>
 
     <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.dataset.theme;
-            const next = current === 'dark' ? 'light' : 'dark';
-            html.dataset.theme = next;
-            localStorage.setItem('theme', next);
-            // Update screen reader status
-            const statusEl = document.getElementById('theme-status');
-            if (statusEl) {
-                statusEl.textContent = 'Theme: ' + next;
-            }
-        }
+        // Shared copy feedback for every copy button (.z-copy): copies, marks
+        // the button with data-copied, swaps its icon and label for a moment,
+        // and announces the result in a polite live region.
+        window.zAnnounce = function (text) {
+            var el = document.getElementById('z-announce');
+            if (!el) return;
+            el.textContent = '';
+            setTimeout(function () { el.textContent = text; }, 30);
+        };
+        window.zCopy = function (btn, text, message) {
+            var CHECK = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+            var write = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject();
+            return write.then(function () {
+                if (!btn._zCopyHtml) btn._zCopyHtml = btn.innerHTML;
+                var label = btn.querySelector('span');
+                btn.innerHTML = CHECK + (label ? '<span>Copied</span>' : '');
+                btn.setAttribute('data-copied', '');
+                window.zAnnounce(message || 'Copied to the clipboard');
+                clearTimeout(btn._zCopyTimer);
+                btn._zCopyTimer = setTimeout(function () {
+                    btn.innerHTML = btn._zCopyHtml;
+                    btn.removeAttribute('data-copied');
+                }, 1800);
+                return true;
+            }, function () {
+                window.zAnnounce('Copy failed: the browser blocked clipboard access');
+                return false;
+            });
+        };
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const btn = document.querySelector('.mobile-menu-btn');
-            const isOpen = menu.classList.toggle('open');
-            btn.classList.toggle('open', isOpen);
-            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            btn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
-            menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-            // Focus management for accessibility
-            if (isOpen) {
-                const firstLink = menu.querySelector('.mobile-menu-link');
-                if (firstLink) firstLink.focus();
-            }
-        }
-
-        function closeMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const btn = document.querySelector('.mobile-menu-btn');
-            menu.classList.remove('open');
-            btn.classList.remove('open');
-            btn.setAttribute('aria-expanded', 'false');
-            btn.setAttribute('aria-label', 'Open navigation menu');
-            menu.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-        }
+        // Footer theme switch: System removes data-theme (prefers-color-scheme
+        // applies), Light/Dark set it. The choice is remembered when storage works.
+        (function () {
+            var root = document.documentElement;
+            var current = root.getAttribute('data-theme') || 'system';
+            document.querySelectorAll('.theme-switch input[name="theme"]').forEach(function (input) {
+                input.checked = input.value === current;
+                input.addEventListener('change', function () {
+                    if (!input.checked) return;
+                    if (input.value === 'system') root.removeAttribute('data-theme');
+                    else root.setAttribute('data-theme', input.value);
+                    try {
+                        if (input.value === 'system') localStorage.removeItem('theme');
+                        else localStorage.setItem('theme', input.value);
+                    } catch (e) {}
+                    document.dispatchEvent(new CustomEvent('zentinel:themechange'));
+                });
+            });
+        })();
 
         // Wrap content tables so wide ones scroll inside their own box on narrow screens
         document.querySelectorAll('main table').forEach(t => {
@@ -493,115 +506,107 @@
             wrap.appendChild(t);
         });
 
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('.mobile-menu-link').forEach(link => {
-            link.addEventListener('click', closeMobileMenu);
-        });
-
-        // Close mobile menu on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeMobileMenu();
+        // Mobile menu: a modal sheet. Focus moves in, is kept in, and returns
+        // to the menu button when it closes (Esc, the close button, a link).
+        (function () {
+            var sheet = document.getElementById('mobileMenu');
+            var openBtn = document.querySelector('.mobile-menu-btn');
+            var closeBtn = sheet.querySelector('.mobile-menu-close');
+            function focusables() {
+                return Array.prototype.filter.call(sheet.querySelectorAll('a[href], button'), function (el) { return el.offsetParent !== null; });
             }
-        });
-
-        // Navigation Dropdowns (portal approach for backdrop-filter compatibility)
-        (function() {
-            const dropdowns = document.querySelectorAll('.nav-dropdown');
-            let activeDropdown = null;
-            let activeMenu = null;
-            let activeTrigger = null;
-            let originalParent = null;
-
-            function positionDropdown(trigger, menu) {
-                const rect = trigger.getBoundingClientRect();
-                const header = document.querySelector('.header');
-                const headerBottom = header ? header.getBoundingClientRect().bottom : rect.bottom + 8;
-                const menuWidth = menu.offsetWidth || 180;
-                const left = rect.left + (rect.width / 2) - (menuWidth / 2);
-
-                menu.style.left = Math.max(8, left) + 'px';
-                menu.style.top = headerBottom + 'px';
+            function open() {
+                sheet.hidden = false;
+                openBtn.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+                requestAnimationFrame(function () { sheet.classList.add('open'); closeBtn.focus(); });
             }
-
-            function closeActiveDropdown() {
-                if (activeDropdown && activeMenu && originalParent) {
-                    activeDropdown.classList.remove('open');
-                    activeMenu.classList.remove('open');
-                    activeTrigger.setAttribute('aria-expanded', 'false');
-                    // Move menu back to original parent
-                    originalParent.appendChild(activeMenu);
-                    activeDropdown = null;
-                    activeMenu = null;
-                    activeTrigger = null;
-                    originalParent = null;
-                }
+            function close(returnFocus) {
+                if (sheet.hidden) return;
+                sheet.classList.remove('open');
+                sheet.hidden = true;
+                openBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+                if (returnFocus) openBtn.focus();
             }
+            openBtn.addEventListener('click', open);
+            closeBtn.addEventListener('click', function () { close(true); });
+            sheet.addEventListener('click', function (e) { if (e.target.closest('a')) close(false); });
+            sheet.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { e.preventDefault(); close(true); return; }
+                if (e.key !== 'Tab') return;
+                var f = focusables(), first = f[0], last = f[f.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            });
+            window.matchMedia('(min-width: 961px)').addEventListener('change', function (m) { if (m.matches) close(false); });
+        })();
 
-            dropdowns.forEach(dropdown => {
-                const trigger = dropdown.querySelector('.nav-dropdown__trigger');
-                const menu = dropdown.querySelector('.nav-dropdown__menu');
-
-                if (trigger && menu) {
-                    trigger.addEventListener('click', (e) => {
+        // Header dropdowns (disclosure pattern). Click or Enter/Space toggles;
+        // ArrowDown/ArrowUp open and move through the links, Home/End jump;
+        // Escape closes and returns focus; tabbing out or clicking elsewhere
+        // closes. With a mouse they also open on hover and close after a short
+        // delay once the pointer leaves (unless clicked open). One open at a time.
+        (function () {
+            var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.nav-dropdown'));
+            var hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)');
+            function parts(d) { return { btn: d.querySelector('.nav-dropdown__trigger'), menu: d.querySelector('.nav-dropdown__menu') }; }
+            function items(d) { return Array.prototype.slice.call(parts(d).menu.querySelectorAll('a')); }
+            function setOpen(d, on) {
+                var p = parts(d);
+                if (on) dropdowns.forEach(function (o) { if (o !== d) setOpen(o, false); });
+                d.classList.toggle('open', on);
+                p.btn.setAttribute('aria-expanded', String(on));
+            }
+            function isOpen(d) { return d.classList.contains('open'); }
+            dropdowns.forEach(function (d) {
+                var p = parts(d);
+                var timer = null;
+                // A click on a menu the pointer opened keeps it open (pins it).
+                p.btn.addEventListener('click', function () {
+                    if (isOpen(d) && d._via === 'hover') { d._via = 'click'; return; }
+                    d._via = 'click';
+                    setOpen(d, !isOpen(d));
+                });
+                p.btn.addEventListener('keydown', function (e) {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                         e.preventDefault();
-                        e.stopPropagation();
-
-                        const isOpen = dropdown.classList.contains('open');
-
-                        // Close any other open dropdown
-                        if (activeDropdown && activeDropdown !== dropdown) {
-                            closeActiveDropdown();
-                        }
-
-                        if (isOpen) {
-                            closeActiveDropdown();
-                        } else {
-                            dropdown.classList.add('open');
-                            trigger.setAttribute('aria-expanded', 'true');
-                            activeDropdown = dropdown;
-                            activeMenu = menu;
-                            activeTrigger = trigger;
-                            originalParent = menu.parentElement;
-                            // Move menu to body (portal) for backdrop-filter to work
-                            document.body.appendChild(menu);
-                            positionDropdown(trigger, menu);
-                            menu.classList.add('open');
-                        }
-                    });
-
-                    // Close on menu link click
-                    menu.querySelectorAll('a').forEach(link => {
-                        link.addEventListener('click', closeActiveDropdown);
-                    });
-                }
+                        d._via = 'key';
+                        setOpen(d, true);
+                        var list = items(d);
+                        (e.key === 'ArrowDown' ? list[0] : list[list.length - 1]).focus();
+                    }
+                });
+                p.menu.addEventListener('keydown', function (e) {
+                    var list = items(d);
+                    var i = list.indexOf(document.activeElement);
+                    var next = null;
+                    if (e.key === 'ArrowDown') next = list[(i + 1) % list.length];
+                    else if (e.key === 'ArrowUp') next = list[(i - 1 + list.length) % list.length];
+                    else if (e.key === 'Home') next = list[0];
+                    else if (e.key === 'End') next = list[list.length - 1];
+                    if (next) { e.preventDefault(); next.focus(); }
+                });
+                d.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && isOpen(d)) { e.preventDefault(); setOpen(d, false); p.btn.focus(); }
+                });
+                d.addEventListener('focusout', function (e) {
+                    if (!d.contains(e.relatedTarget)) setOpen(d, false);
+                });
+                d.addEventListener('pointerenter', function (e) {
+                    if (e.pointerType !== 'mouse' || !hoverCapable.matches) return;
+                    clearTimeout(timer);
+                    if (!isOpen(d)) { d._via = 'hover'; setOpen(d, true); }
+                });
+                d.addEventListener('pointerleave', function (e) {
+                    if (e.pointerType !== 'mouse' || !hoverCapable.matches) return;
+                    clearTimeout(timer);
+                    if (d._via !== 'hover') return;
+                    timer = setTimeout(function () { if (d._via === 'hover') setOpen(d, false); }, 220);
+                });
             });
-
-            // Reposition on scroll/resize
-            window.addEventListener('scroll', () => {
-                if (activeDropdown && activeMenu && activeTrigger) {
-                    positionDropdown(activeTrigger, activeMenu);
-                }
-            }, { passive: true });
-
-            window.addEventListener('resize', () => {
-                if (activeDropdown && activeMenu && activeTrigger) {
-                    positionDropdown(activeTrigger, activeMenu);
-                }
-            }, { passive: true });
-
-            // Close on outside click
-            document.addEventListener('click', (e) => {
-                if (activeDropdown && !activeDropdown.contains(e.target) && !activeMenu.contains(e.target)) {
-                    closeActiveDropdown();
-                }
-            });
-
-            // Close on escape
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && activeDropdown) {
-                    closeActiveDropdown();
-                }
+            document.addEventListener('click', function (e) {
+                dropdowns.forEach(function (d) { if (!d.contains(e.target)) setOpen(d, false); });
             });
         })();
     </script>

@@ -496,18 +496,8 @@ function loadSample(sampleId) {
 
 // Copy to clipboard
 async function copyToClipboard(text, button) {
-    try {
-        await navigator.clipboard.writeText(text);
-        const originalHTML = button.innerHTML;
-        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-        button.style.color = 'var(--color-success)';
-        setTimeout(() => {
-            button.innerHTML = originalHTML;
-            button.style.color = '';
-        }, 2000);
-    } catch (e) {
-        console.error('Failed to copy:', e);
-    }
+    // Shared feedback from base.html: data-copied state and a live announcement
+    return window.zCopy(button, text, 'Copied to the clipboard');
 }
 
 // Toggle fullscreen split-pane view
@@ -581,8 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cliInstallTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             // Update active tab
-            cliInstallTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+            cliInstallTabs.forEach(t => t.setAttribute('aria-pressed', String(t === tab)));
 
             // Update command
             const method = tab.dataset.method;
@@ -618,6 +607,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const versionDropdown = document.getElementById('version-dropdown');
 
     if (versionBadgeBtn && versionDropdown) {
+        versionBadgeBtn.setAttribute('aria-expanded', 'false');
+        versionBadgeBtn.setAttribute('aria-controls', 'version-dropdown');
+        new MutationObserver(() => {
+            versionBadgeBtn.setAttribute('aria-expanded', String(versionDropdown.classList.contains('active')));
+        }).observe(versionDropdown, { attributes: true, attributeFilter: ['class'] });
         versionBadgeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             versionBadgeBtn.classList.toggle('active');
@@ -637,6 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Escape' && versionDropdown.classList.contains('active')) {
                 versionBadgeBtn.classList.remove('active');
                 versionDropdown.classList.remove('active');
+                versionBadgeBtn.focus();
             }
         });
     }

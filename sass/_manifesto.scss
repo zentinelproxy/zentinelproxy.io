@@ -7,8 +7,8 @@
 .manifesto-hero {
     padding: 6rem 1.5rem 4rem;
     text-align: center;
-    background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
-    border-bottom: 1px solid var(--color-border);
+    background: linear-gradient(180deg, var(--z-surface) 0%, var(--z-bg) 100%);
+    border-bottom: 1px solid var(--z-border);
 
     .container {
         max-width: var(--manifesto-max-width);
@@ -58,10 +58,10 @@
         z-index: 1;
         background: linear-gradient(
             180deg,
-            var(--color-bg) 0%,
+            var(--z-bg) 0%,
             transparent 30%,
             transparent 70%,
-            var(--color-bg) 100%
+            var(--z-bg) 100%
         );
     }
 }
@@ -78,12 +78,12 @@
 .manifesto-opening {
     font-size: 1.25rem;
     line-height: 1.7;
-    color: var(--color-text-muted);
+    color: var(--z-muted);
     margin: 0 auto;
     text-align: center;
 
     strong {
-        color: var(--color-text);
+        color: var(--z-text);
     }
 }
 
@@ -102,10 +102,10 @@
 .manifesto-intro {
     font-size: 1.125rem;
     line-height: 1.8;
-    color: var(--color-text-muted);
+    color: var(--z-muted);
     margin-bottom: 3rem;
     padding-bottom: 3rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--z-border);
 
     p {
         margin: 0 0 1.25rem;
@@ -116,7 +116,7 @@
     }
 
     strong {
-        color: var(--color-text);
+        color: var(--z-text);
     }
 }
 
@@ -128,14 +128,14 @@
         font-size: 1.5rem;
         font-weight: 600;
         margin: 0 0 2rem;
-        color: var(--color-text);
+        color: var(--z-text);
     }
 }
 
 .belief {
     margin-bottom: 3rem;
     padding-bottom: 3rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--z-border);
 
     &:last-child {
         border-bottom: none;
@@ -159,7 +159,7 @@
 .belief-number {
     font-size: 2.5rem;
     font-weight: 700;
-    color: var(--color-primary);
+    color: var(--z-accent-text);
     line-height: 1;
     font-variant-numeric: tabular-nums;
     opacity: 0.7;
@@ -172,7 +172,7 @@
 .belief-title {
     font-size: 1.375rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--z-text);
     margin: 0;
 }
 
@@ -186,7 +186,7 @@
     p {
         font-size: 1rem;
         line-height: 1.8;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
         margin: 0 0 1rem;
 
         &:last-child {
@@ -195,11 +195,11 @@
     }
 
     strong {
-        color: var(--color-text);
+        color: var(--z-text);
     }
 
     em {
-        color: var(--color-primary);
+        color: var(--z-accent-text);
         font-style: normal;
     }
 }
@@ -215,7 +215,7 @@
         margin-bottom: 0.5rem;
         font-size: 1rem;
         line-height: 1.6;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
 
         &::before {
             content: "";
@@ -224,7 +224,7 @@
             top: 0.6em;
             width: 6px;
             height: 6px;
-            background: var(--color-primary);
+            background: var(--z-accent);
             border-radius: 50%;
             opacity: 0.6;
         }
@@ -235,9 +235,9 @@
 .future-section {
     margin-bottom: 4rem;
     padding: 2rem;
-    background: var(--color-bg-subtle);
+    background: var(--z-surface);
     border-radius: 12px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--z-border);
 
     @media (max-width: 640px) {
         padding: 1.5rem;
@@ -247,13 +247,13 @@
         font-size: 1.375rem;
         font-weight: 600;
         margin: 0 0 1.5rem;
-        color: var(--color-text);
+        color: var(--z-text);
     }
 
     p {
         font-size: 1rem;
         line-height: 1.8;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
         margin: 0 0 1rem;
 
         &:last-child {
@@ -262,7 +262,7 @@
     }
 
     strong {
-        color: var(--color-text);
+        color: var(--z-text);
     }
 }
 
@@ -274,13 +274,13 @@
         font-size: 1.375rem;
         font-weight: 600;
         margin: 0 0 1rem;
-        color: var(--color-text);
+        color: var(--z-text);
     }
 
     p {
         font-size: 1rem;
         line-height: 1.8;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
         margin: 0 0 1rem;
     }
 }
@@ -296,13 +296,13 @@
         margin-bottom: 0.5rem;
         font-size: 1rem;
         line-height: 1.6;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
 
         &::before {
             content: "\2715";
             position: absolute;
             left: 0;
-            color: var(--color-error, #f38ba8);
+            color: var(--z-danger);
             font-size: 0.875rem;
             opacity: 0.8;
         }
@@ -313,9 +313,9 @@
 .contributors-section {
     margin-bottom: 4rem;
     padding: 2rem;
-    background: linear-gradient(135deg, rgba(203, 166, 247, 0.08) 0%, rgba(137, 180, 250, 0.08) 100%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--z-accent) 8%, transparent) 0%, color-mix(in srgb, var(--z-info) 8%, transparent) 100%);
     border-radius: 12px;
-    border: 1px solid rgba(203, 166, 247, 0.2);
+    border: 1px solid color-mix(in srgb, var(--z-accent) 20%, transparent);
 
     @media (max-width: 640px) {
         padding: 1.5rem;
@@ -325,13 +325,13 @@
         font-size: 1.375rem;
         font-weight: 600;
         margin: 0 0 1rem;
-        color: var(--color-text);
+        color: var(--z-text);
     }
 
     p {
         font-size: 1rem;
         line-height: 1.8;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
         margin: 0 0 1rem;
 
         &:last-child {
@@ -352,14 +352,14 @@
         margin-bottom: 0.5rem;
         font-size: 1rem;
         line-height: 1.6;
-        color: var(--color-text);
+        color: var(--z-text);
         font-style: italic;
 
         &::before {
             content: "?";
             position: absolute;
             left: 0;
-            color: var(--color-primary);
+            color: var(--z-accent-text);
             font-weight: 600;
             font-style: normal;
         }
@@ -369,13 +369,13 @@
 // Summary Section
 .summary-section {
     padding-top: 3rem;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--z-border);
 
     h2 {
         font-size: 1.375rem;
         font-weight: 600;
         margin: 0 0 1.5rem;
-        color: var(--color-text);
+        color: var(--z-text);
     }
 }
 
@@ -392,14 +392,14 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background: var(--color-bg-subtle);
-        border: 1px solid var(--color-border);
+        background: var(--z-surface);
+        border: 1px solid var(--z-border);
         border-radius: 100px;
         font-size: 0.9375rem;
-        color: var(--color-text);
+        color: var(--z-text);
 
         svg {
-            color: var(--color-primary);
+            color: var(--z-accent-text);
             flex-shrink: 0;
         }
     }
@@ -408,7 +408,7 @@
 .summary-closing {
     font-size: 1.125rem;
     line-height: 1.8;
-    color: var(--color-text-muted);
+    color: var(--z-muted);
 
     p {
         margin: 0 0 1rem;
@@ -419,11 +419,11 @@
     }
 
     strong {
-        color: var(--color-text);
+        color: var(--z-text);
     }
 
     em {
-        color: var(--color-primary);
+        color: var(--z-accent-text);
         font-style: normal;
         font-weight: 500;
     }

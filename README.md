@@ -32,7 +32,7 @@ zentinelproxy.io/
 ├── content/
 │   ├── _index.md        # Homepage
 │   └── agents/          # Agent registry pages
-├── sass/style.scss      # Styles (Catppuccin palette)
+├── sass/style.scss      # Styles (Zentinel design tokens, var(--z-*))
 ├── static/              # Images, fonts, favicon
 └── templates/           # Zola templates
 ```
@@ -62,8 +62,8 @@ Documentation content...
 
 - [Zola](https://www.getzola.org/) — Static site generator
 - [mise](https://mise.jdx.dev/) — Task runner
-- [Catppuccin](https://catppuccin.com/) — Color palette
-- [Geist](https://vercel.com/font) — Typeface
+- [Zentinel design tokens](https://github.com/zentinelproxy/design) — palette, type, spacing and the raised button, vendored as `sass/_tokens.scss`, `sass/_fonts.scss`, `sass/_frame.scss` and `static/fonts/` (do not edit them here)
+- Unbounded, Atkinson Hyperlegible Next and Mono — Typefaces (SIL OFL 1.1)
 
 ## Related
 

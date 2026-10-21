@@ -9,58 +9,44 @@
     code[class*="language-"],
     pre[class*="language-"] {
         background: transparent;
-        font-family: var(--font-mono);
+        color: var(--z-code-fg);
+        font-family: var(--z-font-mono);
         font-size: 0.875rem;
         text-shadow: none;
     }
     pre[class*="language-"] {
-        padding: var(--space-lg);
+        padding: var(--z-space-6);
         margin: 0;
         overflow: auto;
     }
-    .token.comment { color: var(--color-text-muted); }
-    .token.string { color: #a6e3a1; }
-    .token.number { color: #fab387; }
-    .token.keyword { color: #cba6f7; }
-    .token.property { color: #89b4fa; }
-    .token.node-name { color: #f5c2e7; }
-    .token.punctuation { color: var(--color-text-muted); }
-
-    /* Light theme - darker colors */
-    [data-theme="light"] .code-output {
-        background: #ffffff;
-    }
-    [data-theme="light"] code[class*="language-"],
-    [data-theme="light"] pre[class*="language-"] {
-        color: #4c4f69;
-    }
-    [data-theme="light"] .token.comment { color: #6c6f85; }
-    [data-theme="light"] .token.string { color: #40a02b; }
-    [data-theme="light"] .token.number { color: #d6500a; }
-    [data-theme="light"] .token.keyword { color: #8839ef; }
-    [data-theme="light"] .token.property { color: #1e66f5; }
-    [data-theme="light"] .token.node-name { color: #dd3d9a; }
-    [data-theme="light"] .token.function { color: #1e66f5; }
-    [data-theme="light"] .token.builtin { color: #d6500a; }
-    [data-theme="light"] .token.operator { color: #179299; }
-    [data-theme="light"] .token.punctuation { color: #5c5f77; }
+    /* Token colours: the --syn-* roles from sass/_syntax.scss (per theme) */
+    .token.comment { color: var(--syn-comment); }
+    .token.string { color: var(--syn-string); }
+    .token.number,
+    .token.builtin { color: var(--syn-constant); }
+    .token.keyword { color: var(--syn-keyword); }
+    .token.property,
+    .token.function { color: var(--syn-entity); }
+    .token.node-name { color: var(--syn-tag); }
+    .token.operator,
+    .token.punctuation { color: var(--z-muted); }
 
     /* Code header actions */
     .code-header-actions {
         display: flex;
         align-items: center;
-        gap: var(--space-md);
+        gap: var(--z-space-4);
     }
     .code-link {
         display: flex;
         align-items: center;
-        gap: var(--space-xs);
+        gap: var(--z-space-1);
         font-size: 0.75rem;
-        color: var(--color-text-muted);
-        transition: color var(--transition-fast);
+        color: var(--z-muted);
+        transition: color var(--z-duration-fast) var(--z-ease-standard);
     }
     .code-link:hover {
-        color: var(--color-primary);
+        color: var(--z-accent-text);
     }
     .code-link code {
         font-size: 0.75rem;
@@ -72,33 +58,33 @@
     .section-note {
         display: flex;
         align-items: flex-start;
-        gap: var(--space-sm);
-        margin-top: var(--space-md);
-        padding: var(--space-sm) var(--space-md);
-        background: var(--color-bg-elevated);
-        border-radius: var(--radius-md);
-        border-left: 3px solid var(--color-primary);
+        gap: var(--z-space-2);
+        margin-top: var(--z-space-4);
+        padding: var(--z-space-2) var(--z-space-4);
+        background: var(--z-surface-raised);
+        border-radius: var(--z-radius-md);
+        border-left: 3px solid var(--z-accent-text);
         font-size: 0.85rem;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
     }
     .section-note svg {
         flex-shrink: 0;
         margin-top: 2px;
-        color: var(--color-primary);
+        color: var(--z-accent-text);
     }
 
     /* More agents CTA */
     .more-agents-cta {
-        margin-top: var(--space-xl);
-        padding: var(--space-lg);
+        margin-top: var(--z-space-8);
+        padding: var(--z-space-6);
         text-align: center;
-        background: var(--color-bg-elevated);
-        border: 1px dashed var(--color-border);
-        border-radius: var(--radius-lg);
+        background: var(--z-surface-raised);
+        border: 1px dashed var(--z-border);
+        border-radius: var(--z-radius-lg);
     }
     .more-agents-cta p {
-        margin: 0 0 var(--space-md);
-        color: var(--color-text-muted);
+        margin: 0 0 var(--z-space-4);
+        color: var(--z-muted);
         font-size: 0.9375rem;
     }
 
@@ -106,58 +92,53 @@
     .customize-version {
         display: inline-block;
         font-size: 0.75rem;
-        font-family: var(--font-mono);
-        color: var(--color-text-muted);
-        background: var(--color-bg-elevated);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-full);
-        padding: 2px var(--space-sm);
-        margin-top: var(--space-sm);
+        font-family: var(--z-font-mono);
+        color: var(--z-muted);
+        background: var(--z-surface-raised);
+        border: 1px solid var(--z-border);
+        border-radius: var(--z-radius-full);
+        padding: 2px var(--z-space-2);
+        margin-top: var(--z-space-2);
     }
 
     /* Verification section */
     .verify-output {
-        margin-top: var(--space-md);
-        padding: var(--space-md);
-        background: #1e1e2e;
-        border-radius: var(--radius-md);
-        font-family: var(--font-mono);
+        margin-top: var(--z-space-4);
+        padding: var(--z-space-4);
+        background: var(--z-code-bg);
+        border: 1px solid var(--z-border);
+        border-radius: var(--z-radius-md);
+        font-family: var(--z-font-mono);
         font-size: 0.8125rem;
-        line-height: 1.6;
-        color: #cdd6f4;
+        line-height: var(--z-leading-code);
+        color: var(--z-code-fg);
         white-space: pre;
         overflow-x: auto;
     }
-    [data-theme="light"] .verify-output {
-        background: #f5f5f5;
-        color: #333;
-    }
-    .verify-output .g { color: #a6e3a1; }
-    .verify-output .m { color: #6c7086; }
-    [data-theme="light"] .verify-output .g { color: #40a02b; }
-    [data-theme="light"] .verify-output .m { color: #6c6f85; }
+    .verify-output .g { color: var(--z-success); }
+    .verify-output .m { color: var(--z-muted); }
 
     /* Checklist */
     .checklist {
         list-style: none;
         padding: 0;
-        margin: var(--space-lg) 0 0;
+        margin: var(--z-space-6) 0 0;
         display: grid;
-        gap: var(--space-sm);
+        gap: var(--z-space-2);
     }
     .checklist li {
         display: flex;
         align-items: center;
-        gap: var(--space-sm);
+        gap: var(--z-space-2);
         font-size: 0.9375rem;
-        color: var(--color-text-muted);
+        color: var(--z-muted);
     }
     .checklist li svg {
         flex-shrink: 0;
-        color: var(--color-primary);
+        color: var(--z-accent-text);
     }
     .checklist li strong {
-        color: var(--color-text);
+        color: var(--z-text);
     }
 </style>
 {% endblock %}
@@ -341,7 +322,7 @@
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
-                        <button class="copy-btn" onclick="copyCode('install-code')" aria-label="Copy to clipboard">
+                        <button class="copy-btn" type="button" onclick="copyCode('install-code', this)" aria-label="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             <span>Copy</span>
                         </button>
@@ -351,7 +332,7 @@ curl -fsSL https://get.zentinelproxy.io | sh
 
 # Select agents above to include them in the installation</code></pre>
                 </div>
-                <p class="section-description" style="margin-top: var(--space-md);">
+                <p class="section-description" style="margin-top: var(--z-space-4);">
                     On Linux with systemd, the installer also drops a unit at <code>/etc/systemd/system/zentinel.service</code>, a sysusers snippet, and a starter config at <code>/etc/zentinel/zentinel.kdl</code>. Pass <code>-s -- --enable-service</code> to enable and start the service in one step. See the <a href="https://docs.zentinelproxy.io/getting-started/installation/">installation docs</a> for details.
                 </p>
             </div>
@@ -371,7 +352,7 @@ curl -fsSL https://get.zentinelproxy.io | sh
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                 <span>Learn more about <code>.kdl</code></span>
                             </a>
-                            <button class="copy-btn" onclick="copyCode('config-code')" aria-label="Copy to clipboard">
+                            <button class="copy-btn" type="button" onclick="copyCode('config-code', this)" aria-label="Copy to clipboard">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 <span>Copy</span>
                             </button>
@@ -426,7 +407,7 @@ upstreams {
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
-                        <button class="copy-btn" onclick="copyCode('startup-code')" aria-label="Copy to clipboard">
+                        <button class="copy-btn" type="button" onclick="copyCode('startup-code', this)" aria-label="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             <span>Copy</span>
                         </button>
@@ -450,7 +431,7 @@ zentinel --config zentinel.kdl</code></pre>
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
-                        <button class="copy-btn" onclick="copyCode('verify-code')" aria-label="Copy to clipboard">
+                        <button class="copy-btn" type="button" onclick="copyCode('verify-code', this)" aria-label="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             <span>Copy</span>
                         </button>
@@ -495,7 +476,7 @@ curl -i http://localhost:8080/</code></pre>
                         <span><strong>Deploy to production</strong> — systemd, Docker, or Kubernetes. <a href="https://docs.zentinelproxy.io/deployment/">Deployment guide</a></span>
                     </li>
                 </ul>
-                <div class="next-steps-grid" style="margin-top: var(--space-xl);">
+                <div class="next-steps-grid" style="margin-top: var(--z-space-8);">
                     <a href="{{ config.extra.docs_external_url }}" class="next-step-card">
                         <div class="next-step-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -915,14 +896,9 @@ zentinel --config zentinel.kdl`;
 }
 
 // Copy code to clipboard
-function copyCode(elementId) {
+function copyCode(elementId, btn) {
     const code = document.querySelector(`#${elementId} code`).textContent;
-    navigator.clipboard.writeText(code).then(() => {
-        const btn = document.querySelector(`#${elementId}`).parentElement.querySelector('.copy-btn span');
-        const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = originalText, 2000);
-    });
+    window.zCopy(btn, code, 'Copied to the clipboard');
 }
 
 // Initialize event listeners

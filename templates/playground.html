@@ -4,94 +4,76 @@
 {% block description %}Interactive Zentinel configuration playground - validate configs, simulate requests, and visualize routing decisions{% endblock %}
 
 {% block content %}
-<section class="playground-hero">
+<section class="playground-hero pg-hero">
     <div class="container">
         <h1 class="playground-title">
             <span class="gradient-text">Playground</span>
         </h1>
         <p class="playground-subtitle">
-            Validate configurations, simulate requests, and visualize how Zentinel routes traffic
+            Write a configuration, send a request through it, and watch each stage of the real engine decide what happens.
         </p>
     </div>
 </section>
 
-<section class="playground-main">
+<section class="playground-main pg">
     <div class="container">
-        <p class="playground-intro">Choose a template to get started, or write your own configuration below</p>
-
-        <!-- Template Selector -->
-        <div class="template-selector">
-            <div class="template-grid">
-                <button type="button" class="template-card" data-template="basic">
-                    <h3>Vanilla Setup</h3>
-                    <span class="template-tooltip">Simple reverse proxy with multiple routes and load balancing</span>
+        <div class="pg-toolbar">
+            <label class="pg-preset">
+                <span class="z-label">Example</span>
+                <select class="z-select" id="pg-preset">
+                    <option value="custom" hidden>Your configuration</option>
+                    <option value="basic" selected data-desc="Simple reverse proxy with multiple routes and load balancing">Vanilla setup</option>
+                    <option value="agents" data-desc="A WAF and a rate limiter as agents in front of an API route; set their decisions in the Agents tab">Agent pipeline (WAF + rate limit)</option>
+                    <option value="ai-gateway" data-desc="LLM inference proxy with token-based rate limiting and intelligent routing">AI gateway</option>
+                    <option value="api-gateway" data-desc="REST API proxy with schema validation and versioning">API gateway</option>
+                    <option value="microservices" data-desc="Service-to-service routing with health checks and load balancing">Service mesh</option>
+                    <option value="static-cdn" data-desc="High-performance static file delivery with caching">Caching (CDN)</option>
+                    <option value="websocket" data-desc="Real-time WebSocket connections with upgrade handling">WebSocket proxy</option>
+                    <option value="security" data-desc="Rate limiting, body limits and security headers">Security gateway</option>
+                    <option value="canary" data-desc="Gradual rollout with weighted traffic splitting between versions">Canary deployment</option>
+                    <option value="content-routing" data-desc="Header-based and path-based routing">Content router</option>
+                    <option value="grpc" data-desc="HTTP/2 gRPC service proxy with load balancing">gRPC gateway</option>
+                    <option value="multi-region" data-desc="Geographic routing with failover across regions">Multi-region</option>
+                </select>
+            </label>
+            <p class="pg-preset-desc" id="pg-preset-desc">Simple reverse proxy with multiple routes and load balancing</p>
+            <div class="pg-toolbar-actions">
+                <button type="button" class="z-btn z-btn--ghost z-btn--sm" id="pg-reset" title="Restore the selected example">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                    Reset
                 </button>
-                <button type="button" class="template-card" data-template="ai-gateway">
-                    <h3>AI Gateway</h3>
-                    <span class="template-tooltip">LLM inference proxy with token-based rate limiting and intelligent routing</span>
-                </button>
-                <button type="button" class="template-card" data-template="api-gateway">
-                    <h3>API Gateway</h3>
-                    <span class="template-tooltip">REST API proxy with schema validation and versioning</span>
-                </button>
-                <button type="button" class="template-card" data-template="microservices">
-                    <h3>Service Mesh</h3>
-                    <span class="template-tooltip">Service-to-service routing with health checks and load balancing</span>
-                </button>
-                <button type="button" class="template-card" data-template="static-cdn">
-                    <h3>Varnish-type Caching (CDN)</h3>
-                    <span class="template-tooltip">High-performance static file delivery with caching</span>
-                </button>
-                <button type="button" class="template-card" data-template="websocket">
-                    <h3>WebSocket Proxy</h3>
-                    <span class="template-tooltip">Real-time WebSocket connections with upgrade handling</span>
-                </button>
-                <button type="button" class="template-card" data-template="security">
-                    <h3>Security Gateway</h3>
-                    <span class="template-tooltip">WAF, rate limiting, and security headers</span>
-                </button>
-                <button type="button" class="template-card" data-template="canary">
-                    <h3>Canary Deployment</h3>
-                    <span class="template-tooltip">Gradual rollout with weighted traffic splitting between versions</span>
-                </button>
-                <button type="button" class="template-card" data-template="content-routing">
-                    <h3>Content Router</h3>
-                    <span class="template-tooltip">Header-based and path-based intelligent routing</span>
-                </button>
-                <button type="button" class="template-card" data-template="grpc">
-                    <h3>gRPC Gateway</h3>
-                    <span class="template-tooltip">HTTP/2 gRPC service proxy with load balancing</span>
-                </button>
-                <button type="button" class="template-card" data-template="multi-region">
-                    <h3>Multi-Region</h3>
-                    <span class="template-tooltip">Geographic routing with failover across regions</span>
+                <button type="button" class="z-btn z-btn--ghost z-btn--sm" id="pg-share" title="Copy a link that opens this configuration">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span class="pg-share-label">Share link</span>
                 </button>
             </div>
         </div>
 
-        <div class="playground-grid">
-            <!-- Config Editor -->
-            <div class="playground-panel config-panel" id="config-panel">
-                <div class="panel-header">
-                    <h2>Configuration</h2>
-                    <div class="panel-header-actions">
-                        <div class="validation-status" id="validation-status">
-                            <span class="status-icon" id="status-icon"></span>
-                            <span class="status-text" id="status-text">Loading...</span>
-                        </div>
-                        <button type="button" class="panel-action-btn" id="copy-config-btn" title="Copy configuration">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        <div class="pg-grid">
+            <!-- Config editor -->
+            <div class="pg-panel pg-editor-panel" id="config-panel">
+                <div class="pg-panel-header">
+                    <h2 class="pg-panel-title" id="pg-editor-title">Configuration</h2>
+                    <div class="pg-panel-actions">
+                        <span class="pg-status" id="validation-status" role="status" aria-live="polite">
+                            <span class="pg-status-icon" id="status-icon" aria-hidden="true"></span>
+                            <span id="status-text">Loading the engine…</span>
+                        </span>
+                        <button type="button" class="z-btn z-btn--ghost z-btn--sm z-btn--icon" id="copy-config-btn" aria-label="Copy configuration">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                         </button>
-                        <button type="button" class="panel-action-btn" id="fullscreen-config-btn" title="Toggle fullscreen">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-expand"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-collapse"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                        <button type="button" class="z-btn z-btn--ghost z-btn--sm z-btn--icon" id="fullscreen-config-btn" aria-label="Expand editor" aria-pressed="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-expand" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-collapse" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
                         </button>
                     </div>
                 </div>
-                <div class="editor-wrapper">
-                    <div class="editor-container">
-                        <pre class="editor-highlight" id="editor-highlight" aria-hidden="true"><code id="highlight-code"></code></pre>
-                        <textarea id="config-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">system {
+                <div class="pg-editor" id="pg-editor">
+                    <div class="pg-gutter" aria-hidden="true"><div class="pg-gutter-inner" id="pg-gutter"></div></div>
+                    <div class="pg-code">
+                        <div class="pg-marks" id="pg-marks" aria-hidden="true"></div>
+                        <pre class="pg-highlight" id="editor-highlight" aria-hidden="true"><code id="highlight-code"></code></pre>
+                        <textarea id="config-editor" aria-labelledby="pg-editor-title" aria-describedby="pg-editor-hint" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" wrap="off">system {
     worker-threads 4
 }
 
@@ -139,26 +121,30 @@ upstreams {
 }</textarea>
                     </div>
                 </div>
-                <div class="error-display" id="error-display"></div>
+                <p class="pg-hint" id="pg-editor-hint">
+                    <kbd class="z-kbd">Tab</kbd> indents ·
+                    <kbd class="z-kbd">Esc</kbd> then <kbd class="z-kbd">Tab</kbd> leaves the editor ·
+                    <kbd class="z-kbd" data-mod>Ctrl</kbd> + <kbd class="z-kbd">Enter</kbd> runs
+                </p>
+                <div class="pg-problems" id="error-display" aria-live="polite"></div>
             </div>
 
-            <!-- Request Builder -->
-            <div class="playground-panel request-panel">
-                <div class="panel-header">
-                    <h2>Request</h2>
-                    <div class="request-tabs">
-                        <button type="button" class="request-tab active" data-tab="builder">Builder</button>
-                        <button type="button" class="request-tab" data-tab="raw">Raw</button>
-                        <button type="button" class="request-tab" data-tab="agents">Agents</button>
-                    </div>
+            <!-- Request -->
+            <div class="pg-panel pg-request-panel">
+                <div class="pg-panel-header">
+                    <h2 class="pg-panel-title">Request</h2>
+                </div>
+                <div class="z-tabs pg-tabs" role="tablist" aria-label="Request input">
+                    <button type="button" role="tab" id="tab-btn-builder" aria-controls="tab-builder" aria-selected="true">Builder</button>
+                    <button type="button" role="tab" id="tab-btn-raw" aria-controls="tab-raw" aria-selected="false" tabindex="-1">Raw HTTP</button>
+                    <button type="button" role="tab" id="tab-btn-agents" aria-controls="tab-agents" aria-selected="false" tabindex="-1">Agents <span class="pg-count" id="agents-count" hidden></span></button>
                 </div>
 
-                <!-- Builder Tab (default) -->
-                <div class="request-tab-content active" id="tab-builder">
-                    <div class="request-builder">
-                        <div class="request-row">
-                            <label for="request-method">Method</label>
-                            <select id="request-method">
+                <div class="pg-tab" role="tabpanel" id="tab-builder" aria-labelledby="tab-btn-builder">
+                    <div class="pg-request-line">
+                        <label class="z-field pg-method">
+                            <span class="z-label">Method</span>
+                            <select class="z-select" id="request-method">
                                 <option value="GET" selected>GET</option>
                                 <option value="POST">POST</option>
                                 <option value="PUT">PUT</option>
@@ -167,106 +153,77 @@ upstreams {
                                 <option value="HEAD">HEAD</option>
                                 <option value="OPTIONS">OPTIONS</option>
                             </select>
-                        </div>
-                        <div class="request-row">
-                            <label for="request-host">Host</label>
-                            <input type="text" id="request-host" value="example.com" placeholder="example.com">
-                        </div>
-                        <div class="request-row">
-                            <label for="request-path">Path</label>
-                            <input type="text" id="request-path" value="/api/users" placeholder="/api/users">
-                        </div>
-                        <div class="request-row headers-row">
-                            <label>Headers</label>
-                            <div class="headers-list" id="headers-list">
-                                <!-- Headers added dynamically -->
-                            </div>
-                            <button type="button" class="btn btn-ghost btn-small" id="add-header-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                Add Header
-                            </button>
-                        </div>
-                        <button type="button" class="btn btn-gradient simulate-btn" id="simulate-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Simulate Request
+                        </label>
+                        <label class="z-field">
+                            <span class="z-label">Host</span>
+                            <input class="z-input" type="text" id="request-host" value="example.com" placeholder="example.com" autocomplete="off" spellcheck="false">
+                        </label>
+                    </div>
+                    <label class="z-field">
+                        <span class="z-label">Path</span>
+                        <input class="z-input z-input--mono" type="text" id="request-path" value="/api/users" placeholder="/api/users" autocomplete="off" spellcheck="false" aria-describedby="request-path-hint">
+                        <span class="z-hint" id="request-path-hint">Query strings are ignored for routing.</span>
+                    </label>
+                    <div class="z-field">
+                        <span class="z-label" id="headers-label">Headers</span>
+                        <div class="pg-headers" id="headers-list" role="group" aria-labelledby="headers-label"></div>
+                        <button type="button" class="z-btn z-btn--ghost z-btn--sm pg-add" id="add-header-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add header
                         </button>
                     </div>
                 </div>
 
-                <!-- Raw Tab -->
-                <div class="request-tab-content" id="tab-raw">
-                    <div class="request-raw">
-                        <textarea id="raw-request" spellcheck="false" placeholder="GET /api/users HTTP/1.1
-Host: example.com
-Content-Type: application/json
-Authorization: Bearer token123">GET /api/users HTTP/1.1
+                <div class="pg-tab" role="tabpanel" id="tab-raw" aria-labelledby="tab-btn-raw" hidden>
+                    <label class="z-field">
+                        <span class="z-label">Raw HTTP request</span>
+                        <textarea class="z-textarea z-textarea--mono" id="raw-request" rows="8" spellcheck="false" aria-describedby="raw-hint">GET /api/users HTTP/1.1
 Host: example.com</textarea>
-                        <button type="button" class="btn btn-gradient simulate-btn" id="simulate-raw-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Simulate Request
-                        </button>
-                    </div>
+                        <span class="z-hint" id="raw-hint">Request line, then one header per line.</span>
+                    </label>
                 </div>
 
-                <!-- Agents Tab -->
-                <div class="request-tab-content" id="tab-agents">
-                    <div class="agents-builder">
-                        <div class="agents-empty" id="agents-empty">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
-                            <p>No agents detected in configuration</p>
-                            <p class="agents-hint">Add <code>agents</code> and <code>filters</code> blocks to your config to simulate agent decisions</p>
-                        </div>
-                        <div class="agents-list" id="agents-list">
-                            <!-- Agent cards populated by JS -->
-                        </div>
-                        <button type="button" class="btn btn-gradient simulate-btn" id="simulate-agents-btn" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Simulate with Agents
-                        </button>
+                <div class="pg-tab" role="tabpanel" id="tab-agents" aria-labelledby="tab-btn-agents" hidden>
+                    <div class="pg-agents-empty" id="agents-empty">
+                        <p>No agents in this configuration.</p>
+                        <p class="z-hint">Agents run as separate processes; the playground lets you mock their decisions. Try the <button type="button" class="pg-linkbtn" data-load-preset="agents">agent pipeline example</button>.</p>
                     </div>
+                    <div class="pg-agents" id="agents-list"></div>
+                </div>
+
+                <div class="pg-run">
+                    <button type="button" class="z-btn z-btn--lg pg-run-btn" id="simulate-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                        Run request
+                    </button>
+                    <span class="pg-hint"><kbd class="z-kbd" data-mod>Ctrl</kbd> + <kbd class="z-kbd">Enter</kbd></span>
                 </div>
             </div>
         </div>
 
-        <!-- Flow Diagram -->
-        <div class="playground-panel flow-panel" id="flow-panel">
-            <div class="panel-header">
-                <h2>Request & Response Flow</h2>
-            </div>
-            <div class="flow-container">
-                <div class="flow-section">
-                    <h3 class="flow-section-title">Request Flow</h3>
-                    <div class="flow-diagram" id="flow-diagram">
-                        <div class="flow-placeholder">
-                            <p>Click "Simulate Request" to see the routing flow</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flow-divider"></div>
-                <div class="flow-section">
-                    <h3 class="flow-section-title">Response Flow</h3>
-                    <div class="flow-diagram" id="response-flow-diagram">
-                        <div class="flow-placeholder">
-                            <p>Response flow will appear here</p>
-                        </div>
-                    </div>
+        <!-- Result -->
+        <div class="pg-panel pg-result" id="flow-panel">
+            <div class="pg-panel-header">
+                <h2 class="pg-panel-title" id="pg-result-title">Request → response</h2>
+                <div class="z-segmented" role="group" aria-label="Result view">
+                    <button type="button" aria-pressed="true" data-view="pipeline">Pipeline</button>
+                    <button type="button" aria-pressed="false" data-view="raw">Raw</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Detailed Trace -->
-        <div class="playground-panel trace-panel" id="trace-panel">
-            <div class="panel-header">
-                <h2>Detailed Trace</h2>
-                <button type="button" class="btn btn-ghost btn-small" id="toggle-trace-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    Expand All
-                </button>
+            <p class="sr-only" id="pg-announce" aria-live="polite"></p>
+            <div class="pg-view" id="pg-view-pipeline">
+                <ol class="pg-pipeline" id="flow-diagram" aria-labelledby="pg-result-title">
+                    <li class="pg-empty">Run a request to see each stage decide.</li>
+                </ol>
+                <div class="pg-detail" id="pg-detail" hidden></div>
+                <div class="pg-warnings" id="pg-warnings"></div>
             </div>
-            <div class="trace-content" id="trace-content">
-                <div class="trace-placeholder">
-                    <p>Simulation results will appear here</p>
+            <div class="pg-view" id="pg-view-raw" hidden>
+                <div class="pg-raw-head">
+                    <span class="z-hint">What the engine returned for the last run.</span>
+                    <button type="button" class="z-copy" id="pg-copy-raw"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> <span>Copy</span></button>
                 </div>
+                <pre class="pg-raw" id="trace-content"><code>Nothing yet.</code></pre>
             </div>
         </div>
 

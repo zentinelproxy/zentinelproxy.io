@@ -4,8 +4,8 @@
   "description": "A security-first reverse proxy based on Pingora built to guard the free web.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1e1e2e",
-  "theme_color": "#cba6f7",
+  "background_color": "#160d15",
+  "theme_color": "#160d15",
   "icons": [
     {
       "src": "/favicon.png",
