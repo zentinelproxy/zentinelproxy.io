@@ -68,18 +68,14 @@ github = "https://github.com/zentinelproxy/zentinel"
 # Discord links are simply hidden while it is unset. Restore by setting a
 # permanent invite (Server Settings -> Invites -> expiry Never).
 
-# Navigation: two menus in the header (templates/base.html renders each as a
-# dropdown, and the mobile menu as a labelled group). Explore is the product
-# and the tools to try it; Learn is how to adopt and understand it. The GitHub
-# link is rendered as an icon next to search.
+# Navigation (templates/base.html). Entries with children render as
+# dropdowns (Explore, Learn), the rest as direct links. The GitHub link is the
+# icon next to search, and "Install" is the call to action on the right.
 [[extra.nav_links]]
 name = "Explore"
 [[extra.nav_links.children]]
 name = "Features"
 url = "/features/"
-[[extra.nav_links.children]]
-name = "Playground"
-url = "/playground/"
 [[extra.nav_links.children]]
 name = "Config Converter"
 url = "/converter/"
@@ -103,10 +99,6 @@ name = "Learn"
 name = "Install & Configure"
 url = "/customize/"
 [[extra.nav_links.children]]
-name = "Documentation"
-url = "https://docs.zentinelproxy.io/"
-external = true
-[[extra.nav_links.children]]
 name = "Blog"
 url = "/blog/"
 [[extra.nav_links.children]]
@@ -120,6 +112,10 @@ name = "Security"
 url = "/security/"
 
 [[extra.nav_links]]
-name = "GitHub"
-url = "https://github.com/zentinelproxy/zentinel"
+name = "Playground"
+url = "/playground/"
+
+[[extra.nav_links]]
+name = "Docs"
+url = "https://docs.zentinelproxy.io/"
 external = true
