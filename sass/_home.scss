@@ -285,23 +285,7 @@
 }
 
 .code-snippet__copy {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--z-space-1);
-    padding: var(--z-space-1) var(--z-space-2);
-    font-family: var(--z-font-text);
-    font-size: 0.8125rem;
-    color: var(--z-muted);
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: var(--z-radius-sm);
-    cursor: pointer;
-
-    &:hover,
-    &:focus-visible {
-        color: var(--z-text);
-        border-color: var(--z-border);
-    }
+    @extend .z-copy;
 }
 
 .code-snippet__body {
@@ -336,11 +320,6 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--z-space-4);
-}
-
-.btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
 }
 
 .community-links {

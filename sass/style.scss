@@ -489,27 +489,14 @@ img {
 }
 
 .btn-lg {
-    font-size: var(--z-size-lg);
+    @extend .z-btn--lg;
 }
 
-// Small flat utility button (playground and converter toolbars)
+// Small flat utility button
 .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--z-space-2);
-    padding: var(--z-space-2) var(--z-space-4);
-    background: transparent;
-    color: var(--z-text);
-    font-size: var(--z-size-sm);
-    font-weight: var(--z-weight-medium);
-    border: 1px solid var(--z-border-strong);
-    border-radius: var(--z-radius-sm);
-    transition: background-color var(--z-duration-fast) var(--z-ease-standard), color var(--z-duration-fast) var(--z-ease-standard);
-
-    &:hover {
-        background: var(--z-surface-raised);
-        color: var(--z-heading);
-    }
+    @extend .z-btn;
+    @extend .z-btn--ghost;
+    @extend .z-btn--sm;
 }
 
 // ============================================
@@ -673,114 +660,21 @@ img {
 // ============================================
 .install-widget {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--z-space-2);
     position: relative;
-    max-width: fit-content;
+    max-width: 100%;
 
     @media (max-width: 768px) {
+        justify-content: center;
         margin: 0 auto;
-        max-width: 100%;
         width: 100%;
     }
 }
 
-.install-selector {
-    position: relative;
-    z-index: 100;
-}
-
-.install-toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--z-space-1);
-    padding: var(--z-space-2) var(--z-space-4);
-    background: var(--z-surface-raised);
-    border: 1px solid var(--z-border);
-    border-radius: var(--z-radius-md);
-    color: var(--z-text);
-    cursor: pointer;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
-
-    &:hover {
-        border-color: var(--z-accent-text);
-    }
-}
-
-.install-toggle-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.install-toggle-chevron {
-    color: var(--z-muted);
-    transition: transform var(--z-duration-fast) var(--z-ease-standard);
-}
-
-.install-dropdown.open + .install-toggle .install-toggle-chevron,
-.install-selector:has(.install-dropdown.open) .install-toggle-chevron {
-    transform: rotate(180deg);
-}
-
-.install-dropdown {
-    position: absolute;
-    top: calc(100% + var(--z-space-1));
-    left: 0;
-    min-width: 180px;
-    background: var(--z-surface-raised);
-    border: 1px solid var(--z-border);
-    border-radius: var(--z-radius-md);
-    box-shadow: var(--z-shadow-lg);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
-    z-index: 9999;
-
-    &.open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-}
-
-.install-option {
-    display: flex;
-    align-items: center;
-    gap: var(--z-space-2);
-    width: 100%;
-    padding: var(--z-space-2) var(--z-space-4);
-    background: transparent;
-    border: none;
-    color: var(--z-muted);
-    font-family: var(--z-font-text);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
-    white-space: nowrap;
-
-    &:first-child {
-        border-radius: var(--z-radius-md) var(--z-radius-md) 0 0;
-    }
-
-    &:last-child {
-        border-radius: 0 0 var(--z-radius-md) var(--z-radius-md);
-    }
-
-    &:hover {
-        background: var(--z-surface);
-        color: var(--z-text);
-    }
-
-    &.active {
-        color: var(--z-accent-text);
-        background: color-mix(in srgb, var(--z-accent) 10%, transparent);
-    }
-
-    svg {
-        flex-shrink: 0;
-    }
+.install-methods {
+    flex-shrink: 0;
 }
 
 .install-cmd-wrapper {
@@ -813,23 +707,14 @@ img {
     }
 }
 
-.install-cmd-wrapper .copy-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--z-space-1);
-    background: transparent;
-    border: none;
-    color: var(--z-muted);
-    cursor: pointer;
-    border-radius: var(--z-radius-sm);
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
+.install-copy {
     flex-shrink: 0;
+}
 
-    &:hover {
-        color: var(--z-text);
-        background: var(--z-surface-raised);
-    }
+// The command gets its own row under the method switch
+.install-widget .install-cmd-wrapper {
+    flex: 1 1 100%;
+    max-width: 30rem;
 }
 
 .hero-visual {
@@ -2271,50 +2156,41 @@ img {
     }
 }
 
-// Option Cards (Installation Method)
+// Option cards (install method, radios) and agent cards (checkboxes) on
+// /customize/: the frame's radio card (.z-choice). The input stays in the
+// accessibility tree and takes focus; the drawn check mirrors its state.
 .option-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: var(--z-space-4);
 }
 
+.option-card,
+label.agent-card {
+    @extend .z-choice;
+
+    > input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
 .option-card {
-    display: flex;
     align-items: center;
-    gap: var(--z-space-4);
-    padding: var(--z-space-6);
-    background: var(--z-surface-raised);
-    border: 2px solid var(--z-border);
-    border-radius: var(--z-radius-lg);
-    cursor: pointer;
-    transition: all var(--z-duration-base) var(--z-ease-standard);
-
-    input {
-        display: none;
-    }
-
-    &:hover:not(.disabled) {
-        border-color: var(--z-border);
-    }
-
-    &.selected {
-        border-color: var(--z-accent-text);
-        background: color-mix(in srgb, var(--z-accent) 10%, transparent);
-    }
-
-    &.disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+    padding: var(--z-space-5);
 }
 
 .option-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    background: var(--z-bg);
+    width: 52px;
+    height: 52px;
+    background: var(--z-surface-raised);
     border-radius: var(--z-radius-md);
     color: var(--z-accent-text);
     flex-shrink: 0;
@@ -2322,88 +2198,81 @@ img {
 
 .option-content {
     flex: 1;
+    min-width: 0;
 
     h3 {
-        font-size: 1.125rem;
-        font-weight: 600;
+        font-size: var(--z-size-base);
         margin-bottom: var(--z-space-1);
     }
 
     p {
-        font-size: 0.875rem;
+        font-size: var(--z-size-sm);
         color: var(--z-muted);
         margin: 0;
     }
 }
 
-.option-check {
+// The drawn indicator: a radio dot or a check box, like .z-check.
+.option-check,
+.agent-check {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    background: var(--z-bg);
-    border: 2px solid var(--z-border);
-    border-radius: var(--z-radius-full);
-    color: transparent;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
+    background: var(--z-bg);
+    border: 1.5px solid var(--z-border-strong);
+    color: transparent;
+    transition:
+        background-color var(--z-duration-fast) var(--z-ease-standard),
+        border-color var(--z-duration-fast) var(--z-ease-standard),
+        color var(--z-duration-fast) var(--z-ease-standard);
 
-    .selected & {
-        background: var(--z-accent);
-        border-color: var(--z-accent-text);
-        color: var(--z-on-accent);
+    svg {
+        width: 16px;
+        height: 16px;
     }
 }
 
-// Agent Cards
+.option-check {
+    border-radius: 50%;
+}
+
+.agent-check {
+    border-radius: 5px;
+}
+
+.option-card:has(input:checked) .option-check,
+label.agent-card:has(input:checked) .agent-check {
+    background: var(--z-accent);
+    border-color: var(--z-button-edge);
+    color: var(--z-on-accent);
+}
+
+// Agent cards
 .agents-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: var(--z-space-4);
 }
 
-.agent-card {
-    display: flex;
+label.agent-card {
     flex-direction: column;
-    padding: var(--z-space-6);
-    background: var(--z-surface-raised);
-    border: 2px solid var(--z-border);
-    border-radius: var(--z-radius-lg);
-    cursor: pointer;
-    transition: all var(--z-duration-base) var(--z-ease-standard);
-
-    input {
-        display: none;
-    }
-
-    &:hover {
-        border-color: var(--z-border);
-    }
-
-    &.selected {
-        border-color: var(--z-accent-text);
-        background: color-mix(in srgb, var(--z-accent) 10%, transparent);
-
-        .agent-check {
-            background: var(--z-accent);
-            border-color: var(--z-accent-text);
-            color: var(--z-on-accent);
-        }
-    }
+    align-items: stretch;
+    gap: var(--z-space-2);
 }
 
 .agent-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: var(--z-space-2);
+    gap: var(--z-space-3);
 }
 
 .agent-info {
     h3 {
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: var(--z-size-base);
         margin-bottom: var(--z-space-1);
     }
 }
@@ -2412,7 +2281,7 @@ img {
     display: inline-block;
     padding: 0.125rem 0.5rem;
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: var(--z-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-radius: var(--z-radius-full);
@@ -2428,22 +2297,8 @@ img {
     }
 }
 
-.agent-check {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    background: var(--z-bg);
-    border: 2px solid var(--z-border);
-    border-radius: var(--z-radius-sm);
-    color: transparent;
-    flex-shrink: 0;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
-}
-
 .agent-description {
-    font-size: 0.875rem;
+    font-size: var(--z-size-sm);
     color: var(--z-muted);
     line-height: 1.5;
     margin: 0;
@@ -2475,25 +2330,9 @@ img {
     letter-spacing: 0.05em;
 }
 
+// Copy buttons in code headers: the frame copy button.
 .copy-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--z-space-1);
-    padding: var(--z-space-1) var(--z-space-2);
-    background: transparent;
-    border: 1px solid var(--z-border);
-    border-radius: var(--z-radius-sm);
-    color: var(--z-muted);
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
-
-    &:hover {
-        background: var(--z-surface-raised);
-        border-color: var(--z-accent-text);
-        color: var(--z-accent-text);
-    }
+    @extend .z-copy;
 }
 
 .code-output pre {

@@ -99,17 +99,24 @@
     display: flex;
     align-items: center;
     gap: var(--z-space-2);
-    max-width: 400px;
+    max-width: 420px;
+    min-height: var(--z-control-height-md);
     margin: 0 auto var(--z-space-8);
-    padding: var(--z-space-2) var(--z-space-4);
+    padding: 0 var(--z-control-padding-x);
     background: var(--z-bg);
-    border: 1px solid var(--z-border);
-    border-radius: var(--z-radius-lg);
-    transition: all var(--z-duration-base) var(--z-ease-standard);
+    border: var(--z-control-border-width) solid var(--z-border-strong);
+    border-radius: var(--z-control-radius);
+    transition: border-color var(--z-duration-fast) var(--z-ease-standard);
 
+    &:hover {
+        border-color: var(--z-muted);
+    }
+
+    // the field drops its own outline; the whole bar takes the focus ring
     &:focus-within {
-        border-color: var(--z-accent-text);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--z-accent-text) 15%, transparent);
+        border-color: var(--z-focus);
+        outline: 2px solid var(--z-focus);
+        outline-offset: 2px;
     }
 
     svg {
@@ -119,11 +126,12 @@
 
     input {
         flex: 1;
+        min-width: 0;
+        min-height: calc(var(--z-control-height-md) - 2px);
         border: none;
         background: transparent;
         color: var(--z-text);
-        font-family: var(--z-font-text);
-        font-size: 0.9375rem;
+        font: var(--z-weight-regular) var(--z-size-base) / 1.4 var(--z-font-text);
         outline: none;
 
         &::placeholder {
@@ -140,26 +148,36 @@
     margin-bottom: var(--z-space-16);
 }
 
+// Filter chips: toggle buttons (aria-pressed)
 .filter-tag {
-    padding: var(--z-space-1) var(--z-space-4);
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--z-control-height-sm);
+    padding: 0 var(--z-space-4);
     background: var(--z-bg);
-    border: 1px solid var(--z-border);
+    border: var(--z-control-border-width) solid var(--z-border-strong);
     border-radius: var(--z-radius-full);
-    color: var(--z-muted);
-    font-size: 0.875rem;
-    font-weight: 500;
+    color: var(--z-text);
+    font: var(--z-weight-semibold) var(--z-size-sm) / 1 var(--z-font-text);
     cursor: pointer;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
+    transition:
+        background-color var(--z-duration-fast) var(--z-ease-standard),
+        border-color var(--z-duration-fast) var(--z-ease-standard),
+        color var(--z-duration-fast) var(--z-ease-standard);
 
     &:hover {
-        border-color: var(--z-accent-text);
-        color: var(--z-text);
+        background: var(--z-surface-raised);
+        color: var(--z-heading);
     }
 
-    &.active {
+    &[aria-pressed="true"] {
         background: var(--z-accent);
-        border-color: var(--z-accent-text);
+        border-color: var(--z-button-edge);
         color: var(--z-on-accent);
+    }
+
+    @media (pointer: coarse) {
+        min-height: var(--z-control-target-min);
     }
 }
 

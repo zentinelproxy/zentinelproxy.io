@@ -73,6 +73,11 @@
     align-items: center;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--z-border);
+
+    // the input drops its own outline; the row shows the focus instead
+    &:focus-within {
+        box-shadow: inset 0 -2px 0 var(--z-focus);
+    }
 }
 
 .search__icon {

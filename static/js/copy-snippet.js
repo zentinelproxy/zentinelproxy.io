@@ -11,13 +11,7 @@
                 .filter(function (l) { return l.indexOf('$ ') === 0; })
                 .map(function (l) { return l.slice(2); })
                 .join('\n');
-            var label = btn.querySelector('.code-snippet__copy-label');
-            var done = function () {
-                if (!label) return;
-                label.textContent = 'Copied';
-                setTimeout(function () { label.textContent = 'Copy'; }, 2000);
-            };
-            if (navigator.clipboard) navigator.clipboard.writeText(cmds).then(done, function () {});
+            window.zCopy(btn, cmds, 'Commands copied');
         });
     });
 })();

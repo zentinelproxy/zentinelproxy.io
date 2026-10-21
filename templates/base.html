@@ -242,6 +242,7 @@
 <body>
     <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <p id="z-announce" class="sr-only" aria-live="polite"></p>
 
     <div class="layout">
         <header class="header" role="banner">
@@ -446,6 +447,36 @@
     </div>
 
     <script>
+        // Shared copy feedback for every copy button (.z-copy): copies, marks
+        // the button with data-copied, swaps its icon and label for a moment,
+        // and announces the result in a polite live region.
+        window.zAnnounce = function (text) {
+            var el = document.getElementById('z-announce');
+            if (!el) return;
+            el.textContent = '';
+            setTimeout(function () { el.textContent = text; }, 30);
+        };
+        window.zCopy = function (btn, text, message) {
+            var CHECK = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+            var write = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject();
+            return write.then(function () {
+                if (!btn._zCopyHtml) btn._zCopyHtml = btn.innerHTML;
+                var label = btn.querySelector('span');
+                btn.innerHTML = CHECK + (label ? '<span>Copied</span>' : '');
+                btn.setAttribute('data-copied', '');
+                window.zAnnounce(message || 'Copied to the clipboard');
+                clearTimeout(btn._zCopyTimer);
+                btn._zCopyTimer = setTimeout(function () {
+                    btn.innerHTML = btn._zCopyHtml;
+                    btn.removeAttribute('data-copied');
+                }, 1800);
+                return true;
+            }, function () {
+                window.zAnnounce('Copy failed: the browser blocked clipboard access');
+                return false;
+            });
+        };
+
         // Footer theme switch: System removes data-theme (prefers-color-scheme
         // applies), Light/Dark set it. The choice is remembered when storage works.
         (function () {

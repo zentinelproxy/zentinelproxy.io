@@ -322,7 +322,7 @@
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
-                        <button class="copy-btn" onclick="copyCode('install-code')" aria-label="Copy to clipboard">
+                        <button class="copy-btn" type="button" onclick="copyCode('install-code', this)" aria-label="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             <span>Copy</span>
                         </button>
@@ -352,7 +352,7 @@ curl -fsSL https://get.zentinelproxy.io | sh
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                 <span>Learn more about <code>.kdl</code></span>
                             </a>
-                            <button class="copy-btn" onclick="copyCode('config-code')" aria-label="Copy to clipboard">
+                            <button class="copy-btn" type="button" onclick="copyCode('config-code', this)" aria-label="Copy to clipboard">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 <span>Copy</span>
                             </button>
@@ -407,7 +407,7 @@ upstreams {
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
-                        <button class="copy-btn" onclick="copyCode('startup-code')" aria-label="Copy to clipboard">
+                        <button class="copy-btn" type="button" onclick="copyCode('startup-code', this)" aria-label="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             <span>Copy</span>
                         </button>
@@ -431,7 +431,7 @@ zentinel --config zentinel.kdl</code></pre>
                 <div class="code-output">
                     <div class="code-header">
                         <span class="code-label">Shell</span>
-                        <button class="copy-btn" onclick="copyCode('verify-code')" aria-label="Copy to clipboard">
+                        <button class="copy-btn" type="button" onclick="copyCode('verify-code', this)" aria-label="Copy to clipboard">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             <span>Copy</span>
                         </button>
@@ -896,14 +896,9 @@ zentinel --config zentinel.kdl`;
 }
 
 // Copy code to clipboard
-function copyCode(elementId) {
+function copyCode(elementId, btn) {
     const code = document.querySelector(`#${elementId} code`).textContent;
-    navigator.clipboard.writeText(code).then(() => {
-        const btn = document.querySelector(`#${elementId}`).parentElement.querySelector('.copy-btn span');
-        const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = originalText, 2000);
-    });
+    window.zCopy(btn, code, 'Copied to the clipboard');
 }
 
 // Initialize event listeners

@@ -98,8 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filterTags.forEach(tag => {
         tag.addEventListener('click', () => {
             // Update active state
-            filterTags.forEach(t => t.classList.remove('active'));
-            tag.classList.add('active');
+            filterTags.forEach(t => t.setAttribute('aria-pressed', String(t === tag)));
 
             // Update current filter
             currentFilter = tag.dataset.category;

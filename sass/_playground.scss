@@ -67,28 +67,10 @@
 }
 
 .panel-action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: transparent;
-    border: 1px solid var(--z-border);
-    border-radius: var(--z-radius-sm);
-    color: var(--z-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background: var(--z-surface-raised);
-        color: var(--z-text);
-        border-color: var(--z-border);
-    }
-
-    &:active {
-        background: var(--z-surface);
-    }
+    @extend .z-btn;
+    @extend .z-btn--ghost;
+    @extend .z-btn--sm;
+    @extend .z-btn--icon;
 
     svg {
         width: 16px;
@@ -97,6 +79,11 @@
 
     .icon-collapse {
         display: none;
+    }
+
+    &[data-copied] {
+        color: var(--z-success);
+        box-shadow: inset 0 0 0 1px var(--z-success);
     }
 }
 
@@ -772,28 +759,11 @@ $editor-padding: var(--z-space-4);
 }
 
 .editor-sample-select {
-    padding: var(--z-space-1) var(--z-space-2);
-    font-size: 0.6875rem;
+    @extend .z-select;
+    @extend .z-select--sm;
+    width: auto;
     font-family: var(--z-font-mono);
-    background: var(--z-bg);
-    border: 1px solid var(--z-border);
-    border-radius: var(--z-radius-sm);
-    color: var(--z-muted);
-    cursor: pointer;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
-    opacity: 0.7;
-
-    &:hover {
-        opacity: 1;
-        border-color: var(--z-muted);
-        background: var(--z-surface-raised);
-    }
-
-    &:focus {
-        outline: none;
-        opacity: 1;
-        border-color: var(--z-accent-text);
-    }
+    font-size: var(--z-size-xs);
 }
 
 // Converter status indicator
@@ -1017,13 +987,6 @@ $editor-padding: var(--z-space-4);
 .cmt { color: var(--z-muted); font-style: italic; }
 .bool { color: var(--z-accent-text); }
 
-// Copy button feedback
-.panel-action-btn.copied {
-    background: color-mix(in srgb, var(--z-success) 20%, transparent);
-    border-color: var(--z-success);
-    color: var(--z-success);
-}
-
 // =============================================================================
 // CLI Install Section
 // =============================================================================
@@ -1120,49 +1083,11 @@ $editor-padding: var(--z-space-4);
 }
 
 .cli-install-tabs {
-    display: flex;
-    background: var(--z-bg);
-    border-bottom: 1px solid var(--z-border);
-}
-
-.cli-install-tab {
-    display: flex;
-    align-items: center;
-    gap: var(--z-space-1);
-    padding: var(--z-space-2) var(--z-space-4);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--z-muted);
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    transition: all var(--z-duration-fast) var(--z-ease-standard);
+    margin: var(--z-space-3) var(--z-space-3) 0;
 
     svg {
         width: 16px;
         height: 16px;
-        opacity: 0.7;
-    }
-
-    &:hover {
-        color: var(--z-text);
-        background: var(--z-surface-raised);
-
-        svg {
-            opacity: 1;
-        }
-    }
-
-    &.active {
-        color: var(--z-accent-text);
-        border-bottom-color: var(--z-accent-text);
-        background: var(--z-surface-raised);
-
-        svg {
-            opacity: 1;
-            color: var(--z-accent-text);
-        }
     }
 }
 
