@@ -9,8 +9,17 @@ description = "Start development server"
 run = "zola serve --drafts"
 
 [tasks.build]
-description = "Build production site"
+description = "Build production site (regenerates llms.txt first)"
+depends = ["llms"]
 run = "zola build"
+
+[tasks.llms]
+description = "Generate static/llms.txt and static/llms-full.txt from content (commit the result)"
+run = "python3 scripts/llms.py"
+
+[tasks.check-version]
+description = "Check config.toml software_version against the latest zentinel release (needs network)"
+run = "python3 scripts/check_version.py"
 
 [tasks.convert-images]
 description = "Convert PNG/JPG images to AVIF format"

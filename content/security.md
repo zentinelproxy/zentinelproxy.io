@@ -50,7 +50,7 @@ Published advisories are listed on the repository's [GitHub Security Advisories]
 
 ## Security design
 
-Zentinel's approach follows the [manifesto](/manifesto/): explicit limits and timeouts instead of hidden defaults, bounded resources, security logic isolated in external agents rather than the core, and every decision observable in logs and metrics. Two known limitations are worth stating plainly:
+Zentinel's approach follows the [manifesto](/manifesto/): explicit limits and timeouts instead of hidden defaults, bounded resources, security logic isolated in external agents rather than the core, and every decision observable in logs and metrics. Two points about agents are worth stating plainly:
 
-- WASM agents run **in-process**, sandboxed by Wasmtime, so a Wasmtime vulnerability can affect the proxy process itself (see the wasmtime 49 update in 26.10_3). Out-of-process agents do not share that exposure.
+- The proxy runs every agent **out of process**, over a Unix domain socket or gRPC, so a fault in an agent, including a Wasmtime vulnerability in the WASM agent, stays in that agent's process. The zentinel repository also contains an in-process WebAssembly runtime (`zentinel-wasm-runtime`, moved to wasmtime 49 in 26.10_3), but the proxy binary does not use it.
 - Agent traffic over Unix domain sockets is not encrypted; use gRPC with TLS for agents in sensitive environments.
