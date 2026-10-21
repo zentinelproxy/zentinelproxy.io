@@ -1,6 +1,9 @@
 // =============================================================================
 // Zentinel Playground
-// Interactive configuration validation and request simulation
+// Validate a configuration and run a request through the real engine (the
+// zentinel-playground WASM build). The pipeline shows only stages the engine
+// reports: route matching, policies, agent hooks and decisions, upstream
+// selection. Nothing here contacts an upstream.
 // =============================================================================
 
 import init, {
@@ -12,12 +15,6 @@ import init, {
     init_panic_hook,
     get_version
 } from '../wasm/zentinel_playground_wasm.js';
-
-// State
-let wasmReady = false;
-let lastValidation = null;
-let debounceTimer = null;
-let detectedAgents = [];
 
 // Template Configurations
 const TEMPLATES = {
@@ -70,6 +67,83 @@ upstreams {
         load-balancing "round_robin"
     }
 }`,
+
+    'agents': `// Agent Pipeline Configuration
+// A WAF and a rate limiter run as agents in front of the API route.
+// Set their mock decisions in the Agents tab, then run a request.
+
+system {
+    worker-threads 4
+}
+
+listeners {
+    listener "http" {
+        address "0.0.0.0:8080"
+        protocol "http"
+    }
+}
+
+agents {
+    agent "waf" {
+        type "waf"
+        unix-socket path="/run/zentinel/waf.sock"
+        events "request_headers"
+        timeout-ms 50
+    }
+    agent "ratelimit" {
+        type "custom"
+        unix-socket path="/run/zentinel/ratelimit.sock"
+        events "request_headers"
+        timeout-ms 20
+    }
+}
+
+filters {
+    filter "waf" {
+        type "agent"
+        agent "waf"
+        failure-mode "closed"
+    }
+    filter "ratelimit" {
+        type "agent"
+        agent "ratelimit"
+        failure-mode "open"
+    }
+}
+
+routes {
+    route "api" {
+        priority "high"
+        matches {
+            path-prefix "/api"
+        }
+        upstream "api-pool"
+        filters "waf" "ratelimit"
+        policies {
+            timeout-secs 30
+        }
+    }
+    route "default" {
+        priority "low"
+        matches {
+            path-prefix "/"
+        }
+        upstream "web-pool"
+    }
+}
+
+upstreams {
+    upstream "api-pool" {
+        target "10.0.0.2:8080" weight=1
+        target "10.0.0.3:8080" weight=1
+        load-balancing "round_robin"
+    }
+    upstream "web-pool" {
+        target "10.0.1.2:8080"
+        target "10.0.1.3:8080"
+    }
+}
+`,
 
     'ai-gateway': `// AI Gateway Configuration
 // LLM inference proxy with token-based rate limiting
@@ -872,1505 +946,1006 @@ upstreams {
 `
 };
 
-// DOM Elements
-const configEditor = document.getElementById('config-editor');
-const highlightCode = document.getElementById('highlight-code');
-const statusIcon = document.getElementById('status-icon');
-const statusText = document.getElementById('status-text');
-const errorDisplay = document.getElementById('error-display');
-const simulateBtn = document.getElementById('simulate-btn');
-const flowDiagram = document.getElementById('flow-diagram');
-const traceContent = document.getElementById('trace-content');
-const headersList = document.getElementById('headers-list');
-const addHeaderBtn = document.getElementById('add-header-btn');
-const configPanel = document.getElementById('config-panel');
-const copyConfigBtn = document.getElementById('copy-config-btn');
-const fullscreenConfigBtn = document.getElementById('fullscreen-config-btn');
-const responseFlowDiagram = document.getElementById('response-flow-diagram');
-const agentsEmpty = document.getElementById('agents-empty');
-const agentsList = document.getElementById('agents-list');
-const simulateAgentsBtn = document.getElementById('simulate-agents-btn');
 
 // =============================================================================
-// KDL Syntax Highlighting
+// DOM
 // =============================================================================
 
-// KDL keywords and node names commonly used in Zentinel config
+const $ = (id) => document.getElementById(id);
+const configEditor = $('config-editor');
+const highlightPre = $('editor-highlight');
+const highlightCode = $('highlight-code');
+const gutter = $('pg-gutter');
+const marks = $('pg-marks');
+const statusEl = $('validation-status');
+const statusIcon = $('status-icon');
+const statusText = $('status-text');
+const problemsEl = $('error-display');
+const runBtn = $('simulate-btn');
+const pipelineEl = $('flow-diagram');
+const detailEl = $('pg-detail');
+const warningsEl = $('pg-warnings');
+const rawOut = $('trace-content');
+const announceEl = $('pg-announce');
+const headersList = $('headers-list');
+const presetSelect = $('pg-preset');
+const presetDesc = $('pg-preset-desc');
+const agentsEmpty = $('agents-empty');
+const agentsList = $('agents-list');
+const agentsCount = $('agents-count');
+const configPanel = $('config-panel');
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+document.querySelectorAll('[data-mod]').forEach((el) => { el.textContent = isMac ? '⌘' : 'Ctrl'; });
+
+// State
+let wasmReady = false;
+let lastValidation = null;
+let debounceTimer = null;
+let lastRaw = null;
+let stages = [];
+let selectedStage = null;
+let runToken = 0;
+const agentMocks = new Map(); // agent id -> mock response settings, kept across edits
+
+// =============================================================================
+// Small helpers
+// =============================================================================
+
+function escapeHtml(str) {
+    if (typeof str !== 'string') str = String(str);
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+const code = (s) => `<code>${escapeHtml(s)}</code>`;
+
+function announce(text) {
+    announceEl.textContent = '';
+    // a new text node each time so repeated messages are read again
+    requestAnimationFrame(() => { announceEl.textContent = text; });
+}
+
+const ICON = {
+    pass: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>',
+    blocked: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>',
+    redirect: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h12"/><path d="m13 6 6 6-6 6"/></svg>',
+    error: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+    unreached: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="12" x2="18" y2="12"/></svg>',
+    loading: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>',
+    copy: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+    check: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>',
+    remove: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+};
+
+// Words for each outcome, so state is never carried by colour alone.
+const STATE_WORD = {
+    pass: 'passed', blocked: 'stopped', redirect: 'redirected', error: 'error',
+    info: 'noted', unreached: 'not reached', pending: 'waiting',
+};
+
+// Copy text and confirm on the button (data-copied) and to screen readers.
+async function copyWithFeedback(btn, text, label = 'Copied') {
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (e) {
+        announce('Copy failed: the browser blocked clipboard access.');
+        return false;
+    }
+    const before = btn.innerHTML;
+    btn.setAttribute('data-copied', '');
+    btn.innerHTML = `${ICON.check}<span>${label}</span>`;
+    announce(label);
+    clearTimeout(btn._copyTimer);
+    btn._copyTimer = setTimeout(() => {
+        btn.removeAttribute('data-copied');
+        btn.innerHTML = before;
+    }, 1800);
+    return true;
+}
+
+// =============================================================================
+// Editor: highlighting, line numbers, line marks, keys
+// =============================================================================
+
 const kdlKeywords = new Set([
     'system', 'listeners', 'listener', 'routes', 'route', 'upstreams', 'upstream',
     'matches', 'policies', 'target', 'health-check', 'agents', 'agent', 'limits',
-    'tls', 'cache', 'rate-limit', 'circuit-breaker', 'retry', 'timeout'
+    'tls', 'cache', 'rate-limit', 'circuit-breaker', 'retry', 'timeout', 'filters', 'filter'
 ]);
 
-function highlightKDL(code) {
-    let result = '';
+function highlightKDL(src) {
+    let out = '';
     let i = 0;
-    const len = code.length;
-
+    const len = src.length;
     while (i < len) {
-        const char = code[i];
-
-        // Comments (// and /*)
-        if (char === '/' && code[i + 1] === '/') {
-            const end = code.indexOf('\n', i);
-            const comment = end === -1 ? code.slice(i) : code.slice(i, end);
-            result += `<span class="hl-comment">${escapeHtml(comment)}</span>`;
-            i += comment.length;
+        const ch = src[i];
+        if (ch === '/' && src[i + 1] === '/') {
+            const end = src.indexOf('\n', i);
+            const c = end === -1 ? src.slice(i) : src.slice(i, end);
+            out += `<span class="hl-comment">${escapeHtml(c)}</span>`;
+            i += c.length;
             continue;
         }
-
-        if (char === '/' && code[i + 1] === '*') {
-            const end = code.indexOf('*/', i + 2);
-            const comment = end === -1 ? code.slice(i) : code.slice(i, end + 2);
-            result += `<span class="hl-comment">${escapeHtml(comment)}</span>`;
-            i += comment.length;
+        if (ch === '/' && src[i + 1] === '*') {
+            const end = src.indexOf('*/', i + 2);
+            const c = end === -1 ? src.slice(i) : src.slice(i, end + 2);
+            out += `<span class="hl-comment">${escapeHtml(c)}</span>`;
+            i += c.length;
             continue;
         }
-
-        // Strings (double-quoted)
-        if (char === '"') {
+        if (ch === '"') {
             let j = i + 1;
-            while (j < len && code[j] !== '"') {
-                if (code[j] === '\\') j++; // Skip escaped char
+            while (j < len && src[j] !== '"' && src[j] !== '\n') {
+                if (src[j] === '\\') j++;
                 j++;
             }
-            const str = code.slice(i, j + 1);
-            result += `<span class="hl-string">${escapeHtml(str)}</span>`;
+            const s = src.slice(i, j + 1);
+            out += `<span class="hl-string">${escapeHtml(s)}</span>`;
             i = j + 1;
             continue;
         }
-
-        // Raw strings (r#"..."#)
-        if (char === 'r' && code[i + 1] === '#') {
-            let hashes = 0;
-            let j = i + 1;
-            while (code[j] === '#') { hashes++; j++; }
-            if (code[j] === '"') {
-                const endPattern = '"' + '#'.repeat(hashes);
-                const endIdx = code.indexOf(endPattern, j + 1);
-                if (endIdx !== -1) {
-                    const str = code.slice(i, endIdx + endPattern.length);
-                    result += `<span class="hl-string">${escapeHtml(str)}</span>`;
-                    i = endIdx + endPattern.length;
-                    continue;
-                }
-            }
-        }
-
-        // Numbers
-        if (/[0-9]/.test(char) || (char === '-' && /[0-9]/.test(code[i + 1]))) {
-            let j = i;
-            if (char === '-') j++;
-            while (j < len && /[0-9._eE+-]/.test(code[j])) j++;
-            const num = code.slice(i, j);
-            result += `<span class="hl-number">${escapeHtml(num)}</span>`;
+        if (/[0-9]/.test(ch) || (ch === '-' && /[0-9]/.test(src[i + 1]))) {
+            let j = i + (ch === '-' ? 1 : 0);
+            while (j < len && /[0-9._eE+-]/.test(src[j])) j++;
+            out += `<span class="hl-number">${escapeHtml(src.slice(i, j))}</span>`;
             i = j;
             continue;
         }
-
-        // Identifiers and keywords
-        if (/[a-zA-Z_]/.test(char)) {
+        if (/[a-zA-Z_]/.test(ch)) {
             let j = i;
-            while (j < len && /[a-zA-Z0-9_-]/.test(code[j])) j++;
-            const word = code.slice(i, j);
-
-            // Check for property assignment (word=)
-            if (code[j] === '=') {
-                result += `<span class="hl-property">${escapeHtml(word)}</span>`;
-            } else if (kdlKeywords.has(word)) {
-                result += `<span class="hl-keyword">${escapeHtml(word)}</span>`;
-            } else if (word === 'true' || word === 'false' || word === 'null') {
-                result += `<span class="hl-constant">${escapeHtml(word)}</span>`;
-            } else {
-                result += `<span class="hl-node">${escapeHtml(word)}</span>`;
-            }
+            while (j < len && /[a-zA-Z0-9_-]/.test(src[j])) j++;
+            const w = src.slice(i, j);
+            const cls = src[j] === '=' ? 'hl-property'
+                : kdlKeywords.has(w) ? 'hl-keyword'
+                : (w === 'true' || w === 'false' || w === 'null') ? 'hl-constant' : 'hl-node';
+            out += `<span class="${cls}">${escapeHtml(w)}</span>`;
             i = j;
             continue;
         }
-
-        // Punctuation
-        if (char === '{' || char === '}') {
-            result += `<span class="hl-brace">${char}</span>`;
-            i++;
-            continue;
-        }
-
-        if (char === '=' || char === ';') {
-            result += `<span class="hl-operator">${char}</span>`;
-            i++;
-            continue;
-        }
-
-        // Default: output as-is
-        result += escapeHtml(char);
+        if (ch === '{' || ch === '}') { out += `<span class="hl-brace">${ch}</span>`; i++; continue; }
+        if (ch === '=' || ch === ';') { out += `<span class="hl-operator">${ch}</span>`; i++; continue; }
+        out += escapeHtml(ch);
         i++;
     }
-
-    return result;
+    return out;
 }
 
-function updateHighlight() {
-    if (!highlightCode) return;
-    try {
-        const code = configEditor.value;
-        // Add a trailing newline to match textarea behavior
-        highlightCode.innerHTML = highlightKDL(code) + '\n';
-    } catch (e) {
-        console.error('Highlight error:', e);
+let lastLineCount = 0;
+function refreshEditor() {
+    const src = configEditor.value;
+    highlightCode.innerHTML = highlightKDL(src) + '\n';
+    const n = src.split('\n').length;
+    if (n !== lastLineCount) {
+        let html = '';
+        for (let k = 1; k <= n; k++) html += `<span>${k}</span>`;
+        gutter.innerHTML = html;
+        lastLineCount = n;
     }
+    syncScroll();
 }
 
 function syncScroll() {
-    const highlight = document.getElementById('editor-highlight');
-    if (highlight) {
-        highlight.scrollTop = configEditor.scrollTop;
-        highlight.scrollLeft = configEditor.scrollLeft;
+    const { scrollTop, scrollLeft } = configEditor;
+    highlightPre.style.transform = `translate(${-scrollLeft}px, ${-scrollTop}px)`;
+    marks.style.transform = `translateY(${-scrollTop}px)`;
+    gutter.style.transform = `translateY(${-scrollTop}px)`;
+}
+
+function lineHeightPx() {
+    return parseFloat(getComputedStyle(configEditor).lineHeight) || 22;
+}
+
+// Mark editor lines [from, to] (1-based) and bring the first into view.
+function markLines(ranges, { scroll = true } = {}) {
+    marks.innerHTML = '';
+    gutter.querySelectorAll('.is-marked').forEach((el) => el.classList.remove('is-marked'));
+    if (!ranges || ranges.length === 0) return;
+    const lh = lineHeightPx();
+    const padTop = parseFloat(getComputedStyle(configEditor).paddingTop) || 0;
+    for (const [from, to] of ranges) {
+        const m = document.createElement('div');
+        m.className = 'pg-mark';
+        m.style.top = `${padTop + (from - 1) * lh}px`;
+        m.style.height = `${(to - from + 1) * lh}px`;
+        marks.appendChild(m);
+        for (let k = from; k <= to; k++) gutter.children[k - 1]?.classList.add('is-marked');
+    }
+    if (scroll) {
+        const first = ranges[0][0];
+        const top = padTop + (first - 1) * lh;
+        const view = configEditor.clientHeight;
+        if (top < configEditor.scrollTop || top > configEditor.scrollTop + view - lh * 2) {
+            configEditor.scrollTop = Math.max(0, top - lh * 2);
+            syncScroll();
+        }
     }
 }
 
-// Icons
-const icons = {
-    valid: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    invalid: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    loading: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>',
-    warning: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-};
+function goToLine(line) {
+    const lines = configEditor.value.split('\n');
+    const idx = lines.slice(0, line - 1).reduce((a, l) => a + l.length + 1, 0);
+    configEditor.focus();
+    configEditor.setSelectionRange(idx, idx + (lines[line - 1] || '').length);
+    markLines([[line, line]]);
+}
 
-// Initialize WASM
+// Find a block such as `route "api" { … }` and return its [first, last] line.
+// Only names written as quoted node arguments are found; that is how every
+// block the engine reports by id is declared.
+function findBlock(keyword, name, within) {
+    const lines = configEditor.value.split('\n');
+    const lo = within ? within[0] - 1 : 0;
+    const hi = within ? within[1] : lines.length;
+    const re = name == null
+        ? new RegExp(`^\\s*${keyword}\\s*\\{`)
+        : new RegExp(`^\\s*${keyword}\\s+"${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`);
+    for (let k = lo; k < hi; k++) {
+        if (!re.test(lines[k])) continue;
+        let depth = 0;
+        let opened = false;
+        for (let j = k; j < hi; j++) {
+            const text = lines[j].replace(/"(?:[^"\\]|\\.)*"/g, '""').replace(/\/\/.*$/, '');
+            for (const c of text) {
+                if (c === '{') { depth++; opened = true; }
+                else if (c === '}') depth--;
+            }
+            if (opened && depth <= 0) return [k + 1, j + 1];
+            if (!opened && j > k) break;
+        }
+        return [k + 1, k + 1];
+    }
+    return null;
+}
+
+configEditor.addEventListener('input', () => {
+    refreshEditor();
+    markLines(null);
+    if (presetSelect.value !== 'custom' && configEditor.value !== TEMPLATES[presetSelect.value]) {
+        presetSelect.value = 'custom';
+        presetDesc.textContent = 'Edited. Reset restores the last example.';
+    }
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(validateConfig, 250);
+});
+configEditor.addEventListener('scroll', syncScroll);
+
+// Tab inserts four spaces (Shift+Tab outdents). Esc releases Tab for one
+// keystroke so keyboard users can leave the editor.
+let tabReleased = false;
+configEditor.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { tabReleased = true; return; }
+    if (e.key !== 'Tab' || tabReleased || e.ctrlKey || e.metaKey || e.altKey) {
+        if (e.key !== 'Tab') tabReleased = false;
+        return;
+    }
+    e.preventDefault();
+    const { selectionStart: s, selectionEnd: t, value: v } = configEditor;
+    const lineStart = v.lastIndexOf('\n', s - 1) + 1;
+    if (e.shiftKey) {
+        const lead = v.slice(lineStart, lineStart + 4).match(/^ {1,4}/);
+        if (!lead) return;
+        configEditor.setRangeText('', lineStart, lineStart + lead[0].length, 'preserve');
+    } else if (s !== t && v.slice(s, t).includes('\n')) {
+        // indent every selected line
+        const block = v.slice(lineStart, t);
+        const indented = block.replace(/^/gm, '    ');
+        configEditor.setRangeText(indented, lineStart, t, 'select');
+    } else {
+        configEditor.setRangeText('    ', s, t, 'end');
+    }
+    configEditor.dispatchEvent(new Event('input'));
+});
+configEditor.addEventListener('blur', () => { tabReleased = false; });
+
+// Ctrl/Cmd+Enter runs from anywhere on the page.
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        runSimulation();
+    }
+});
+
+// =============================================================================
+// Engine
+// =============================================================================
+
+function setStatus(type, text) {
+    statusText.textContent = text;
+    statusEl.dataset.state = type;
+    statusIcon.innerHTML = type === 'valid' ? ICON.pass
+        : type === 'invalid' ? ICON.blocked
+        : type === 'warning' ? ICON.error
+        : type === 'loading' ? ICON.loading : '';
+}
+
 async function initWasm() {
-    setStatus('loading', 'Loading...');
+    setStatus('loading', 'Loading the engine…');
+    runBtn.disabled = true;
     try {
         await init();
         init_panic_hook();
         wasmReady = true;
-
-        // Display version
         try {
-            const version = get_version();
-            const versionEl = document.getElementById('wasm-version');
-            if (versionEl) {
-                versionEl.textContent = version;
-            }
-        } catch (e) {
-            console.warn('Could not get WASM version:', e);
-        }
-
+            const v = $('wasm-version');
+            if (v) v.textContent = get_version();
+        } catch (e) { /* version is cosmetic */ }
+        runBtn.disabled = false;
         validateConfig();
     } catch (e) {
-        setStatus('error', 'Failed to load');
         console.error('WASM init error:', e);
-
-        // Update version display with error
-        const versionEl = document.getElementById('wasm-version');
-        if (versionEl) {
-            versionEl.textContent = 'Load failed';
-        }
-
-        // Show helpful error message in the config panel
-        const errorDisplay = document.getElementById('error-display');
-        if (errorDisplay) {
-            let errorMsg = 'Failed to load WebAssembly module. ';
-            if (e.message?.includes('CompileError') || e.message?.includes('instantiate')) {
-                errorMsg += 'Your browser may not support WebAssembly, or it may be blocked by an extension.';
-            } else if (e.message?.includes('NetworkError') || e.message?.includes('fetch')) {
-                errorMsg += 'Could not download the module. Check your network connection.';
-            } else {
-                errorMsg += 'Please try refreshing the page or using a different browser.';
-            }
-            errorDisplay.innerHTML = `
-                <div class="error-item error-error">
-                    <span class="error-icon">${icons.invalid}</span>
-                    <div class="error-content">
-                        <span class="error-message">${errorMsg}</span>
-                        <span class="error-hint">Supported browsers: Chrome 57+, Firefox 52+, Safari 11+, Edge 16+</span>
-                    </div>
-                </div>
-            `;
-            errorDisplay.classList.add('visible');
-        }
+        setStatus('invalid', 'Engine failed to load');
+        const v = $('wasm-version');
+        if (v) v.textContent = 'Load failed';
+        let why = 'Please refresh the page or try another browser.';
+        if (/CompileError|instantiate/.test(e.message || '')) why = 'Your browser may not support WebAssembly, or an extension is blocking it.';
+        else if (/NetworkError|fetch/.test(e.message || '')) why = 'The module could not be downloaded. Check your connection.';
+        problemsEl.innerHTML = `<div class="pg-problem" data-severity="error">${ICON.blocked}<div><strong>The WebAssembly engine did not load.</strong> ${escapeHtml(why)}</div></div>`;
     }
 }
 
-// Set validation status
-function setStatus(type, text) {
-    statusText.textContent = text;
-    statusIcon.innerHTML = type === 'valid' ? icons.valid :
-                           type === 'invalid' ? icons.invalid :
-                           type === 'loading' ? icons.loading :
-                           type === 'warning' ? icons.warning : '';
-    statusIcon.className = 'status-icon status-' + type;
-}
-
-// Run the checks `zentinel validate` and `zentinel lint` would.
-//
-// `validate` alone used to be the whole check, and it does not look for
-// settings nothing reads: a typo'd key parsed, was dropped, and the page said
-// "Valid". `lint_config` finds those from the KDL text, so its unknown-key
-// findings are shown as warnings. Its best-practice advice (no retry policy,
-// a single target, ...) is left out: every template would carry it.
-//
+// Run the checks `zentinel validate` and `zentinel lint` would. `validate`
+// does not look for settings nothing reads (a typo'd key parses, is dropped,
+// and the page said "Valid"), so lint's unknown-key findings are shown as
+// warnings; its best-practice advice is left out, every example would carry it.
 // A route naming an upstream that does not exist stops the proxy from
-// starting, but payloads up to 0.6.46 report it only as a warning. Treat it
-// as the error it is; newer payloads already fail validation for it.
+// starting, but payloads up to 0.6.46 report it only as a warning, so it is
+// treated as an error here; newer payloads already fail validation for it.
 const FATAL_WARNINGS = new Set(['UNDEFINED_UPSTREAM']);
 
 function checkConfig(config) {
     const result = validate(config);
     if (!result.valid) return result;
-
-    const fatal = (result.warnings || []).filter(w => FATAL_WARNINGS.has(w.code));
+    const fatal = (result.warnings || []).filter((w) => FATAL_WARNINGS.has(w.code));
     if (fatal.length > 0) {
-        const messages = [...new Set(fatal.map(w => w.message))];
-        return {
-            ...result,
-            valid: false,
-            errors: messages.map(message => ({ message, severity: 'error' })),
-        };
+        return { ...result, valid: false, errors: [...new Set(fatal.map((w) => w.message))].map((message) => ({ message, severity: 'error' })) };
     }
-
     const lint = lint_config(config);
-    const ignored = (lint && lint.warnings || []).filter(w => w.code === 'unknown-key');
+    const ignored = ((lint && lint.warnings) || []).filter((w) => w.code === 'unknown-key');
     return { ...result, warnings: [...(result.warnings || []), ...ignored] };
 }
 
-// Validate configuration
-function validateConfig() {
-    console.log('validateConfig called, wasmReady:', wasmReady);
-    if (!wasmReady) return;
-
-    const config = configEditor.value;
-    console.log('Validating config length:', config.length);
-    try {
-        lastValidation = checkConfig(config);
-
-        if (lastValidation.valid) {
-            if (lastValidation.warnings && lastValidation.warnings.length > 0) {
-                setStatus('warning', `Valid (${lastValidation.warnings.length} warning${lastValidation.warnings.length > 1 ? 's' : ''})`);
-                showWarnings(lastValidation.warnings);
-            } else {
-                setStatus('valid', 'Valid');
-                errorDisplay.innerHTML = '';
-                errorDisplay.classList.remove('visible');
-            }
-            simulateBtn.disabled = false;
-            // Detect agents when config is valid
-            detectAgentsFromConfig();
-        } else {
-            setStatus('invalid', 'Invalid');
-            showErrors(lastValidation.errors);
-            simulateBtn.disabled = true;
-            // Clear agents when config is invalid
-            detectedAgents = [];
-            updateAgentsUI();
-        }
-    } catch (e) {
-        setStatus('invalid', 'Parse Error');
-        showErrors([{ message: e.message || String(e), severity: 'error' }]);
-        simulateBtn.disabled = true;
-    }
+// The engine's parse errors carry "--> at line N, column M".
+function errorLine(message) {
+    const m = /at line (\d+)(?:, column (\d+))?/.exec(message || '');
+    return m ? Number(m[1]) : null;
 }
 
-// Show errors
-function showErrors(errors) {
-    errorDisplay.innerHTML = errors.map(e => `
-        <div class="error-item error-${e.severity || 'error'}">
-            <span class="error-icon">${icons.invalid}</span>
-            <pre class="error-message">${escapeHtml(e.message)}</pre>
-        </div>
-    `).join('');
-    errorDisplay.classList.add('visible');
-}
-
-// Show warnings
-function showWarnings(warnings) {
-    errorDisplay.innerHTML = warnings.map(w => `
-        <div class="error-item error-warning">
-            <span class="error-icon">${icons.warning}</span>
-            <pre class="error-message">${escapeHtml(w.message)}</pre>
-        </div>
-    `).join('');
-    errorDisplay.classList.add('visible');
-}
-
-// Run simulation
-function runSimulation() {
-    if (!wasmReady || !lastValidation?.valid) return;
-
-    const config = configEditor.value;
-    const method = document.getElementById('request-method').value;
-    const host = document.getElementById('request-host').value;
-    const path = document.getElementById('request-path').value;
-
-    // Collect headers
-    const headers = {};
-    document.querySelectorAll('.header-row').forEach(row => {
-        const key = row.querySelector('.header-key')?.value?.trim();
-        const value = row.querySelector('.header-value')?.value?.trim();
-        if (key) headers[key] = value || '';
-    });
-
-    try {
-        const request = create_sample_request(method, host, path);
-        request.headers = headers;
-
-        const result = simulate(config, JSON.stringify(request));
-        renderFlowDiagram(result, { method, host, path });
-        renderResponseFlowDiagram(result);
-        renderTrace(result);
-    } catch (e) {
-        console.error('Simulation error:', e);
-        flowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
-        responseFlowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
-    }
-}
-
-// Render flow diagram
-function renderFlowDiagram(result, request) {
-    const matched = result.matched_route;
-    const upstream = result.upstream_selection;
-    const policies = result.applied_policies || {};
-
-    const nodes = [
-        { id: 'client', label: 'Client', sublabel: `${request.method} ${request.path}`, type: 'client' },
-        { id: 'route', label: matched ? `Route: ${matched.id}` : 'No Match', sublabel: matched ? `priority: ${matched.priority}` : '', type: matched ? 'route' : 'nomatch' },
-    ];
-
-    if (matched) {
-        if (Object.keys(policies).length > 0) {
-            const policyLabels = [];
-            if (policies.timeout_secs) policyLabels.push(`timeout: ${policies.timeout_secs}s`);
-            if (policies.failure_mode) policyLabels.push(`mode: ${policies.failure_mode}`);
-            nodes.push({ id: 'policies', label: 'Policies', sublabel: policyLabels.join(', ') || 'default', type: 'policies' });
-        }
-
-        if (upstream) {
-            nodes.push({
-                id: 'upstream',
-                label: `Upstream: ${upstream.upstream_id}`,
-                sublabel: upstream.selected_target || '',
-                type: 'upstream'
-            });
-        }
-    }
-
-    flowDiagram.innerHTML = `
-        <div class="flow-nodes">
-            ${nodes.map((node, i) => `
-                <div class="flow-node flow-node-${node.type}" data-node="${node.id}" data-index="${i}">
-                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
-                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
-                </div>
-                ${i < nodes.length - 1 ? `<div class="flow-arrow" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
-            `).join('')}
-        </div>
-    `;
-
-    // Animate nodes appearing
-    requestAnimationFrame(() => {
-        document.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
-            el.style.animationDelay = `${i * 0.1}s`;
-            el.classList.add('flow-animate');
-        });
-    });
-}
-
-// Render response flow diagram (reverse direction)
-function renderResponseFlowDiagram(result) {
-    const matched = result.matched_route;
-    const upstream = result.upstream_selection;
-    const policies = result.applied_policies || {};
-
-    const nodes = [];
-
-    // Build response flow in reverse order
-    if (matched) {
-        if (upstream) {
-            nodes.push({
-                id: 'upstream',
-                label: `Upstream: ${upstream.upstream_id}`,
-                sublabel: upstream.selected_target || '',
-                type: 'upstream'
-            });
-        }
-
-        // Response transformations (if any policies modify response)
-        if (Object.keys(policies).length > 0) {
-            const responseTransforms = [];
-            if (policies.response_headers) responseTransforms.push('headers modified');
-            if (policies.response_body) responseTransforms.push('body transformed');
-
-            if (responseTransforms.length > 0) {
-                nodes.push({
-                    id: 'transform',
-                    label: 'Response Transform',
-                    sublabel: responseTransforms.join(', '),
-                    type: 'policies'
-                });
-            }
-        }
-
-        nodes.push({
-            id: 'proxy',
-            label: 'Zentinel Proxy',
-            sublabel: 'response processing',
-            type: 'route'
-        });
-    } else {
-        // No match - return error response
-        nodes.push({
-            id: 'proxy',
-            label: 'Zentinel Proxy',
-            sublabel: '404 - no route matched',
-            type: 'nomatch'
-        });
-    }
-
-    nodes.push({
-        id: 'client',
-        label: 'Client',
-        sublabel: matched ? '200 OK' : '404 Not Found',
-        type: 'client'
-    });
-
-    responseFlowDiagram.innerHTML = `
-        <div class="flow-nodes">
-            ${nodes.map((node, i) => `
-                <div class="flow-node flow-node-${node.type}" data-node="${node.id}" data-index="${i}">
-                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
-                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
-                </div>
-                ${i < nodes.length - 1 ? `<div class="flow-arrow" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
-            `).join('')}
-        </div>
-    `;
-
-    // Animate nodes appearing
-    requestAnimationFrame(() => {
-        responseFlowDiagram.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
-            el.style.animationDelay = `${i * 0.1}s`;
-            el.classList.add('flow-animate');
-        });
-    });
-}
-
-// Render detailed trace
-function renderTrace(result) {
-    const sections = [];
-
-    // Route matching trace
-    if (result.match_trace && result.match_trace.length > 0) {
-        sections.push(`
-            <details class="trace-section" open>
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Route Matching
-                </summary>
-                <div class="trace-details">
-                    ${result.match_trace.map(step => `
-                        <div class="trace-step trace-step-${step.result}">
-                            <span class="trace-step-route">${escapeHtml(step.route_id)}</span>
-                            <span class="trace-step-result">${step.result === 'match' ? '✓ Match' : '✗ No match'}</span>
-                            <span class="trace-step-reason">${escapeHtml(step.reason)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    // Applied policies
-    const policies = result.applied_policies || {};
-    if (Object.keys(policies).length > 0) {
-        sections.push(`
-            <details class="trace-section">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Applied Policies
-                </summary>
-                <div class="trace-details">
-                    <div class="trace-policies">
-                        ${Object.entries(policies).map(([key, value]) => `
-                            <div class="trace-policy">
-                                <span class="policy-key">${escapeHtml(key)}</span>
-                                <span class="policy-value">${escapeHtml(JSON.stringify(value))}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            </details>
-        `);
-    }
-
-    // Upstream selection
-    if (result.upstream_selection) {
-        const us = result.upstream_selection;
-        sections.push(`
-            <details class="trace-section">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Upstream Selection
-                </summary>
-                <div class="trace-details">
-                    <div class="trace-upstream">
-                        <div><strong>Upstream:</strong> ${escapeHtml(us.upstream_id)}</div>
-                        <div><strong>Target:</strong> ${escapeHtml(us.selected_target)}</div>
-                        <div><strong>Algorithm:</strong> ${escapeHtml(us.load_balancer)}</div>
-                        ${us.selection_reason ? `<div><strong>Reason:</strong> ${escapeHtml(us.selection_reason)}</div>` : ''}
-                    </div>
-                </div>
-            </details>
-        `);
-    }
-
-    // Agent hooks
-    if (result.agent_hooks && result.agent_hooks.length > 0) {
-        sections.push(`
-            <details class="trace-section">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Agent Hooks (${result.agent_hooks.length})
-                </summary>
-                <div class="trace-details">
-                    ${result.agent_hooks.map(hook => `
-                        <div class="trace-hook">
-                            <span class="hook-agent">${escapeHtml(hook.agent_id)}</span>
-                            <span class="hook-phase">${escapeHtml(hook.hook)}</span>
-                            <span class="hook-timeout">${hook.timeout_ms}ms</span>
-                            <span class="hook-mode ${hook.failure_mode}">${escapeHtml(hook.failure_mode)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    // Warnings
-    if (result.warnings && result.warnings.length > 0) {
-        sections.push(`
-            <details class="trace-section trace-section-warning">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.warning}</span>
-                    Warnings (${result.warnings.length})
-                </summary>
-                <div class="trace-details">
-                    ${result.warnings.map(w => `
-                        <div class="trace-warning">
-                            ${w.code ? `<span class="warning-code">${escapeHtml(w.code)}</span>` : ''}
-                            <span class="warning-message">${escapeHtml(w.message)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    if (sections.length === 0) {
-        traceContent.innerHTML = '<div class="trace-empty">No routing decision (config may be incomplete)</div>';
-    } else {
-        traceContent.innerHTML = sections.join('');
-    }
-}
-
-// =============================================================================
-// Agent Simulation
-// =============================================================================
-
-// Detect agents from configuration
-function detectAgentsFromConfig() {
-    if (!wasmReady || !lastValidation?.valid) {
-        detectedAgents = [];
-        updateAgentsUI();
+function renderProblems(items, severity) {
+    if (!items || items.length === 0) {
+        problemsEl.innerHTML = '';
         return;
     }
-
-    const config = configEditor.value;
-    try {
-        // Run a basic simulate to get agent_hooks
-        const request = create_sample_request('GET', 'example.com', '/');
-        const result = simulate(config, JSON.stringify(request));
-        detectedAgents = result.agent_hooks || [];
-        updateAgentsUI();
-    } catch (e) {
-        console.warn('Agent detection failed:', e);
-        detectedAgents = [];
-        updateAgentsUI();
-    }
-}
-
-// Update agents UI based on detected agents
-function updateAgentsUI() {
-    if (!agentsEmpty || !agentsList || !simulateAgentsBtn) return;
-
-    if (detectedAgents.length === 0) {
-        agentsEmpty.style.display = 'flex';
-        agentsList.style.display = 'none';
-        simulateAgentsBtn.disabled = true;
-    } else {
-        agentsEmpty.style.display = 'none';
-        agentsList.style.display = 'flex';
-        simulateAgentsBtn.disabled = false;
-        renderAgentCards();
-    }
-}
-
-// Render agent cards
-function renderAgentCards() {
-    if (!agentsList) return;
-
-    // Group agents by ID to avoid duplicates
-    const uniqueAgents = new Map();
-    detectedAgents.forEach(agent => {
-        if (!uniqueAgents.has(agent.agent_id)) {
-            uniqueAgents.set(agent.agent_id, agent);
-        }
-    });
-
-    agentsList.innerHTML = Array.from(uniqueAgents.values()).map(agent => `
-        <div class="agent-card" data-agent-id="${escapeHtml(agent.agent_id)}" data-decision="allow">
-            <div class="agent-card-header">
-                <div class="agent-header-left">
-                    <span class="agent-collapse-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    </span>
-                    <span class="agent-name">${escapeHtml(agent.agent_id)}</span>
-                    <span class="agent-type">${escapeHtml(agent.hook)}</span>
-                </div>
-                <select class="agent-decision-quick" onchange="updateAgentDecision(this)">
-                    <option value="allow" selected>Allow</option>
-                    <option value="block">Block</option>
-                    <option value="redirect">Redirect</option>
-                </select>
+    problemsEl.innerHTML = items.map((p) => {
+        const line = errorLine(p.message);
+        const [first, ...rest] = String(p.message).split('\n');
+        return `<div class="pg-problem" data-severity="${severity}">
+            ${severity === 'error' ? ICON.blocked : ICON.error}
+            <div class="pg-problem-body">
+                <span class="pg-problem-kind">${severity === 'error' ? 'Error' : 'Warning'}</span>
+                <span>${escapeHtml(first)}</span>
+                ${line ? `<button type="button" class="pg-linkbtn" data-goto="${line}">Go to line ${line}</button>` : ''}
+                ${rest.length ? `<details><summary>Details</summary><pre>${escapeHtml(rest.join('\n'))}</pre></details>` : ''}
             </div>
-            <div class="agent-card-body">
-                <div class="agent-section">
-                    <label class="agent-label">Decision</label>
-                    <select class="agent-decision" onchange="updateAgentDecisionFromBody(this)">
-                        <option value="allow" selected>Allow - Let request pass</option>
-                        <option value="block">Block - Return error response</option>
-                        <option value="redirect">Redirect - Send to different URL</option>
-                    </select>
-                </div>
-
-                <div class="decision-details decision-block">
-                    <div class="decision-row">
-                        <label>Status Code</label>
-                        <input type="number" class="block-status" value="403" min="400" max="599">
-                    </div>
-                    <div class="decision-row">
-                        <label>Response Body</label>
-                        <input type="text" class="block-body" placeholder="Blocked by agent">
-                    </div>
-                </div>
-
-                <div class="decision-details decision-redirect">
-                    <div class="decision-row">
-                        <label>Redirect URL</label>
-                        <input type="text" class="redirect-url" placeholder="https://example.com/blocked">
-                    </div>
-                    <div class="decision-row">
-                        <label>Status Code</label>
-                        <input type="number" class="redirect-status" value="302" min="300" max="399">
-                    </div>
-                </div>
-
-                <div class="agent-section">
-                    <label class="agent-label">Request Header Mutations</label>
-                    <div class="header-mutations">
-                        <!-- Mutations populated here -->
-                    </div>
-                    <button type="button" class="btn btn-ghost btn-small add-mutation-btn" onclick="addHeaderMutation(this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add Header Mutation
-                    </button>
-                </div>
-
-                <div class="agent-section">
-                    <label class="agent-label">Audit (optional)</label>
-                    <div class="audit-fields">
-                        <div class="audit-row">
-                            <label>Rule IDs</label>
-                            <input type="text" class="audit-rule-ids" placeholder="942100, 941100">
-                        </div>
-                        <div class="audit-row">
-                            <label>Tags</label>
-                            <input type="text" class="audit-tags" placeholder="sql-injection, xss">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `).join('');
-
-    // Add click handlers for collapse
-    agentsList.querySelectorAll('.agent-card-header').forEach(header => {
-        header.addEventListener('click', (e) => {
-            // Don't toggle if clicking on select
-            if (e.target.tagName === 'SELECT') return;
-            const card = header.closest('.agent-card');
-            card.classList.toggle('collapsed');
-        });
-    });
+        </div>`;
+    }).join('');
 }
 
-// Update agent decision from quick select
-window.updateAgentDecision = function(select) {
-    const card = select.closest('.agent-card');
-    const decision = select.value;
-    card.dataset.decision = decision;
+problemsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-goto]');
+    if (b) goToLine(Number(b.dataset.goto));
+});
 
-    // Sync with body select
-    const bodySelect = card.querySelector('.agent-decision');
-    if (bodySelect) bodySelect.value = decision;
-
-    updateDecisionDetails(card, decision);
-};
-
-// Update agent decision from body select
-window.updateAgentDecisionFromBody = function(select) {
-    const card = select.closest('.agent-card');
-    const decision = select.value;
-    card.dataset.decision = decision;
-
-    // Sync with quick select
-    const quickSelect = card.querySelector('.agent-decision-quick');
-    if (quickSelect) quickSelect.value = decision;
-
-    updateDecisionDetails(card, decision);
-};
-
-// Show/hide decision details based on type
-function updateDecisionDetails(card, decision) {
-    const blockDetails = card.querySelector('.decision-block');
-    const redirectDetails = card.querySelector('.decision-redirect');
-
-    if (blockDetails) {
-        blockDetails.classList.toggle('visible', decision === 'block');
-    }
-    if (redirectDetails) {
-        redirectDetails.classList.toggle('visible', decision === 'redirect');
-    }
-}
-
-// Add header mutation row
-window.addHeaderMutation = function(btn) {
-    const mutationsContainer = btn.previousElementSibling;
-    const row = document.createElement('div');
-    row.className = 'header-mutation-row';
-    row.innerHTML = `
-        <select class="mutation-op">
-            <option value="set">Set</option>
-            <option value="add">Add</option>
-            <option value="remove">Remove</option>
-        </select>
-        <input type="text" class="mutation-name" placeholder="Header name">
-        <input type="text" class="mutation-value" placeholder="Value">
-        <button type="button" class="mutation-remove" onclick="this.parentElement.remove()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-    `;
-
-    // Toggle value field based on operation
-    const opSelect = row.querySelector('.mutation-op');
-    const valueInput = row.querySelector('.mutation-value');
-    opSelect.addEventListener('change', () => {
-        valueInput.style.display = opSelect.value === 'remove' ? 'none' : '';
-    });
-
-    mutationsContainer.appendChild(row);
-};
-
-// Collect agent response from a card
-function getAgentResponseFromCard(card) {
-    const agentId = card.dataset.agentId;
-    const decision = card.dataset.decision || 'allow';
-
-    let decisionObj = { type: decision };
-
-    if (decision === 'block') {
-        const status = parseInt(card.querySelector('.block-status')?.value) || 403;
-        const body = card.querySelector('.block-body')?.value || null;
-        decisionObj.status = status;
-        if (body) decisionObj.body = body;
-    } else if (decision === 'redirect') {
-        const url = card.querySelector('.redirect-url')?.value || '';
-        const status = parseInt(card.querySelector('.redirect-status')?.value) || 302;
-        decisionObj.url = url;
-        decisionObj.status = status;
-    }
-
-    // Collect header mutations
-    const requestHeaders = [];
-    card.querySelectorAll('.header-mutation-row').forEach(row => {
-        const op = row.querySelector('.mutation-op')?.value;
-        const name = row.querySelector('.mutation-name')?.value?.trim();
-        const value = row.querySelector('.mutation-value')?.value;
-        if (name) {
-            if (op === 'remove') {
-                requestHeaders.push({ op, name });
-            } else {
-                requestHeaders.push({ op, name, value: value || '' });
-            }
-        }
-    });
-
-    // Collect audit info
-    const ruleIdsRaw = card.querySelector('.audit-rule-ids')?.value || '';
-    const tagsRaw = card.querySelector('.audit-tags')?.value || '';
-    const ruleIds = ruleIdsRaw.split(',').map(s => s.trim()).filter(Boolean);
-    const tags = tagsRaw.split(',').map(s => s.trim()).filter(Boolean);
-
-    return {
-        agent_id: agentId,
-        decision: decisionObj,
-        request_headers: requestHeaders,
-        response_headers: [],
-        audit: { rule_ids: ruleIds, tags: tags }
-    };
-}
-
-// Run agent simulation
-function runAgentSimulation() {
-    if (!wasmReady || !lastValidation?.valid) return;
-
-    const config = configEditor.value;
-    const method = document.getElementById('request-method').value;
-    const host = document.getElementById('request-host').value;
-    const path = document.getElementById('request-path').value;
-
-    // Collect headers from builder tab
-    const headers = {};
-    document.querySelectorAll('.header-row').forEach(row => {
-        const key = row.querySelector('.header-key')?.value?.trim();
-        const value = row.querySelector('.header-value')?.value?.trim();
-        if (key) headers[key] = value || '';
-    });
-
-    // Collect agent responses
-    const agentResponses = [];
-    document.querySelectorAll('.agent-card').forEach(card => {
-        agentResponses.push(getAgentResponseFromCard(card));
-    });
-
+function validateConfig() {
+    if (!wasmReady) return;
     try {
-        const request = create_sample_request(method, host, path);
-        request.headers = headers;
-
-        const result = simulate_with_agents(
-            config,
-            JSON.stringify(request),
-            JSON.stringify(agentResponses)
-        );
-
-        renderAgentFlowDiagram(result, { method, host, path });
-        renderAgentResponseFlow(result);
-        renderAgentTrace(result);
+        lastValidation = checkConfig(configEditor.value);
     } catch (e) {
-        console.error('Agent simulation error:', e);
-        flowDiagram.innerHTML = `<div class="flow-error">Agent simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
-        responseFlowDiagram.innerHTML = `<div class="flow-error">Agent simulation failed</div>`;
+        lastValidation = { valid: false, errors: [{ message: e.message || String(e), severity: 'error' }] };
     }
-}
-
-// Render flow diagram with agents
-function renderAgentFlowDiagram(result, request) {
-    const matched = result.matched_route;
-    const upstream = result.upstream_selection;
-    const agentChain = result.agent_chain || [];
-
-    const nodes = [
-        { id: 'client', label: 'Client', sublabel: `${request.method} ${request.path}`, type: 'client' },
-    ];
-
-    if (matched) {
-        nodes.push({
-            id: 'route',
-            label: `Route: ${matched.id}`,
-            sublabel: `priority: ${matched.priority}`,
-            type: 'route'
-        });
-
-        // Add agent nodes
-        agentChain.forEach((step, i) => {
-            const decision = step.decision.toLowerCase();
-            nodes.push({
-                id: `agent-${i}`,
-                label: step.agent_id,
-                sublabel: decision.toUpperCase(),
-                type: `agent-${decision}`,
-                shortCircuited: step.short_circuited
-            });
-
-            // If this agent blocked/redirected, don't add more nodes
-            if (step.short_circuited) return;
-        });
-
-        // Add upstream if not short-circuited
-        const wasShortCircuited = agentChain.some(s => s.short_circuited);
-        if (!wasShortCircuited && upstream) {
-            nodes.push({
-                id: 'upstream',
-                label: `Upstream: ${upstream.upstream_id}`,
-                sublabel: upstream.selected_target || '',
-                type: 'upstream'
-            });
+    if (lastValidation.valid) {
+        const n = (lastValidation.warnings || []).length;
+        if (n) {
+            setStatus('warning', `Valid, ${n} warning${n > 1 ? 's' : ''}`);
+            renderProblems(lastValidation.warnings, 'warning');
+        } else {
+            setStatus('valid', 'Valid');
+            renderProblems([]);
         }
     } else {
-        nodes.push({
-            id: 'route',
-            label: 'No Match',
-            sublabel: '',
-            type: 'nomatch'
-        });
+        const n = lastValidation.errors.length;
+        setStatus('invalid', `${n} error${n > 1 ? 's' : ''}`);
+        renderProblems(lastValidation.errors, 'error');
+        const line = errorLine(lastValidation.errors[0]?.message);
+        markLines(line ? [[line, line]] : null, { scroll: false });
     }
-
-    flowDiagram.innerHTML = `
-        <div class="flow-nodes">
-            ${nodes.map((node, i) => `
-                <div class="flow-node flow-node-${node.type}${node.shortCircuited ? ' flow-node-short-circuit' : ''}" data-node="${node.id}" data-index="${i}">
-                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
-                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
-                </div>
-                ${i < nodes.length - 1 ? `<div class="flow-arrow${node.shortCircuited ? ' flow-arrow-blocked' : ''}" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
-            `).join('')}
-        </div>
-    `;
-
-    // Animate nodes appearing
-    requestAnimationFrame(() => {
-        flowDiagram.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
-            el.style.animationDelay = `${i * 0.1}s`;
-            el.classList.add('flow-animate');
-        });
-    });
+    renderAgentMocks();
 }
 
-// Render response flow for agent simulation
-function renderAgentResponseFlow(result) {
-    const matched = result.matched_route;
-    const upstream = result.upstream_selection;
-    const agentChain = result.agent_chain || [];
-    const wasShortCircuited = agentChain.some(s => s.short_circuited);
-    const blockingAgent = agentChain.find(s => s.short_circuited);
+// =============================================================================
+// Request input
+// =============================================================================
 
-    const nodes = [];
-
-    if (matched) {
-        if (wasShortCircuited && blockingAgent) {
-            // Show the blocking response
-            const decision = blockingAgent.decision.toLowerCase();
-            nodes.push({
-                id: 'block-response',
-                label: decision === 'block' ? 'Block Response' : 'Redirect',
-                sublabel: `from ${blockingAgent.agent_id}`,
-                type: `agent-${decision}`
-            });
-        } else if (upstream) {
-            nodes.push({
-                id: 'upstream',
-                label: `Upstream: ${upstream.upstream_id}`,
-                sublabel: upstream.selected_target || '',
-                type: 'upstream'
-            });
-        }
-
-        nodes.push({
-            id: 'proxy',
-            label: 'Zentinel Proxy',
-            sublabel: wasShortCircuited ? 'short-circuited' : 'response processing',
-            type: wasShortCircuited ? 'agent-block' : 'route'
-        });
-    } else {
-        nodes.push({
-            id: 'proxy',
-            label: 'Zentinel Proxy',
-            sublabel: '404 - no route matched',
-            type: 'nomatch'
-        });
-    }
-
-    nodes.push({
-        id: 'client',
-        label: 'Client',
-        sublabel: wasShortCircuited ?
-            (blockingAgent?.decision === 'redirect' ? '302 Redirect' : '403 Blocked') :
-            (matched ? '200 OK' : '404 Not Found'),
-        type: 'client'
-    });
-
-    responseFlowDiagram.innerHTML = `
-        <div class="flow-nodes">
-            ${nodes.map((node, i) => `
-                <div class="flow-node flow-node-${node.type}" data-node="${node.id}" data-index="${i}">
-                    <div class="flow-node-label">${escapeHtml(node.label)}</div>
-                    ${node.sublabel ? `<div class="flow-node-sublabel">${escapeHtml(node.sublabel)}</div>` : ''}
-                </div>
-                ${i < nodes.length - 1 ? `<div class="flow-arrow" data-index="${i}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>` : ''}
-            `).join('')}
-        </div>
-    `;
-
-    // Animate nodes appearing
-    requestAnimationFrame(() => {
-        responseFlowDiagram.querySelectorAll('.flow-node, .flow-arrow').forEach((el, i) => {
-            el.style.animationDelay = `${i * 0.1}s`;
-            el.classList.add('flow-animate');
-        });
-    });
-}
-
-// Render trace with agent chain
-function renderAgentTrace(result) {
-    const sections = [];
-
-    // Agent chain section (show first if agents were involved)
-    const agentChain = result.agent_chain || [];
-    if (agentChain.length > 0) {
-        sections.push(`
-            <details class="trace-section" open>
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Agent Chain (${agentChain.length} agent${agentChain.length > 1 ? 's' : ''})
-                </summary>
-                <div class="trace-details">
-                    ${agentChain.map(step => `
-                        <div class="trace-agent trace-agent-${step.decision.toLowerCase()}">
-                            <span class="agent-id">${escapeHtml(step.agent_id)}</span>
-                            <span class="agent-decision decision-${step.decision.toLowerCase()}">${step.decision.toUpperCase()}</span>
-                            ${step.mutations_applied > 0 ? `<span class="agent-mutations">${step.mutations_applied} mutation${step.mutations_applied > 1 ? 's' : ''}</span>` : ''}
-                            ${step.short_circuited ? `<span class="agent-short-circuit">short-circuited</span>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    // Transformed request section
-    if (result.final_request) {
-        const req = result.final_request;
-        const changes = [];
-
-        if (req.added_headers && req.added_headers.length > 0) {
-            req.added_headers.forEach(h => changes.push({ type: 'add', text: h }));
-        }
-        if (req.modified_headers && req.modified_headers.length > 0) {
-            req.modified_headers.forEach(h => changes.push({ type: 'modify', text: h }));
-        }
-        if (req.removed_headers && req.removed_headers.length > 0) {
-            req.removed_headers.forEach(h => changes.push({ type: 'remove', text: h }));
-        }
-
-        if (changes.length > 0) {
-            sections.push(`
-                <details class="trace-section">
-                    <summary class="trace-summary">
-                        <span class="trace-icon">${icons.valid}</span>
-                        Request Transformations (${changes.length})
-                    </summary>
-                    <div class="trace-details">
-                        <div class="trace-transforms">
-                            ${changes.map(c => `
-                                <div class="transform-item transform-${c.type}">
-                                    <span class="transform-op">${c.type === 'add' ? '+' : c.type === 'remove' ? '-' : '~'}</span>
-                                    <span class="transform-text">${escapeHtml(c.text)}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </details>
-            `);
-        }
-    }
-
-    // Audit trail section
-    if (result.audit_trail && result.audit_trail.length > 0) {
-        sections.push(`
-            <details class="trace-section">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Audit Trail (${result.audit_trail.length})
-                </summary>
-                <div class="trace-details">
-                    ${result.audit_trail.map(entry => `
-                        <div class="trace-audit">
-                            <span class="audit-agent">${escapeHtml(entry.agent_id)}</span>
-                            ${entry.rule_ids && entry.rule_ids.length > 0 ? `<span class="audit-rules">Rules: ${entry.rule_ids.join(', ')}</span>` : ''}
-                            ${entry.tags && entry.tags.length > 0 ? `<span class="audit-tags">Tags: ${entry.tags.join(', ')}</span>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    // Route matching trace
-    if (result.match_trace && result.match_trace.length > 0) {
-        sections.push(`
-            <details class="trace-section">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Route Matching
-                </summary>
-                <div class="trace-details">
-                    ${result.match_trace.map(step => `
-                        <div class="trace-step trace-step-${step.result}">
-                            <span class="trace-step-route">${escapeHtml(step.route_id)}</span>
-                            <span class="trace-step-result">${step.result === 'match' ? '✓ Match' : '✗ No match'}</span>
-                            <span class="trace-step-reason">${escapeHtml(step.reason)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    // Upstream selection
-    if (result.upstream_selection) {
-        const us = result.upstream_selection;
-        sections.push(`
-            <details class="trace-section">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.valid}</span>
-                    Upstream Selection
-                </summary>
-                <div class="trace-details">
-                    <div class="trace-upstream">
-                        <div><strong>Upstream:</strong> ${escapeHtml(us.upstream_id)}</div>
-                        <div><strong>Target:</strong> ${escapeHtml(us.selected_target)}</div>
-                        <div><strong>Algorithm:</strong> ${escapeHtml(us.load_balancer)}</div>
-                        ${us.selection_reason ? `<div><strong>Reason:</strong> ${escapeHtml(us.selection_reason)}</div>` : ''}
-                    </div>
-                </div>
-            </details>
-        `);
-    }
-
-    // Warnings
-    if (result.warnings && result.warnings.length > 0) {
-        sections.push(`
-            <details class="trace-section trace-section-warning">
-                <summary class="trace-summary">
-                    <span class="trace-icon">${icons.warning}</span>
-                    Warnings (${result.warnings.length})
-                </summary>
-                <div class="trace-details">
-                    ${result.warnings.map(w => `
-                        <div class="trace-warning">
-                            ${w.code ? `<span class="warning-code">${escapeHtml(w.code)}</span>` : ''}
-                            <span class="warning-message">${escapeHtml(w.message)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </details>
-        `);
-    }
-
-    if (sections.length === 0) {
-        traceContent.innerHTML = '<div class="trace-empty">No simulation results</div>';
-    } else {
-        traceContent.innerHTML = sections.join('');
-    }
-}
-
-// Add header row
 function addHeaderRow(key = '', value = '') {
     const row = document.createElement('div');
-    row.className = 'header-row';
+    row.className = 'pg-header-row';
+    const n = headersList.children.length + 1;
     row.innerHTML = `
-        <input type="text" class="header-key" placeholder="Header name" value="${escapeHtml(key)}">
-        <input type="text" class="header-value" placeholder="Value" value="${escapeHtml(value)}">
-        <button type="button" class="header-remove" aria-label="Remove header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-    `;
-    row.querySelector('.header-remove').addEventListener('click', () => row.remove());
-    headersList.appendChild(row);
-}
-
-// Parse URL hash for pre-loaded config
-function loadConfigFromHash() {
-    const hash = window.location.hash;
-    if (hash.startsWith('#config=')) {
-        try {
-            const encoded = hash.slice(8);
-            const config = atob(decodeURIComponent(encoded));
-            configEditor.value = config;
-        } catch (e) {
-            console.error('Failed to parse config from URL:', e);
-        }
-    }
-}
-
-// Escape HTML
-function escapeHtml(str) {
-    if (typeof str !== 'string') return String(str);
-    return str.replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;')
-              .replace(/'/g, '&#039;');
-}
-
-// Debounced validation
-function debouncedValidate() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        console.log('Debounce triggered, validating...');
-        validateConfig();
-    }, 300);
-}
-
-// Event listeners
-configEditor.addEventListener('input', (e) => {
-    console.log('Input event fired');
-    updateHighlight();
-    debouncedValidate();
-});
-configEditor.addEventListener('scroll', syncScroll);
-simulateBtn.addEventListener('click', runSimulation);
-addHeaderBtn.addEventListener('click', () => addHeaderRow());
-if (simulateAgentsBtn) {
-    simulateAgentsBtn.addEventListener('click', runAgentSimulation);
-}
-
-// Copy configuration button
-copyConfigBtn.addEventListener('click', async () => {
-    const config = configEditor.value;
-    try {
-        await navigator.clipboard.writeText(config);
-        // Visual feedback
-        const originalHTML = copyConfigBtn.innerHTML;
-        copyConfigBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-        copyConfigBtn.style.color = 'var(--z-success)';
-        setTimeout(() => {
-            copyConfigBtn.innerHTML = originalHTML;
-            copyConfigBtn.style.color = '';
-        }, 2000);
-    } catch (err) {
-        console.error('Failed to copy:', err);
-    }
-});
-
-// Fullscreen toggle button
-fullscreenConfigBtn.addEventListener('click', () => {
-    configPanel.classList.toggle('fullscreen');
-
-    // Handle escape key to exit fullscreen
-    if (configPanel.classList.contains('fullscreen')) {
-        const handleEscape = (e) => {
-            if (e.key === 'Escape') {
-                configPanel.classList.remove('fullscreen');
-                document.removeEventListener('keydown', handleEscape);
-            }
-        };
-        document.addEventListener('keydown', handleEscape);
-    }
-});
-
-// Also listen for keyup to catch paste events and other input methods
-configEditor.addEventListener('keyup', () => {
-    updateHighlight();
-    debouncedValidate();
-});
-
-// =============================================================================
-// Request Tabs
-// =============================================================================
-
-const requestTabs = document.querySelectorAll('.request-tab');
-const tabContents = document.querySelectorAll('.request-tab-content');
-const rawRequestTextarea = document.getElementById('raw-request');
-const simulateRawBtn = document.getElementById('simulate-raw-btn');
-
-// Tab switching
-requestTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const targetTab = tab.dataset.tab;
-
-        // Update tab buttons
-        requestTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // Update tab content
-        tabContents.forEach(content => {
-            content.classList.remove('active');
-            if (content.id === `tab-${targetTab}`) {
-                content.classList.add('active');
-            }
-        });
+        <input class="z-input z-input--sm z-input--mono header-key" type="text" placeholder="Name" aria-label="Header ${n} name" value="${escapeHtml(key)}" spellcheck="false">
+        <input class="z-input z-input--sm z-input--mono header-value" type="text" placeholder="Value" aria-label="Header ${n} value" value="${escapeHtml(value)}" spellcheck="false">
+        <button type="button" class="z-btn z-btn--ghost z-btn--sm z-btn--icon" aria-label="Remove header ${n}">${ICON.remove}</button>`;
+    row.querySelector('button').addEventListener('click', () => {
+        const next = row.nextElementSibling || row.previousElementSibling;
+        row.remove();
+        (next?.querySelector('input') || $('add-header-btn')).focus();
     });
-});
+    headersList.appendChild(row);
+    return row;
+}
+$('add-header-btn').addEventListener('click', () => addHeaderRow().querySelector('input').focus());
 
-// Parse raw HTTP request
 function parseRawRequest(rawText) {
-    const lines = rawText.trim().split('\n');
-    if (lines.length === 0) return null;
-
-    // Parse request line: METHOD /path HTTP/1.1
-    const requestLine = lines[0].trim();
-    const requestMatch = requestLine.match(/^(\w+)\s+(\S+)(?:\s+HTTP\/[\d.]+)?$/i);
-    if (!requestMatch) return null;
-
-    const method = requestMatch[1].toUpperCase();
-    const pathWithQuery = requestMatch[2];
-    const path = pathWithQuery.split('?')[0]; // Remove query string for routing
-
-    // Parse headers
+    const lines = rawText.replace(/\r/g, '').trim().split('\n');
+    const m = /^(\w+)\s+(\S+)(?:\s+HTTP\/[\d.]+)?$/i.exec((lines[0] || '').trim());
+    if (!m) return { error: 'The first line must look like: GET /path HTTP/1.1' };
     const headers = {};
     let host = 'example.com';
-
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === '') break; // Empty line ends headers
-
-        const colonIndex = line.indexOf(':');
-        if (colonIndex > 0) {
-            const key = line.substring(0, colonIndex).trim();
-            const value = line.substring(colonIndex + 1).trim();
-            headers[key] = value;
-
-            if (key.toLowerCase() === 'host') {
-                host = value;
-            }
-        }
+    for (let k = 1; k < lines.length; k++) {
+        const line = lines[k].trim();
+        if (line === '') break;
+        const c = line.indexOf(':');
+        if (c <= 0) return { error: `Line ${k + 1} is not a header ("Name: value").` };
+        const key = line.slice(0, c).trim();
+        const value = line.slice(c + 1).trim();
+        if (key.toLowerCase() === 'host') host = value;
+        else headers[key] = value;
     }
-
-    return { method, host, path, headers };
+    return { method: m[1].toUpperCase(), host, path: m[2].split('?')[0], headers };
 }
 
-// Run simulation from raw request
-function runRawSimulation() {
-    if (!wasmReady || !lastValidation?.valid) return;
-
-    const rawText = rawRequestTextarea.value;
-    const parsed = parseRawRequest(rawText);
-
-    if (!parsed) {
-        flowDiagram.innerHTML = `<div class="flow-error">Invalid request format. Expected: METHOD /path HTTP/1.1</div>`;
-        responseFlowDiagram.innerHTML = `<div class="flow-error">Invalid request format</div>`;
-        return;
-    }
-
-    const config = configEditor.value;
-
-    try {
-        const request = create_sample_request(parsed.method, parsed.host, parsed.path);
-        request.headers = parsed.headers;
-
-        const result = simulate(config, JSON.stringify(request));
-        renderFlowDiagram(result, parsed);
-        renderResponseFlowDiagram(result);
-        renderTrace(result);
-    } catch (e) {
-        console.error('Simulation error:', e);
-        flowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
-        responseFlowDiagram.innerHTML = `<div class="flow-error">Simulation failed: ${escapeHtml(e.message || String(e))}</div>`;
-    }
+function activeTab() {
+    return document.querySelector('.pg-tabs [aria-selected="true"]').id.replace('tab-btn-', '');
 }
 
-// Raw simulate button
-if (simulateRawBtn) {
-    simulateRawBtn.addEventListener('click', runRawSimulation);
-}
-
-// =============================================================================
-// Expand/Collapse All Trace Sections
-// =============================================================================
-
-const toggleTraceBtn = document.getElementById('toggle-trace-btn');
-let allExpanded = false;
-
-if (toggleTraceBtn) {
-    toggleTraceBtn.addEventListener('click', () => {
-        const details = traceContent.querySelectorAll('details');
-        allExpanded = !allExpanded;
-
-        details.forEach(detail => {
-            detail.open = allExpanded;
-        });
-
-        // Update button text
-        toggleTraceBtn.innerHTML = allExpanded
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg> Collapse All`
-            : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> Expand All`;
+function collectRequest() {
+    if (activeTab() === 'raw') return parseRawRequest($('raw-request').value);
+    const path = $('request-path').value.trim() || '/';
+    const headers = {};
+    headersList.querySelectorAll('.pg-header-row').forEach((row) => {
+        const k = row.querySelector('.header-key').value.trim();
+        if (k) headers[k] = row.querySelector('.header-value').value.trim();
     });
+    const pathInput = $('request-path');
+    if (!path.startsWith('/')) {
+        pathInput.setAttribute('aria-invalid', 'true');
+        return { error: 'The path must start with "/".', field: pathInput };
+    }
+    pathInput.removeAttribute('aria-invalid');
+    return { method: $('request-method').value, host: $('request-host').value.trim() || 'example.com', path, headers };
 }
 
-// =============================================================================
-// Template Selector
-// =============================================================================
-
-function loadTemplate(templateKey) {
-    const template = TEMPLATES[templateKey];
-    if (!template) {
-        console.error(`Template not found: ${templateKey}`);
-        return;
-    }
-
-    // Load template into editor
-    configEditor.value = template;
-
-    // Update syntax highlighting
-    updateHighlight();
-
-    // Trigger validation
-    if (wasmReady) {
-        validateConfig();
-    }
-
-    // Scroll to top of editor
-    configEditor.scrollTop = 0;
-
-    // Visual feedback: highlight the selected template button
-    document.querySelectorAll('.template-card').forEach(card => {
-        card.classList.remove('active');
+// Tabs (roving tabindex, arrow keys)
+const tabButtons = [...document.querySelectorAll('.pg-tabs [role="tab"]')];
+function selectTab(btn, focus = false) {
+    tabButtons.forEach((b) => {
+        const on = b === btn;
+        b.setAttribute('aria-selected', String(on));
+        b.tabIndex = on ? 0 : -1;
+        $(b.getAttribute('aria-controls')).hidden = !on;
     });
-    const selectedCard = document.querySelector(`.template-card[data-template="${templateKey}"]`);
-    if (selectedCard) {
-        selectedCard.classList.add('active');
-    }
+    if (focus) btn.focus();
 }
-
-// Add click handlers to template cards
-document.querySelectorAll('.template-card').forEach(card => {
-    card.addEventListener('click', () => {
-        const templateKey = card.getAttribute('data-template');
-        loadTemplate(templateKey);
+tabButtons.forEach((b, k) => {
+    b.addEventListener('click', () => selectTab(b));
+    b.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (e.key === 'Home') { e.preventDefault(); selectTab(tabButtons[0], true); }
+        else if (e.key === 'End') { e.preventDefault(); selectTab(tabButtons[tabButtons.length - 1], true); }
+        else if (d) { e.preventDefault(); selectTab(tabButtons[(k + d + tabButtons.length) % tabButtons.length], true); }
     });
 });
 
-// Version badge dropdown toggle
-const versionBadgeBtn = document.getElementById('version-badge-btn');
-const versionDropdown = document.getElementById('version-dropdown');
+// =============================================================================
+// Agent mocks (the Agents tab)
+// =============================================================================
 
-if (versionBadgeBtn && versionDropdown) {
-    versionBadgeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        versionBadgeBtn.classList.toggle('active');
-        versionDropdown.classList.toggle('active');
+// Agents declared in the config: `agent "name" { type "…" … }` inside `agents { }`.
+function declaredAgents() {
+    const block = findBlock('agents', null);
+    if (!block) return [];
+    const lines = configEditor.value.split('\n').slice(block[0] - 1, block[1]);
+    const out = [];
+    lines.forEach((l, k) => {
+        const m = /^\s*agent\s+"([^"]+)"/.exec(l);
+        if (!m) return;
+        const range = findBlock('agent', m[1], block);
+        const body = range ? configEditor.value.split('\n').slice(range[0] - 1, range[1]).join('\n') : '';
+        const type = (/^\s*type\s+"([^"]+)"/m.exec(body) || [])[1] || '';
+        out.push({ id: m[1], type, line: block[0] + k });
     });
+    return out;
+}
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!versionDropdown.contains(e.target) && !versionBadgeBtn.contains(e.target)) {
-            versionBadgeBtn.classList.remove('active');
-            versionDropdown.classList.remove('active');
-        }
-    });
+function mockFor(id) {
+    if (!agentMocks.has(id)) agentMocks.set(id, { decision: 'allow', status: 403, body: '', url: '', redirectStatus: 302, headers: [], ruleIds: '', tags: '' });
+    return agentMocks.get(id);
+}
 
-    // Close dropdown on escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && versionDropdown.classList.contains('active')) {
-            versionBadgeBtn.classList.remove('active');
-            versionDropdown.classList.remove('active');
-        }
+function renderAgentMocks() {
+    const agents = lastValidation?.valid ? declaredAgents() : [];
+    agentsCount.hidden = agents.length === 0;
+    agentsCount.textContent = agents.length;
+    agentsEmpty.hidden = agents.length > 0;
+    const ids = agents.map((a) => a.id).join('|');
+    if (agentsList.dataset.ids === ids) return; // keep focus and edits while typing
+    agentsList.dataset.ids = ids;
+    agentsList.innerHTML = agents.map((a) => {
+        const m = mockFor(a.id);
+        const name = `mock-${a.id}`;
+        return `<fieldset class="pg-agent" data-agent="${escapeHtml(a.id)}">
+            <legend><span class="pg-agent-name">${escapeHtml(a.id)}</span>${a.type ? ` <span class="pg-agent-type">${escapeHtml(a.type)}</span>` : ''}</legend>
+            <div class="z-segmented" role="radiogroup" aria-label="Mock decision for ${escapeHtml(a.id)}">
+                ${['allow', 'block', 'redirect'].map((d) => `<label><input type="radio" name="${escapeHtml(name)}" value="${d}" ${m.decision === d ? 'checked' : ''}>${d[0].toUpperCase() + d.slice(1)}</label>`).join('')}
+            </div>
+            <div class="pg-agent-fields" data-for="block" ${m.decision === 'block' ? '' : 'hidden'}>
+                <label class="z-field"><span class="z-label">Status</span><input class="z-input z-input--sm" type="number" min="400" max="599" data-k="status" value="${m.status}"></label>
+                <label class="z-field"><span class="z-label">Body</span><input class="z-input z-input--sm" type="text" data-k="body" placeholder="Blocked by agent" value="${escapeHtml(m.body)}"></label>
+            </div>
+            <div class="pg-agent-fields" data-for="redirect" ${m.decision === 'redirect' ? '' : 'hidden'}>
+                <label class="z-field"><span class="z-label">Location</span><input class="z-input z-input--sm" type="url" data-k="url" placeholder="https://example.com/login" value="${escapeHtml(m.url)}"></label>
+                <label class="z-field"><span class="z-label">Status</span><input class="z-input z-input--sm" type="number" min="300" max="399" data-k="redirectStatus" value="${m.redirectStatus}"></label>
+            </div>
+            <details class="pg-agent-more">
+                <summary>Header changes and audit</summary>
+                <div class="pg-agent-fields">
+                    <label class="z-field"><span class="z-label">Set request headers</span><input class="z-input z-input--sm z-input--mono" type="text" data-k="headers" placeholder="x-waf-score: 3, x-user: alice" value="${escapeHtml(m.headers.map((h) => `${h.name}: ${h.value}`).join(', '))}"></label>
+                    <label class="z-field"><span class="z-label">Rule IDs</span><input class="z-input z-input--sm" type="text" data-k="ruleIds" placeholder="942100, 941100" value="${escapeHtml(m.ruleIds)}"></label>
+                    <label class="z-field"><span class="z-label">Tags</span><input class="z-input z-input--sm" type="text" data-k="tags" placeholder="sql-injection" value="${escapeHtml(m.tags)}"></label>
+                </div>
+            </details>
+        </fieldset>`;
+    }).join('');
+}
+
+agentsList.addEventListener('input', (e) => {
+    const card = e.target.closest('.pg-agent');
+    if (!card) return;
+    const m = mockFor(card.dataset.agent);
+    if (e.target.type === 'radio') {
+        m.decision = e.target.value;
+        card.querySelectorAll('[data-for]').forEach((el) => { el.hidden = el.dataset.for !== m.decision; });
+        return;
+    }
+    const k = e.target.dataset.k;
+    if (!k) return;
+    if (k === 'headers') {
+        m.headers = e.target.value.split(',').map((p) => p.trim()).filter(Boolean).map((p) => {
+            const c = p.indexOf(':');
+            return c > 0 ? { name: p.slice(0, c).trim(), value: p.slice(c + 1).trim() } : { name: p, value: '' };
+        });
+    } else if (k === 'status' || k === 'redirectStatus') {
+        m[k] = parseInt(e.target.value, 10) || (k === 'status' ? 403 : 302);
+    } else {
+        m[k] = e.target.value;
+    }
+});
+
+function agentResponses(ids) {
+    const list = (s) => s.split(',').map((x) => x.trim()).filter(Boolean);
+    return ids.map((id) => {
+        const m = mockFor(id);
+        const decision = { type: m.decision };
+        if (m.decision === 'block') { decision.status = m.status; if (m.body) decision.body = m.body; }
+        if (m.decision === 'redirect') { decision.url = m.url || 'https://example.com/'; decision.status = m.redirectStatus; }
+        return {
+            agent_id: id,
+            decision,
+            request_headers: m.headers.map((h) => ({ op: 'set', name: h.name, value: h.value })),
+            response_headers: [],
+            audit: { rule_ids: list(m.ruleIds), tags: list(m.tags) },
+        };
     });
 }
 
-// Initialize
-loadConfigFromHash();
-updateHighlight(); // Initial syntax highlighting
-initWasm();
+document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-load-preset]');
+    if (b) {
+        loadPreset(b.dataset.loadPreset);
+        presetSelect.focus();
+    }
+});
 
-// Debug: log that the script loaded
-console.log('Playground initialized');
+// =============================================================================
+// Pipeline: built only from what the engine returned
+// =============================================================================
+
+function kv(rows) {
+    return `<dl class="pg-kv">${rows.filter(Boolean).map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${v}</dd>`).join('')}</dl>`;
+}
+
+function buildStages(req, sim, agents) {
+    const out = [];
+    const routeBlock = sim.matched_route ? findBlock('route', sim.matched_route.id) : null;
+
+    // 1. The request as sent
+    const hdrs = Object.entries(req.headers || {});
+    out.push({
+        id: 'request', title: 'Request', state: 'pass',
+        summary: `${req.method} ${req.host}${req.path}`,
+        details: kv([
+            ['Method', code(req.method)], ['Host', code(req.host)], ['Path', code(req.path)],
+            ['Headers', hdrs.length ? hdrs.map(([k, v]) => code(`${k}: ${v}`)).join('<br>') : '<span class="pg-muted">none</span>'],
+        ]),
+    });
+
+    // 2. Route matching (match_trace)
+    const trace = sim.match_trace || [];
+    const traceTable = trace.length ? `<table class="pg-table"><thead><tr><th>Route</th><th>Result</th><th>Why</th></tr></thead><tbody>${trace.map((t) => {
+        const why = (t.condition_details || []).map((c) => escapeHtml(c.explanation)).join('<br>') || escapeHtml(t.reason);
+        const word = t.result === 'match' ? 'matched' : t.result === 'skipped' ? 'skipped' : 'no match';
+        return `<tr data-result="${escapeHtml(t.result)}"><td>${code(t.route_id)}</td><td>${word}</td><td>${why}</td></tr>`;
+    }).join('')}</tbody></table>` : '<p class="pg-muted">No routes were evaluated.</p>';
+    if (sim.matched_route) {
+        const r = sim.matched_route;
+        out.push({
+            id: 'route', title: 'Route matching', state: 'pass',
+            summary: `route "${r.id}" (priority ${r.priority})`,
+            details: kv([['Matched', code(r.id)], ['Priority', escapeHtml(r.priority)], r.service_type && ['Service type', escapeHtml(r.service_type)], r.upstream && ['Upstream', code(r.upstream)]]) + traceTable,
+            lines: routeBlock ? [routeBlock] : null,
+        });
+    } else {
+        out.push({
+            id: 'route', title: 'Route matching', state: 'blocked',
+            summary: trace.length ? `no route matched (${trace.length} checked)` : 'no routes defined',
+            details: `<p>No route's conditions matched this request, so it goes no further.</p>${traceTable}`,
+            lines: findBlock('routes', null) ? [findBlock('routes', null)] : null,
+            stop: 'Not routed',
+        });
+        return out;
+    }
+
+    // 3. Policies the route applies
+    const pol = sim.applied_policies || {};
+    // Options the engine leaves unset come back as undefined; skip them.
+    const polKeys = Object.keys(pol).filter((k) => pol[k] !== undefined && pol[k] !== null);
+    if (polKeys.length) {
+        const nice = { timeout_secs: (v) => `timeout ${v}s`, failure_mode: (v) => `failure ${v}`, max_body_size: (v) => `body ≤ ${v}` };
+        const polBlock = routeBlock && findBlock('policies', null, routeBlock);
+        out.push({
+            id: 'policies', title: 'Policies', state: 'pass',
+            summary: polKeys.slice(0, 2).map((k) => (nice[k] ? nice[k](pol[k]) : `${k.replace(/_/g, '-')} ${pol[k]}`)).join(' · ') + (polKeys.length > 2 ? ` +${polKeys.length - 2}` : ''),
+            details: kv(polKeys.map((k) => [k.replace(/_/g, '-'), code(typeof pol[k] === 'object' ? JSON.stringify(pol[k]) : String(pol[k]))])),
+            lines: polBlock ? [polBlock] : routeBlock ? [routeBlock] : null,
+        });
+    }
+
+    // 4. Agents: hooks from simulate, decisions from the mocks via simulate_with_agents
+    const hooks = sim.agent_hooks || [];
+    let stopped = null;
+    if (hooks.length) {
+        const chain = agents?.agent_chain || [];
+        const hookById = new Map(hooks.map((h) => [h.agent_id, h]));
+        const ordered = chain.length ? chain : hooks.map((h) => ({ agent_id: h.agent_id, hook: h.hook }));
+        for (const step of ordered) {
+            const hook = hookById.get(step.agent_id) || {};
+            const audit = (agents?.audit_trail || []).filter((a) => a.agent_id === step.agent_id);
+            const agentBlock = findBlock('agent', step.agent_id);
+            const filterBlock = findBlock('filter', step.agent_id);
+            const base = kv([
+                ['Agent', code(step.agent_id)], step.agent_type && ['Type', escapeHtml(step.agent_type)],
+                ['Hook', code(step.hook || hook.hook || '')], hook.timeout_ms != null && ['Timeout', `${hook.timeout_ms} ms`],
+                hook.failure_mode && ['If unavailable', `fail ${escapeHtml(hook.failure_mode)}`],
+                step.decision && ['Mock decision', escapeHtml(step.decision)],
+                step.mutations_applied != null && ['Header changes', String(step.mutations_applied)],
+                audit.length && ['Audit', audit.map((a) => [...a.rule_ids.map((r) => code(r)), ...a.tags.map((t) => escapeHtml(t))].join(' ')).join('<br>')],
+            ]) + '<p class="pg-muted">The decision comes from the mock you set in the Agents tab; the engine applies it as the proxy would.</p>';
+            const st = { id: `agent-${step.agent_id}`, title: `Agent · ${step.agent_id}`, details: base, lines: [agentBlock, filterBlock].filter(Boolean) };
+            if (stopped) {
+                Object.assign(st, { state: 'unreached', summary: 'the request stopped earlier' });
+            } else if (!step.decision) {
+                Object.assign(st, { state: 'info', summary: `called on ${hook.hook || 'request'}` });
+            } else if (step.decision === 'block') {
+                const b = agents.block_response || {};
+                Object.assign(st, { state: 'blocked', summary: `blocked ${b.status || ''} by ${step.agent_id}`.replace('  ', ' ') });
+                stopped = { kind: 'block', agent: step.agent_id, status: b.status, body: b.body };
+            } else if (step.decision === 'redirect') {
+                Object.assign(st, { state: 'redirect', summary: `redirect ${agents.redirect_status || ''}`.trim() });
+                stopped = { kind: 'redirect', agent: step.agent_id, status: agents.redirect_status, url: agents.redirect_url };
+            } else {
+                const n = step.mutations_applied || 0;
+                Object.assign(st, { state: 'pass', summary: `${step.decision === 'allow' ? 'allowed' : step.decision}${n ? `, ${n} header change${n > 1 ? 's' : ''}` : ''}` });
+            }
+            out.push(st);
+        }
+    }
+
+    // 5. Upstream selection
+    const us = sim.upstream_selection;
+    if (us) {
+        const block = findBlock('upstream', us.upstream_id, findBlock('upstreams', null));
+        out.push({
+            id: 'upstream', title: 'Upstream', state: stopped ? 'unreached' : 'pass',
+            summary: stopped ? 'the request stopped earlier' : `${us.upstream_id} → ${us.selected_target}`,
+            details: kv([['Upstream', code(us.upstream_id)], ['Target', code(us.selected_target)], ['Balancing', escapeHtml(us.load_balancer)], us.health_status && ['Health', escapeHtml(us.health_status)], us.selection_reason && ['Why', escapeHtml(us.selection_reason)]]),
+            lines: block ? [block] : null,
+        });
+    }
+
+    // 6. Outcome
+    const fr = agents?.final_request;
+    const changes = fr ? [
+        fr.added_headers?.length && ['Added', fr.added_headers.map(code).join(' ')],
+        fr.removed_headers?.length && ['Removed', fr.removed_headers.map(code).join(' ')],
+        fr.modified_headers?.length && ['Modified', fr.modified_headers.map(code).join(' ')],
+    ].filter(Boolean) : [];
+    if (stopped?.kind === 'block') {
+        out.push({ id: 'outcome', title: 'Response', state: 'blocked', summary: `${stopped.status || 'error'} from ${stopped.agent}`,
+            details: kv([['Status', code(String(stopped.status || ''))], ['Sent by', code(stopped.agent)], stopped.body && ['Body', code(stopped.body)]]) + '<p class="pg-muted">The agent answered the client; the upstream was never contacted.</p>' });
+    } else if (stopped?.kind === 'redirect') {
+        out.push({ id: 'outcome', title: 'Response', state: 'redirect', summary: `${stopped.status || 302} → ${stopped.url || ''}`,
+            details: kv([['Status', code(String(stopped.status || ''))], ['Location', code(stopped.url || '')], ['Sent by', code(stopped.agent)]]) });
+    } else if (us) {
+        out.push({ id: 'outcome', title: 'Forwarded', state: 'pass', summary: `to ${us.selected_target}`,
+            details: kv([['Proxied to', code(us.selected_target)], ...changes]) + '<p class="pg-muted">The response status comes from the upstream; the playground does not contact one.</p>' });
+    } else {
+        out.push({ id: 'outcome', title: 'Handled', state: 'info', summary: `by route "${sim.matched_route.id}"`,
+            details: '<p>The route matched but the engine reported no upstream selection for it.</p>' });
+    }
+    return out;
+}
+
+function stageHtml(s, k, n) {
+    const word = STATE_WORD[s.state] || s.state;
+    return `<li class="pg-stage" data-state="pending" data-final-state="${s.state}" style="--i:${k}">
+        <button type="button" class="pg-node" aria-pressed="false" aria-controls="pg-detail" data-stage="${k}">
+            <span class="pg-node-step" aria-hidden="true">${k + 1}</span>
+            <span class="pg-node-title">${escapeHtml(s.title)}</span>
+            <span class="pg-node-outcome"><span class="pg-node-icon">${ICON[s.state] || ICON.info}</span><span class="pg-node-word">${escapeHtml(word)}</span></span>
+            <span class="pg-node-summary">${escapeHtml(s.summary)}</span>
+        </button>
+        ${k < n - 1 ? '<span class="pg-link" aria-hidden="true"></span>' : ''}
+    </li>`;
+}
+
+function selectStage(k, { focus = false } = {}) {
+    selectedStage = k;
+    const s = stages[k];
+    pipelineEl.querySelectorAll('.pg-node').forEach((b, j) => b.setAttribute('aria-pressed', String(j === k)));
+    if (!s) { detailEl.hidden = true; markLines(null); return; }
+    detailEl.hidden = false;
+    detailEl.dataset.state = s.state;
+    detailEl.innerHTML = `<h3 class="pg-detail-title">${ICON[s.state] || ICON.info}<span>${k + 1}. ${escapeHtml(s.title)}</span><span class="pg-detail-word">${escapeHtml(STATE_WORD[s.state])}: ${escapeHtml(s.summary)}</span></h3>
+        ${s.details || ''}
+        ${s.lines?.length ? `<p class="pg-detail-lines">Config: ${s.lines.map(([a, b]) => `<button type="button" class="pg-linkbtn" data-goto="${a}">line${a === b ? '' : 's'} ${a}${a === b ? '' : `–${b}`}</button>`).join(', ')}</p>` : ''}`;
+    markLines(s.lines);
+    if (focus) pipelineEl.querySelectorAll('.pg-node')[k]?.focus();
+}
+
+detailEl.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-goto]');
+    if (b) goToLine(Number(b.dataset.goto));
+});
+
+pipelineEl.addEventListener('click', (e) => {
+    const b = e.target.closest('.pg-node');
+    if (b) selectStage(Number(b.dataset.stage));
+});
+pipelineEl.addEventListener('focusin', (e) => {
+    const b = e.target.closest('.pg-node');
+    if (b && Number(b.dataset.stage) !== selectedStage) selectStage(Number(b.dataset.stage));
+});
+pipelineEl.addEventListener('keydown', (e) => {
+    const b = e.target.closest('.pg-node');
+    if (!b) return;
+    const k = Number(b.dataset.stage);
+    const d = ['ArrowRight', 'ArrowDown'].includes(e.key) ? 1 : ['ArrowLeft', 'ArrowUp'].includes(e.key) ? -1 : 0;
+    if (d && stages[k + d]) { e.preventDefault(); selectStage(k + d, { focus: true }); }
+});
+
+function renderPipeline(list) {
+    stages = list;
+    const token = ++runToken;
+    pipelineEl.innerHTML = list.map((s, k) => stageHtml(s, k, list.length)).join('');
+    pipelineEl.dataset.count = list.length;
+    const items = [...pipelineEl.children];
+    const last = list.length - 1;
+    const stopAt = list.findIndex((s) => s.state === 'blocked' || s.state === 'redirect' || s.state === 'error');
+    const focusIdx = stopAt >= 0 ? stopAt : last;
+    const finish = () => {
+        if (token !== runToken) return;
+        items.forEach((li) => { li.dataset.state = li.dataset.finalState; });
+        selectStage(focusIdx);
+        const end = list[focusIdx];
+        announce(`${list.length} stages. ${end.title}: ${STATE_WORD[end.state]}, ${end.summary}.`);
+    };
+    if (reduceMotion.matches) { finish(); return; }
+    // The request travels stage by stage; a stage it never reaches stays "not reached".
+    let k = 0;
+    const step = () => {
+        if (token !== runToken) return;
+        if (k >= items.length) { finish(); return; }
+        const li = items[k];
+        li.dataset.state = li.dataset.finalState === 'unreached' ? 'unreached' : 'active';
+        setTimeout(() => {
+            if (token !== runToken) return;
+            li.dataset.state = li.dataset.finalState;
+            k++;
+            step();
+        }, 150);
+    };
+    step();
+}
+
+function renderError(title, message, line, focusEl) {
+    stages = [{ id: 'error', title, state: 'error', summary: message.split('\n')[0],
+        details: `<p>${escapeHtml(message.split('\n')[0])}</p>${line ? `<p><button type="button" class="pg-linkbtn" data-goto="${line}">Go to line ${line}</button></p>` : ''}`,
+        lines: line ? [[line, line]] : null }];
+    runToken++;
+    pipelineEl.innerHTML = stageHtml(stages[0], 0, 1);
+    pipelineEl.firstElementChild.dataset.state = 'error';
+    selectStage(0);
+    announce(`${title}: ${message.split('\n')[0]}`);
+    if (focusEl) focusEl.focus();
+}
+
+function renderWarnings(list) {
+    warningsEl.innerHTML = list.length ? list.map((w) => `<div class="pg-problem" data-severity="warning">${ICON.error}<div class="pg-problem-body">${w.code ? `<span class="pg-problem-kind">${escapeHtml(w.code)}</span>` : ''}<span>${escapeHtml(w.message)}</span></div></div>`).join('') : '';
+}
+
+// =============================================================================
+// Run
+// =============================================================================
+
+async function runSimulation() {
+    if (!wasmReady || runBtn.getAttribute('aria-busy') === 'true') return;
+    validateConfig();
+    if (!lastValidation?.valid) {
+        const first = lastValidation?.errors?.[0]?.message || 'The configuration is not valid.';
+        renderError('Configuration', first, errorLine(first));
+        showView('pipeline');
+        return;
+    }
+    const req = collectRequest();
+    if (req.error) {
+        renderError('Request', req.error, null, req.field);
+        showView('pipeline');
+        return;
+    }
+
+    runBtn.setAttribute('aria-busy', 'true');
+    runBtn.disabled = true;
+    // let the busy state paint before the (synchronous) engine call
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    try {
+        const config = configEditor.value;
+        const request = create_sample_request(req.method, req.host, req.path);
+        request.headers = req.headers;
+        const reqJson = JSON.stringify(request);
+        const sim = simulate(config, reqJson);
+        let agents = null;
+        if ((sim.agent_hooks || []).length) {
+            const ids = [...new Set(sim.agent_hooks.map((h) => h.agent_id))];
+            agents = simulate_with_agents(config, reqJson, JSON.stringify(agentResponses(ids)));
+        }
+        lastRaw = { request, simulate: sim, ...(agents ? { simulate_with_agents: agents } : {}) };
+        rawOut.innerHTML = `<code>${escapeHtml(JSON.stringify(lastRaw, null, 2))}</code>`;
+        renderWarnings([...(sim.warnings || []), ...((agents && agents.warnings) || [])]);
+        renderPipeline(buildStages(req, sim, agents));
+    } catch (e) {
+        console.error('Simulation error:', e);
+        renderError('Engine', e.message || String(e));
+    } finally {
+        runBtn.removeAttribute('aria-busy');
+        runBtn.disabled = false;
+    }
+}
+runBtn.addEventListener('click', runSimulation);
+
+// Pipeline / Raw view toggle
+const viewButtons = [...document.querySelectorAll('[data-view]')];
+function showView(view) {
+    viewButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    $('pg-view-pipeline').hidden = view !== 'pipeline';
+    $('pg-view-raw').hidden = view !== 'raw';
+}
+viewButtons.forEach((b) => b.addEventListener('click', () => showView(b.dataset.view)));
+$('pg-copy-raw').addEventListener('click', (e) => {
+    if (lastRaw) copyWithFeedback(e.currentTarget, JSON.stringify(lastRaw, null, 2));
+});
+
+// =============================================================================
+// Presets, reset, share, copy, fullscreen
+// =============================================================================
+
+let lastPreset = 'basic';
+function loadPreset(key) {
+    const cfg = TEMPLATES[key];
+    if (!cfg) return;
+    lastPreset = key;
+    presetSelect.value = key;
+    presetDesc.textContent = presetSelect.selectedOptions[0]?.dataset.desc || '';
+    configEditor.value = cfg;
+    configEditor.scrollTop = 0;
+    refreshEditor();
+    markLines(null);
+    validateConfig();
+    if (key === 'agents') selectTab($('tab-btn-agents'));
+}
+presetSelect.addEventListener('change', () => {
+    if (presetSelect.value !== 'custom') loadPreset(presetSelect.value);
+});
+$('pg-reset').addEventListener('click', () => {
+    loadPreset(lastPreset);
+    announce('Example restored.');
+});
+
+// Share: the config travels in the URL fragment (never sent to a server).
+const toB64 = (s) => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+const fromB64 = (b) => new TextDecoder().decode(Uint8Array.from(atob(b), (c) => c.charCodeAt(0)));
+$('pg-share').addEventListener('click', (e) => {
+    const url = `${location.origin}${location.pathname}#config=${encodeURIComponent(toB64(configEditor.value))}`;
+    history.replaceState(null, '', url);
+    copyWithFeedback(e.currentTarget, url, 'Link copied');
+});
+
+function loadConfigFromHash() {
+    if (!location.hash.startsWith('#config=')) return false;
+    try {
+        configEditor.value = fromB64(decodeURIComponent(location.hash.slice(8)));
+        presetSelect.value = 'custom';
+        presetDesc.textContent = 'Opened from a shared link.';
+        return true;
+    } catch (e) {
+        console.error('Failed to read the config from the URL:', e);
+        return false;
+    }
+}
+
+$('copy-config-btn').addEventListener('click', (e) => copyWithFeedback(e.currentTarget, configEditor.value, 'Copied'));
+
+const fsBtn = $('fullscreen-config-btn');
+function setFullscreen(on) {
+    configPanel.classList.toggle('is-fullscreen', on);
+    fsBtn.setAttribute('aria-pressed', String(on));
+    fsBtn.setAttribute('aria-label', on ? 'Exit expanded editor' : 'Expand editor');
+    document.body.style.overflow = on ? 'hidden' : '';
+    syncScroll();
+}
+fsBtn.addEventListener('click', () => setFullscreen(!configPanel.classList.contains('is-fullscreen')));
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && configPanel.classList.contains('is-fullscreen') && document.activeElement !== configEditor) {
+        setFullscreen(false);
+        fsBtn.focus();
+    }
+});
+
+// "Run locally" disclosure on the version badge
+const versionBtn = $('version-badge-btn');
+const versionMenu = $('version-dropdown');
+if (versionBtn && versionMenu) {
+    versionBtn.setAttribute('aria-expanded', 'false');
+    versionBtn.setAttribute('aria-controls', 'version-dropdown');
+    const set = (on) => {
+        versionBtn.classList.toggle('active', on);
+        versionMenu.classList.toggle('active', on);
+        versionBtn.setAttribute('aria-expanded', String(on));
+    };
+    versionBtn.addEventListener('click', (e) => { e.stopPropagation(); set(!versionMenu.classList.contains('active')); });
+    document.addEventListener('click', (e) => { if (!versionMenu.contains(e.target)) set(false); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && versionMenu.classList.contains('active')) { set(false); versionBtn.focus(); }
+    });
+}
+
+// =============================================================================
+// Start
+// =============================================================================
+
+if (!loadConfigFromHash()) {
+    configEditor.value = TEMPLATES.basic;
+    presetDesc.textContent = presetSelect.selectedOptions[0]?.dataset.desc || '';
+}
+refreshEditor();
+initWasm();
