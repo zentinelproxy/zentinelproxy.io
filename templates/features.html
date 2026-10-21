@@ -154,14 +154,14 @@
                             tls.rs
                         </a>
                     </div>
-                    <p class="feature-description">Enterprise-grade TLS with SNI routing and hot certificate reload. Covers both listener-side (client to proxy) and upstream-side (proxy to backend) TLS.</p>
+                    <p class="feature-description">TLS 1.2 and 1.3 with SNI routing and hot certificate reload. Covers both listener-side (client to proxy) and upstream-side (proxy to backend) TLS.</p>
                     <ul class="feature-list">
                         <li>SNI (Server Name Indication) based certificate selection</li>
                         <li>Wildcard certificate matching</li>
                         <li>mTLS client certificate verification (inbound)</li>
                         <li><strong>Upstream TLS</strong> - Secure connections to HTTPS backends</li>
                         <li>Certificate hot-reload (SIGHUP trigger)</li>
-                        <li>OCSP stapling support</li>
+                        <li>OCSP stapling: <code>ocsp-stapling</code> is accepted, but no OCSP response is stapled yet</li>
                     </ul>
                     <div class="feature-code-ref">
                         <strong>Structs:</strong> <code>SniResolver</code>, <code>HotReloadableSniResolver</code>, <code>OcspStapler</code>

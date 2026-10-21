@@ -32,7 +32,7 @@ Facts about other projects are kept to their well-known, documented behaviour as
 
 | | Extension model | WAF |
 |---|---|---|
-| **Zentinel** | External agents (separate processes over Unix sockets or gRPC); WASM agents in-process via Wasmtime | As agents: native Rust WAF, pure-Rust ModSecurity/CRS engine, or libmodsecurity |
+| **Zentinel** | External agents (separate processes over Unix sockets or gRPC); WebAssembly modules through the WASM agent | As agents: native Rust WAF, pure-Rust ModSecurity/CRS engine, or libmodsecurity |
 | **nginx** | C modules, njs; Lua via OpenResty | Third-party ModSecurity connector; commercial F5 products |
 | **HAProxy** | Lua; SPOE (external agents) | Commercial (HAProxy Enterprise), or via SPOE |
 | **Envoy** | C++ filters, Lua, Wasm (proxy-wasm); `ext_authz`/`ext_proc` external services | Via Wasm or external filters (e.g. Coraza) |

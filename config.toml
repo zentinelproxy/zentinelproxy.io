@@ -51,10 +51,14 @@ author = "raskell.io"
 github_repo = "https://github.com/zentinelproxy/zentinel"
 docs_url = "https://docs.zentinelproxy.io/"
 docs_external_url = "https://docs.zentinelproxy.io/"
-software_version = "26.10_3"
+# The current zentinel release (GitHub release tag, CalVer YY.MM_PATCH). It feeds
+# the JSON-LD softwareVersion and the docker tags on /customize/. CI
+# (.github/workflows/content-checks.yml, `mise run check-version`) fails when it
+# is behind the latest release on github.com/zentinelproxy/zentinel.
+software_version = "26.10_7"
 
 # SEO metadata
-keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, edge computing, sleepable ops, agents"
+keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, WAF, KDL, agents"
 # twitter_handle = "@raskell_io"  # Uncomment when Twitter handle is available
 
 # Social links

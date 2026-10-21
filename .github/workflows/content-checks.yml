@@ -1,0 +1,50 @@
+# Checks that the site's generated and release-tied content is current.
+#
+# - software_version in config.toml must be the latest zentinel GitHub release.
+#   It feeds the JSON-LD softwareVersion and the docker tags on /customize/, and
+#   once sat four releases behind with nothing noticing. Releases do not touch
+#   this repository, so the check also runs on a schedule: a red scheduled run
+#   means "bump software_version", not that anything is broken.
+# - static/llms.txt and static/llms-full.txt are generated from content by
+#   scripts/llms.py and committed (Cloudflare Pages runs its own build command).
+#   This fails when they no longer match the content; run `mise run llms`.
+#
+# Neither check needs zola, so both run without mise.
+name: Content checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Not on pull requests: a release would turn every open PR red until the
+  # bump, whatever the PR changes. The run on main and the daily run say when
+  # the bump is due.
+  release-version:
+    name: software_version is the latest release
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare software_version with the latest zentinel release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/check_version.py
+
+  llms-txt:
+    name: llms.txt matches the content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate llms.txt and llms-full.txt and compare
+        run: python3 scripts/llms.py --check
