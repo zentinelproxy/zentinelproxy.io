@@ -348,73 +348,88 @@
                         <a href="{{ get_url(path='/') }}" class="brand brand--footer" aria-label="Zentinel home">
                             <picture>
                                 <source type="image/avif" srcset="{{ get_url(path='img/zentinel-mark-disc-64.avif') | safe }} 1x, {{ get_url(path='img/zentinel-mark-disc-128.avif') | safe }} 2x">
-                                <img src="{{ get_url(path='img/zentinel-mark-disc-128.png') | safe }}" alt="" class="brand__mark" width="40" height="40" loading="lazy">
+                                <img src="{{ get_url(path='img/zentinel-mark-disc-128.png') | safe }}" alt="" class="brand__mark" width="44" height="44" loading="lazy">
                             </picture>
                             <svg class="brand__wordmark" viewBox="0 0 499.3 84.1" aria-hidden="true" focusable="false"><use href="#zentinel-wordmark"/></svg>
                         </a>
-                        <p class="footer-title">Security-first reverse proxy<br>built to guard the free web</p>
-                        <p class="footer-description">Explicit configuration, bounded resources and isolated security agents, built on Cloudflare's Pingora.</p>
-                    </div>
-                    <nav class="footer-links" role="navigation" aria-label="Footer navigation">
-                        <div class="footer-col">
-                            <h2 class="footer-heading">Explore</h2>
-                            <a href="/features/">Features</a>
-                            <a href="/playground/">Playground</a>
-                            <a href="/converter/">Converter</a>
-                            <a href="/benchmarks/">Benchmarks</a>
-                            <a href="https://registry.zentinelproxy.io/" target="_blank" rel="noopener">Agent Registry</a>
-                        </div>
-                        <div class="footer-col">
-                            <h2 class="footer-heading">Learn</h2>
-                            <a href="/customize/">Install</a>
-                            <a href="https://docs.zentinelproxy.io/">Documentation</a>
-                            <a href="https://docs.zentinelproxy.io/getting-started/">Getting Started</a>
-                            <a href="https://docs.zentinelproxy.io/configuration/">Configuration</a>
-                            <a href="https://docs.zentinelproxy.io/examples/">Examples</a>
-                            <a href="https://docs.zentinelproxy.io/reference/">Reference</a>
-                        </div>
-                        <div class="footer-col">
-                            <h2 class="footer-heading">About</h2>
-                            <a href="/manifesto/">Manifesto</a>
-                            <a href="/supply-chain/">Supply Chain</a>
-                            <a href="/support/">Support</a>
-                            <a href="/blog/">Blog</a>
-                            <a href="https://docs.zentinelproxy.io/appendix/changelog/">Changelog</a>
-                            <a href="https://docs.zentinelproxy.io/appendix/faq/">FAQ</a>
-                            <a href="{{ config.extra.github }}/blob/main/LICENSE">License</a>
-                        </div>
-                        <div class="footer-col">
-                            <h2 class="footer-heading">Community</h2>
-                            <a href="{{ config.extra.github }}">GitHub</a>
-                            <a href="{{ config.extra.github }}/issues">Issues</a>
-                            <a href="{{ config.extra.github }}/discussions">Discussions</a>
-                            {% if config.extra.discord %}
-                            <a href="{{ config.extra.discord }}" target="_blank" rel="noopener">Discord</a>
-                            {% endif %}
-                            <a href="{{ config.extra.github }}/blob/main/CONTRIBUTING.md">Contributing</a>
-                        </div>
-                    </nav>
-                </div>
-                <div class="footer-bottom">
-                    <p>Zentinel is licensed under <a href="https://github.com/zentinelproxy/zentinel/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>. Website &copy; {{ now() | date(format='%Y') }} <a href="https://raskell.io">raskell.io</a>.</p>
-                    <fieldset class="theme-switch">
+                        <p class="footer-title">A security-first reverse proxy, built to guard the free web.</p>
+                        <p class="footer-description">Explicit configuration, bounded resources and isolated security agents, on Cloudflare's Pingora. Open source under Apache 2.0.</p>
+                        <div class="footer-theme">
+                            <span class="footer-theme__label" aria-hidden="true">Theme</span>
+                            <fieldset class="theme-switch z-segmented">
                         <legend class="sr-only">Colour theme</legend>
-                        <label class="theme-switch__option" title="Follow the system setting">
+                        <label title="Follow the system setting">
                             <input type="radio" name="theme" value="system" checked>
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
                             <span>System</span>
                         </label>
-                        <label class="theme-switch__option">
+                        <label>
                             <input type="radio" name="theme" value="light">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
                             <span>Light</span>
                         </label>
-                        <label class="theme-switch__option">
+                        <label>
                             <input type="radio" name="theme" value="dark">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                             <span>Dark</span>
                         </label>
                     </fieldset>
+                        </div>
+                    </div>
+                    <nav class="footer-links" aria-label="Footer">
+                        <div class="footer-col">
+                            <h2 class="footer-heading">Product</h2>
+                            <ul>
+                                <li><a href="/features/">Features</a></li>
+                                <li><a href="/playground/">Playground</a></li>
+                                <li><a href="/converter/">Config Converter</a></li>
+                                <li><a href="/benchmarks/">Benchmarks</a></li>
+                                <li><a href="/compare/">Compare</a></li>
+                                <li><a href="/control-plane/">Control Plane</a></li>
+                                <li><a href="https://registry.zentinelproxy.io/" target="_blank" rel="noopener">Agent Registry<span class="sr-only"> (opens in a new tab)</span></a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-col">
+                            <h2 class="footer-heading">Learn</h2>
+                            <ul>
+                                <li><a href="/customize/">Install &amp; Configure</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/">Documentation</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/getting-started/">Getting Started</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/configuration/">Configuration</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/examples/">Examples</a></li>
+                                <li><a href="/blog/">Blog</a></li>
+                                <li><a href="/manifesto/">Manifesto</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-col">
+                            <h2 class="footer-heading">Community</h2>
+                            <ul>
+                                <li><a href="{{ config.extra.github }}">GitHub</a></li>
+                                <li><a href="{{ config.extra.github }}/discussions">Discussions</a></li>
+                                <li><a href="{{ config.extra.github }}/issues">Issues</a></li>
+                                <li><a href="/contributing/">Contributing</a></li>
+                                {% if config.extra.discord %}
+                                <li><a href="{{ config.extra.discord }}" target="_blank" rel="noopener">Discord<span class="sr-only"> (opens in a new tab)</span></a></li>
+                                {% endif %}
+                                <li><a href="/support/">Support</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-col">
+                            <h2 class="footer-heading">Trust</h2>
+                            <ul>
+                                <li><a href="/security/">Security</a></li>
+                                <li><a href="/supply-chain/">Supply Chain</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/appendix/changelog/">Changelog</a></li>
+                                <li><a href="https://docs.zentinelproxy.io/appendix/faq/">FAQ</a></li>
+                                <li><a href="{{ config.extra.github }}/blob/main/LICENSE">Licence</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="footer-bottom">
+                    <p class="footer-legal">Zentinel is licensed under <a href="{{ config.extra.github }}/blob/main/LICENSE">Apache 2.0</a>.</p>
+                    <p class="footer-version"><a href="{{ config.extra.github }}/releases/tag/{{ config.extra.software_version }}">Zentinel {{ config.extra.software_version }}</a></p>
+                    <p class="footer-family">Website &copy; {{ now() | date(format='%Y') }}, part of <a href="https://raskell.io">raskell.io</a></p>
                 </div>
             </div>
             <a href="https://learn-you-the-web.raskell.io/" target="_blank" rel="noopener" class="page-peel" aria-label="Learn You The Web - An e-book about how the web works">

@@ -1527,21 +1527,25 @@ img {
 // ============================================
 .footer {
     position: relative;
-    padding: var(--z-space-16) 0 var(--z-space-8);
+    padding: var(--z-space-20) 0 var(--z-space-10);
     background: var(--z-surface);
     border-top: 1px solid var(--z-border);
     overflow: hidden;
+
+    @media (max-width: 640px) {
+        padding-top: var(--z-space-12);
+    }
 }
 
 .footer-top {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--z-space-16);
-    margin-bottom: var(--z-space-12);
+    grid-template-columns: minmax(17rem, 1.15fr) minmax(0, 2.6fr);
+    gap: var(--z-space-12) var(--z-space-16);
+    margin-bottom: var(--z-space-16);
 
-    @media (max-width: 900px) {
-        grid-template-columns: 1fr;
-        gap: var(--z-space-10);
+    @media (max-width: 1040px) {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--z-space-12);
     }
 }
 
@@ -1549,8 +1553,8 @@ img {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--z-space-3);
-    max-width: 360px;
+    gap: var(--z-space-4);
+    max-width: 26rem;
 
     .brand {
         margin-bottom: var(--z-space-2);
@@ -1558,49 +1562,88 @@ img {
 }
 
 .footer-title {
+    margin: 0;
     font-family: var(--z-font-display);
     font-weight: var(--z-weight-display);
-    font-size: var(--z-size-base);
+    font-size: var(--z-size-xl);
     line-height: var(--z-leading-heading);
+    letter-spacing: var(--z-tracking-heading);
     color: var(--z-heading);
+    text-wrap: balance;
 }
 
 .footer-description {
-    font-size: var(--z-size-sm);
+    margin: 0;
+    font-size: var(--z-size-base);
     color: var(--z-muted);
     line-height: var(--z-leading-body);
 }
 
+.footer-theme {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--z-space-3);
+    margin-top: var(--z-space-4);
+}
+
+.footer-theme__label {
+    font-size: var(--z-size-sm);
+    font-weight: var(--z-weight-semibold);
+    color: var(--z-muted);
+}
+
+.theme-switch > label svg {
+    flex-shrink: 0;
+}
+
 .footer-links {
     display: grid;
-    grid-template-columns: repeat(4, minmax(120px, auto));
-    gap: var(--z-space-10);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--z-space-10) var(--z-space-8);
 
-    @media (max-width: 768px) {
+    @media (max-width: 760px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--z-space-8) var(--z-space-6);
+    }
+
+    @media (max-width: 420px) {
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
 .footer-col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--z-space-2);
     min-width: 0;
 
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: var(--z-space-1);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
     a {
-        font-size: var(--z-size-sm);
-        color: var(--z-muted);
+        display: inline-flex;
+        align-items: center;
+        min-height: 2rem;
+        font-size: var(--z-size-base);
+        color: var(--z-text);
 
         &:hover {
             color: var(--z-link);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        @media (pointer: coarse) {
+            min-height: var(--z-control-target-min);
         }
     }
 }
 
 .footer-heading {
-    margin: 0 0 var(--z-space-1);
+    margin: 0 0 var(--z-space-3);
     padding: 0;
     border: 0;
     font-family: var(--z-font-text);
@@ -1608,86 +1651,52 @@ img {
     font-weight: var(--z-weight-bold);
     text-transform: uppercase;
     letter-spacing: var(--z-tracking-caps);
-    color: var(--z-heading);
+    color: var(--z-muted);
 }
 
 .footer-bottom {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap;
-    gap: var(--z-space-4) var(--z-space-8);
+    gap: var(--z-space-3) var(--z-space-8);
     padding-top: var(--z-space-6);
-    border-top: 1px solid var(--z-border);
     // keep clear of the page-peel corner
     padding-right: 64px;
+    border-top: 1px solid var(--z-border);
 
     p {
+        margin: 0;
         font-size: var(--z-size-sm);
         color: var(--z-muted);
+    }
 
-        a {
-            color: var(--z-muted);
-            text-decoration: underline;
-            text-underline-offset: 2px;
+    a {
+        color: var(--z-text);
+        text-decoration: underline;
+        text-decoration-color: var(--z-border-strong);
+        text-underline-offset: 3px;
 
-            &:hover {
-                color: var(--z-link);
-            }
+        &:hover {
+            color: var(--z-link);
+            text-decoration-color: currentColor;
         }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
         flex-direction: column;
         align-items: flex-start;
     }
 }
 
-// System / Light / Dark switch (base.html). A segmented control of radios.
-.theme-switch {
-    display: inline-flex;
-    gap: 2px;
-    margin: 0;
-    padding: 3px;
-    border: 1px solid var(--z-border-strong);
-    border-radius: var(--z-radius-full);
-    background: var(--z-bg);
-    min-inline-size: 0;
+.footer-version a {
+    font-family: var(--z-font-mono);
 }
 
-.theme-switch__option {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--z-space-1);
-    padding: var(--z-space-1) var(--z-space-3);
-    border-radius: var(--z-radius-full);
-    font-size: var(--z-size-xs);
-    font-weight: var(--z-weight-semibold);
-    color: var(--z-muted);
-    cursor: pointer;
-    transition: background-color var(--z-duration-fast) var(--z-ease-standard), color var(--z-duration-fast) var(--z-ease-standard);
+.footer-family {
+    margin-left: auto !important;
 
-    input {
-        position: absolute;
-        inset: 0;
-        margin: 0;
-        opacity: 0;
-        cursor: pointer;
-    }
-
-    &:hover {
-        color: var(--z-heading);
-    }
-
-    &:has(input:checked) {
-        background: var(--z-accent);
-        color: var(--z-on-accent);
-    }
-
-    &:has(input:focus-visible) {
-        outline: 2px solid var(--z-focus);
-        outline-offset: 2px;
+    @media (max-width: 640px) {
+        margin-left: 0 !important;
     }
 }
 
