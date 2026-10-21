@@ -127,15 +127,7 @@
                 "publisher": {
                     "@id": "{{ config.base_url | safe }}/#organization"
                 },
-                "inLanguage": "{{ lang | default(value='en') }}",
-                "potentialAction": {
-                    "@type": "SearchAction",
-                    "target": {
-                        "@type": "EntryPoint",
-                        "urlTemplate": "{{ config.base_url | safe }}/?q={search_term_string}"
-                    },
-                    "query-input": "required name=search_term_string"
-                }
+                "inLanguage": "{{ lang | default(value='en') }}"
             },
             {
                 "@type": "SoftwareApplication",
@@ -180,10 +172,11 @@
                 "url": "{{ config.base_url | safe }}",
                 "logo": {
                     "@type": "ImageObject",
-                    "url": "{{ get_url(path='img/og-image.png') | safe }}",
-                    "width": 1200,
-                    "height": 630
-                }
+                    "url": "{{ get_url(path='icon-192.png') | safe }}",
+                    "width": 192,
+                    "height": 192
+                },
+                "sameAs": ["https://github.com/zentinelproxy"]
             },
             {
                 "@type": "WebPage",
@@ -238,6 +231,8 @@
             }
             {% endif %}
             {% block jsonld_breadcrumb %}{% endblock %}
+            {#- Extra graph nodes from child templates; each starts with a comma. -#}
+            {% block jsonld_nodes %}{% endblock %}
         ]
     }
     </script>

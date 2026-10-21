@@ -3,6 +3,9 @@
 
 # Allow all standard crawlers
 User-agent: *
+# Content signals (https://contentsignals.org): how this content may be used
+# once accessed. Matches the AI crawler allowances below.
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /api/
 Disallow: /_*
