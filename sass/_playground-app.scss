@@ -436,6 +436,10 @@
     justify-self: start;
 }
 
+.pg-count[hidden] {
+    display: none;
+}
+
 .pg-count {
     display: inline-grid;
     place-items: center;
