@@ -210,7 +210,7 @@ sha256sum target/release/zentinel</code></pre>
 
 .supply-chain-subtitle {
     font-size: 1.25rem;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     max-width: 680px;
     margin: 0 auto;
     line-height: 1.6;
@@ -226,11 +226,11 @@ sha256sum target/release/zentinel</code></pre>
     text-align: center;
     font-size: 1.1rem;
     line-height: 1.7;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
 }
 
 .supply-chain-section .intro-content strong {
-    color: var(--color-text-primary);
+    color: var(--z-heading);
 }
 
 .supply-chain-section .section-heading {
@@ -250,15 +250,15 @@ sha256sum target/release/zentinel</code></pre>
 }
 
 .build-feature {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    background: var(--z-surface);
+    border: 1px solid var(--z-border);
     border-radius: 12px;
     padding: 2rem;
     transition: border-color 0.2s;
 }
 
 .build-feature:hover {
-    border-color: var(--color-border-hover, var(--color-border));
+    border-color: var(--z-border-strong);
 }
 
 .build-icon {
@@ -267,10 +267,10 @@ sha256sum target/release/zentinel</code></pre>
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-surface-elevated, var(--color-surface));
+    background: var(--z-surface-raised);
     border-radius: 10px;
     margin-bottom: 1rem;
-    color: var(--color-accent, #60a5fa);
+    color: var(--z-accent-2-text);
 }
 
 .build-feature h3 {
@@ -280,20 +280,20 @@ sha256sum target/release/zentinel</code></pre>
 }
 
 .build-feature p {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     line-height: 1.6;
     margin-bottom: 1rem;
     font-size: 0.95rem;
 }
 
 .build-feature a {
-    color: var(--color-accent, #60a5fa);
+    color: var(--z-accent-2-text);
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 .verify-command {
-    background: var(--color-code-bg, #1a1a2e);
+    background: var(--z-code-bg);
     border-radius: 8px;
     padding: 1rem;
     overflow-x: auto;
@@ -306,10 +306,10 @@ sha256sum target/release/zentinel</code></pre>
 }
 
 .verify-command code {
-    font-family: 'Geist Mono', monospace;
+    font-family: var(--z-font-mono);
     font-size: 0.8rem;
     line-height: 1.5;
-    color: var(--color-code-text, #e0e0e0);
+    color: var(--z-code-fg);
 }
 
 .release-artifacts-table {
@@ -327,21 +327,21 @@ sha256sum target/release/zentinel</code></pre>
 .release-artifacts-table td {
     text-align: left;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--z-border);
 }
 
 .release-artifacts-table th {
     font-weight: 600;
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .release-artifacts-table td code {
-    font-family: 'Geist Mono', monospace;
+    font-family: var(--z-font-mono);
     font-size: 0.85rem;
-    background: var(--color-code-bg, #1a1a2e);
+    background: var(--z-code-bg);
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
 }
@@ -363,7 +363,7 @@ sha256sum target/release/zentinel</code></pre>
 }
 
 .supply-chain-cta .cta-content p {
-    color: var(--color-text-secondary);
+    color: var(--z-muted);
     margin-bottom: 1.5rem;
     line-height: 1.6;
 }

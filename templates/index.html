@@ -784,7 +784,8 @@
     document.head.appendChild(confettiStyle);
 
     function createConfetti(originX, originY) {
-        const colors = ['#cba6f7', '#fab387', '#b4befe', '#f5c2e7', '#94e2d5'];
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const colors = ['var(--z-accent)', 'var(--z-accent-2)', 'var(--z-accent-text)', 'var(--z-accent-2-text)', 'var(--z-link)'];
 
         for (let i = 0; i < 10; i++) {
             const particle = document.createElement('div');
