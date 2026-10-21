@@ -195,6 +195,13 @@ $z-dark-selection-fg: #faf6fa;
 $z-dark-button-edge: #9b4804;
 $z-dark-button-2-edge: #662c5a;
 $z-dark-shadow-rgb: 8 4 8;
+$z-dark-bg-rgb: 22 13 21;
+$z-dark-surface-rgb: 31 22 30;
+$z-dark-surface-raised-rgb: 42 31 40;
+$z-dark-text-rgb: 243 237 242;
+$z-dark-accent-rgb: 246 141 49;
+$z-dark-accent-2-rgb: 155 77 138;
+$z-dark-gradient-brand-text: unquote("linear-gradient(135deg, #f68d31 0%, #e9a9d9 100%)");
 
 $z-theme-dark: (
   "bg": #160d15,
@@ -228,6 +235,13 @@ $z-theme-dark: (
   "button-edge": #9b4804,
   "button-2-edge": #662c5a,
   "shadow-rgb": "8 4 8",
+  "bg-rgb": "22 13 21",
+  "surface-rgb": "31 22 30",
+  "surface-raised-rgb": "42 31 40",
+  "text-rgb": "243 237 242",
+  "accent-rgb": "246 141 49",
+  "accent-2-rgb": "155 77 138",
+  "gradient-brand-text": "linear-gradient(135deg, #f68d31 0%, #e9a9d9 100%)",
 );
 
 $z-light-bg: #faf6fa;
@@ -261,6 +275,13 @@ $z-light-selection-fg: #1f161e;
 $z-light-button-edge: #9b4804;
 $z-light-button-2-edge: #662c5a;
 $z-light-shadow-rgb: 54 18 46;
+$z-light-bg-rgb: 250 246 250;
+$z-light-surface-rgb: 255 255 255;
+$z-light-surface-raised-rgb: 243 237 242;
+$z-light-text-rgb: 31 22 30;
+$z-light-accent-rgb: 246 141 49;
+$z-light-accent-2-rgb: 155 77 138;
+$z-light-gradient-brand-text: unquote("linear-gradient(135deg, #9b4804 0%, #9b4d8a 100%)");
 
 $z-theme-light: (
   "bg": #faf6fa,
@@ -294,6 +315,13 @@ $z-theme-light: (
   "button-edge": #9b4804,
   "button-2-edge": #662c5a,
   "shadow-rgb": "54 18 46",
+  "bg-rgb": "250 246 250",
+  "surface-rgb": "255 255 255",
+  "surface-raised-rgb": "243 237 242",
+  "text-rgb": "31 22 30",
+  "accent-rgb": "246 141 49",
+  "accent-2-rgb": "155 77 138",
+  "gradient-brand-text": "linear-gradient(135deg, #9b4804 0%, #9b4d8a 100%)",
 );
 
 // Emit one theme's roles as custom properties: @include z-theme(light);
@@ -508,6 +536,13 @@ $z-theme-light: (
   --z-button-edge: #9b4804;
   --z-button-2-edge: #662c5a;
   --z-shadow-rgb: 8 4 8;
+  --z-bg-rgb: 22 13 21;
+  --z-surface-rgb: 31 22 30;
+  --z-surface-raised-rgb: 42 31 40;
+  --z-text-rgb: 243 237 242;
+  --z-accent-rgb: 246 141 49;
+  --z-accent-2-rgb: 155 77 138;
+  --z-gradient-brand-text: linear-gradient(135deg, #f68d31 0%, #e9a9d9 100%);
   color-scheme: dark;
 }
 
@@ -543,6 +578,13 @@ $z-theme-light: (
   --z-button-edge: #9b4804;
   --z-button-2-edge: #662c5a;
   --z-shadow-rgb: 54 18 46;
+  --z-bg-rgb: 250 246 250;
+  --z-surface-rgb: 255 255 255;
+  --z-surface-raised-rgb: 243 237 242;
+  --z-text-rgb: 31 22 30;
+  --z-accent-rgb: 246 141 49;
+  --z-accent-2-rgb: 155 77 138;
+  --z-gradient-brand-text: linear-gradient(135deg, #9b4804 0%, #9b4d8a 100%);
   color-scheme: light;
 }
 
@@ -579,6 +621,13 @@ $z-theme-light: (
     --z-button-edge: #9b4804;
     --z-button-2-edge: #662c5a;
     --z-shadow-rgb: 54 18 46;
+    --z-bg-rgb: 250 246 250;
+    --z-surface-rgb: 255 255 255;
+    --z-surface-raised-rgb: 243 237 242;
+    --z-text-rgb: 31 22 30;
+    --z-accent-rgb: 246 141 49;
+    --z-accent-2-rgb: 155 77 138;
+    --z-gradient-brand-text: linear-gradient(135deg, #9b4804 0%, #9b4d8a 100%);
     color-scheme: light;
   }
 }
