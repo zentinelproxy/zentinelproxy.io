@@ -1,0 +1,51 @@
+# Design drift: are the vendored design files (tokens, fonts, frame, and the
+# tanuki bridge for the docs) still byte-identical to zentinelproxy/design's
+# dist/ on main?
+#
+# Checks this repo out under its own name next to a checkout of the design
+# repo and runs the design repo's own check against it:
+#   deno task sync --check --root "$GITHUB_WORKSPACE"
+# Only this consumer is present, so the others are skipped. Both repos are
+# public, so no secret is needed. The design repo runs the same check for
+# all four consumers (.github/workflows/drift.yml there).
+#
+# Fix a failure from the design repo, never by editing the vendored files
+# here: `deno task build && deno task sync` there, then commit the copies in
+# this repo (design README, "Drift"). A PR here that vendors a design change
+# not yet merged on design's main fails until that change is merged.
+name: Design drift
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "41 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    name: Vendored design files match zentinelproxy/design
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: zentinelproxy/design
+          ref: main
+          path: design
+
+      - uses: jdx/mise-action@v2
+        with:
+          working_directory: design
+
+      - name: Compare with design/dist
+        working-directory: design
+        run: deno task sync --check --root "$GITHUB_WORKSPACE"
