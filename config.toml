@@ -92,6 +92,10 @@ url = "/control-plane/"
 name = "Agent Registry"
 url = "https://registry.zentinelproxy.io/"
 external = true
+[[extra.nav_links.children]]
+name = "API Reference"
+url = "https://api.zentinelproxy.io/reference/"
+external = true
 
 [[extra.nav_links]]
 name = "Learn"
