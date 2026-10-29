@@ -14,7 +14,7 @@ Zentinel is a security-first reverse proxy built to guard the free web. It is wr
 - **Observability:** Prometheus metrics and structured access, error and audit logs. OpenTelemetry tracing and Redis or memcached-backed distributed rate limiting are build features (`opentelemetry`, `distributed-rate-limit`), not in the default build.
 - **Licence:** Apache 2.0.
 
-Current release: 26.10_8 (GitHub release tag; the crate on crates.io is `zentinel-proxy`).
+Current release: 26.10_9 (GitHub release tag; the crate on crates.io is `zentinel-proxy`).
 
 ## Site
 
