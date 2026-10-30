@@ -55,7 +55,7 @@ docs_external_url = "https://docs.zentinelproxy.io/"
 # the JSON-LD softwareVersion and the docker tags on /customize/. CI
 # (.github/workflows/content-checks.yml, `mise run check-version`) fails when it
 # is behind the latest release on github.com/zentinelproxy/zentinel.
-software_version = "26.10_9"
+software_version = "26.10_10"
 
 # SEO metadata
 keywords = "reverse proxy, security, Pingora, Cloudflare, Rust, WAF, KDL, agents"
