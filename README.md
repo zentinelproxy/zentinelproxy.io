@@ -33,7 +33,7 @@ sites with their own repositories (see [Related](#related)).
 ## Quick start
 
 ```bash
-mise install        # zola 0.19, pinned in mise.toml
+mise install        # zola 0.22.1, pinned in mise.toml
 mise run serve      # zola serve --drafts, on http://127.0.0.1:1111
 ```
 
@@ -49,14 +49,13 @@ mise run serve      # zola serve --drafts, on http://127.0.0.1:1111
 | `mise run clean` | remove `public/` |
 | `python3 scripts/check_links.py content` | check internal links; `zola check` does not see absolute-path links, and `/docs/...` links fail because the docs are served at the root of docs.zentinelproxy.io |
 
-**Zola version.** `mise.toml` pins zola 0.19, and production builds with 0.19
-too, but `config.toml` uses zola 0.22's highlighting block
-(`[markdown.highlighting] style = "class"`), which 0.19 ignores: code blocks on
-the live site are not highlighted. `sass/_syntax.scss` already styles the 0.22
-output. Moving both mise and the Cloudflare Pages `ZOLA_VERSION` to 0.22 is
-tracked in [#51](https://github.com/zentinelproxy/zentinelproxy.io/issues/51);
-until then, build with the mise-pinned 0.19 so what you see locally is what
-ships.
+**Zola version.** `mise.toml` pins zola 0.22.1, and the Cloudflare Pages
+build must use the same version (`ZOLA_VERSION=0.22.1` in the project's build
+settings, which live in the Cloudflare dashboard, not in this repository).
+`config.toml` uses 0.22's highlighting block (`[markdown.highlighting]
+style = "class"`) and `sass/_syntax.scss` styles its output; an older zola
+ignores the block and ships unhighlighted code. Zola 0.23 changes the template
+engine (Tera 2) and needs a template port first.
 
 **Design tokens are vendored, not edited.** These files are copied from
 [zentinelproxy/design](https://github.com/zentinelproxy/design) by its

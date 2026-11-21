@@ -2,7 +2,7 @@
 # https://mise.jdx.dev
 
 [tools]
-zola = "0.19"
+zola = "0.22.1"
 
 [tasks.serve]
 description = "Start development server"
